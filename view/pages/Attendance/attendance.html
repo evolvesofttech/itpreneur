@@ -1,0 +1,127 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="attendanceCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Attendance
+              <i class="fa fa-refresh pull-right" ng-click="refreshPage()" style="cursor: pointer;"></i>
+              </h3>
+            </div>
+            <div class="panel-body">
+            
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+
+              <!-- dropdowns -->
+              <div class="form-group required">
+                <!-- Course -->
+                <label class="control-label col-md-1" for="">Course</label>
+                <div class="col-md-3">
+                    <select ng-model="attendanceDropdownData.cCourseId" class="form-control inputEle" ng-options="co.cCourseId as co.coursename for co in Course" ng-change="courseChange(attendanceDropdownData.cCourseId)" ng-required="true">
+                      <option value="">Select Course</option>
+                    </select> 
+                </div>
+                <!-- Course -->
+
+                <!-- Batch -->
+                <label class="control-label col-md-1" for="">Batch</label>
+                  <div class="col-md-3">
+                      <select ng-model="attendanceDropdownData.cBatchId" class="form-control inputEle" ng-options="btch.cBatchId as btch.batchname for btch in Batch" ng-change="batchChange(attendanceDropdownData.cBatchId)" ng-required="true" ng-disabled="batchdisabled">
+                        <option value="">Select Batch</option>
+                      </select> 
+                  </div>
+                  <!-- Batch -->
+
+                  <!-- Tech -->
+                  <label class="control-label col-md-1" for="">Tech/Subject</label>
+                  <div class="col-md-3">
+                      <select ng-model="attendanceDropdownData.cTechnologyMasterId" class="form-control inputEle" ng-options="tech.cTechnologyMasterId as tech.technologyname for tech in TechnologyMaster" ng-change="technologyChange(attendanceDropdownData.cTechnologyMasterId)" ng-required="true" ng-disabled="techdisabled">
+                        <option value="">Select Technology</option>
+                      </select> 
+                  </div>
+                  <!-- Tech -->
+              </div>
+
+              <div class="clearfix"></div>
+              <br>
+
+              <div class="form-group required">
+                  <!-- from date -->
+                  <label class="control-label col-md-1" for="">From Date</label>
+                  <div class="col-md-3">
+                    <datepicker date-format="yyyy-MM-dd" date-min-limit="{{fDate}}" date-max-limit="{{tDate}}" date-disabled-dates="{[{datesDisabled}]}">
+                      <input type="text" name="fromdate" ng-change="dateChange(attendanceDropdownData.fromdate)" ng-model="attendanceDropdownData.fromdate" placeholder="Enter Date" class="form-control" restrict-to="[0-9]" ng-disabled="datedisabled" required />
+                   </datepicker>
+                  </div>
+                  <!-- from date -->
+
+                  <!-- to date -->
+                  <label class="control-label col-md-1" for="">To Date</label>
+                  <div class="col-md-3">
+                    <datepicker date-format="yyyy-MM-dd" date-min-limit="{{limitDate}}" date-max-limit="{{tDate}}">
+                      <input type="text" name="todate" ng-model="attendanceDropdownData.todate" placeholder="Enter Date" class="form-control" restrict-to="[0-9]" ng-disabled="date1disabled" required ng-change="date1Change(attendanceDropdownData.todate)"/>
+                   </datepicker>
+                  </div>
+                  <!-- to date -->
+
+                  <!-- Status -->
+                  <label class="control-label col-md-1" for="">Status</label>
+                  <div class="col-md-3">
+                    <select ng-model="attendanceDropdownData.status" name="attendancestatus" class="form-control inputEle" ng-change="statusChange(attendanceDropdownData.fromdate, attendanceDropdownData.todate, attendanceDropdownData.status)"  ng-disabled="statusdisabled" required>
+                        <option value="Holiday">Holiday</option>
+                        <option value="Weekly Off">Weekly Off</option>
+                        <option value="Working Day">Working Day</option>
+                    </select>
+                  </div>
+                  <!-- Status -->
+              </div>
+              <!-- dropdowns ends -->
+              <div class="clearfix"></div>
+              <hr>
+
+              <!-- attendance display -->
+              <div class="col-md-12 text-center">
+                <div class="table-responsive">
+              	<form name="attendaceForm" ng-submit="saveAttendance(attendance)">
+                  <table class="table table-bordered" ng-hide="hideTable">
+                    <thead>
+                      <th style="width: 40px;">No.</th>
+                      <th style="width: 200px;">Name</th>
+                      <th class="text-center" ng-repeat="da in Schedule" style="width: 120px;">{{da.lecture}}<br>{{da.date}}
+                      </th>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat="employee in Students">
+                          <td>{{$index + 1}}</td>
+                          <td style="text-align: left;">{{employee.firstname}}&nbsp;{{employee.middlename}}&nbsp;{{employee.lastname}}</td>
+                          <td ng-repeat="da in Schedule">
+                            <input type="checkbox" ng-model="attendance.date[employee.eEnquiryFormId + '/' + da.date]" ng-init="attendance.date[ employee.eEnquiryFormId + '/' + da.date] = false " ng-disabled="disableOnHoliday">
+                          </td>
+                      </tr>
+                      </tbody>
+                  </table>
+                  <div class="clearfix"></div>
+                  <hr>
+                  <button type="submit" ng-disabled="disabledButton" class="btn btn-primary">Save</button>
+                </form>
+                </div>
+              </div><!-- col-md-12 text-center -->
+              <!-- attendance display -->
+
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Attendance/attendanceCtrl.js"></script>
+

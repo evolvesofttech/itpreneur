@@ -1,0 +1,252 @@
+<style>
+  .responsive-video {
+    max-width: 100%;  
+    height: auto;  
+    }
+    .video-post {
+      height: 400px;
+      max-height: 400px;
+      min-height: 400px;
+      margin-bottom: 50px;
+    }
+    
+    thumbnail canvas {
+      width: 100%;
+      height: 150px;
+    }
+    thumbnail {
+      cursor: pointer;
+    }
+    .btn-del, .btn-edit, .btn-active {
+      position: absolute;
+      right: 0;
+      top: 0;
+      border-radius: 0;
+     display: none;
+    }
+    
+    .btn-edit {
+      right: 25px;
+    }
+    .thumbnail:hover .btn-del,
+    .thumbnail:hover .btn-edit,
+    .thumbnail:hover .btn-active {
+      display: block;
+    }
+
+
+    .progress1 {
+        display: block;
+        width: 120px !important;
+        height: 120px |!important;
+        /*border: 3px groove #CCC;*/
+        border-radius:120px !important;
+        /*background: #eee;*/
+        margin: 0 auto;
+        position: relative;
+    }
+
+    .progress1 div {
+        /*font-size: smaller;
+        background: orange;
+        width: 0;*/
+            font-size: 30px;
+    /* background: orange; */
+    /*width: 0;*/
+    text-align: center;
+    line-height: 120px;
+    margin: 0 auto;
+    color: green;
+    }
+
+    .progress1 div p {
+        font-size: 30px;
+        text-align: center;
+        margin:0;
+        font-weight: bold;
+    }
+</style>
+<!--================================
+=            Controller            =
+=================================-->
+
+      <div class="row no-margin" ng-controller="VideoTabCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            
+            <div class="panel-body">
+              
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+              <div class="button-group">
+                <a data-toggle="modal" data-target=".addvideo" ng-click="addVideoClick()" class="btn btn-default btn-labeled btn-sm">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp;Add Video
+                </a>
+              </div>
+              
+              <div class="row">
+				<div ng-repeat="vivi in Videos">
+                    <div class="col-md-4">
+                      <div class="thumbnail">
+                      <thumbnail file-type="video" source="{{vivi.path}}" max-height="150" ng-click="viewVideoModal(vivi)" data-toggle="modal" data-target=".viewModal" style="height: 150px;">
+                        
+                      </thumbnail>
+
+
+                      <button class="btn btn-danger btn-xs btn-del" ng-click="delVideo(vivi.conVideoId, Videos)" data-toggle="modal" data-target=".deleteVideo" tooltip-placement="top" uib-tooltip="Delete Video">
+                      <i class="fa fa-trash"></i>
+                      </button>
+
+                      
+
+                      <button ng-click="editVideo(vivi.conVideoId, Videos)" class="btn btn-success btn-xs btn-edit" data-toggle="modal" data-target=".addvideo" tooltip-placement="top" uib-tooltip="Edit Video">
+                      <i class="fa fa-edit"></i>
+                      </button>
+
+                        <div class="video-info">
+                           <h5>{{vivi.name | limitTo:30}}</h5>
+                           <div class="divider"></div>
+                           <div class="description">
+                              <p>{{vivi.description | limitTo:20}}</p>
+                           </div>
+                        </div> <!-- Video info ends -->
+                      </div> <!-- class thumbnail ends -->
+                    </div> <!-- col-md-3 ends -->
+                  </div> <!-- repeat ends -->
+
+                </div> <!-- row ends -->
+	            <!-- table ends -->
+	        
+        		<hr>
+		          <!--=====================================
+		        =            Add Video Modal            =
+		        ======================================-->
+		        <div class="modal fade addvideo" my-modal tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+		            <div class="modal-dialog" role="document">
+		                <div class="modal-content">
+		                    <div class="modal-header">
+		                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+		                        <h4 class="modal-title" ng-model="videoHeading">{{ videoHeading }}</h4> </div>
+		                    <div class="modal-body">
+		                        <form class="form-horizontal" name="vdoform" ng-submit="saveVideoText(videoData, picFile)" novalidate>
+		                            <div class="form-group form-group required">
+		                                <label class="control-label col-md-3" for="">Video Title</label>
+		                                <div class="col-md-9">
+		                                    <input type="text" name="title" class="form-control inputEle" ng-model="videoData.name" placeholder="Enter Video Title" ng-required="true">
+		                                    <div class="clearfix"></div>
+		                                    <p class="error" ng-show="vdoform.title.$invalid && vdoform.title.$touched">Please Enter Title</p>
+		                                </div>
+		                            </div>
+		                            <div class="form-group">
+		                                <label class="control-label col-md-3" for="">Description</label>
+		                                <div class="col-md-9">
+		                                    <textarea class="form-control" rows="5" id="comment" ng-model="videoData.description" placeholder="Enter Description About Video"></textarea>
+		                                </div>
+		                            </div>
+		                            
+		                            <div class="form-group required">
+		                                <label for="" class="control-label col-md-3">Upload Video</label>
+		                                <div class="col-md-9">
+		                                    <input type="file" name="upldvdo" class="form-control" ng-model="picFile" file-model="myFileVideo" accept="video/*" ngf-select ngf-accept="'video/*'" ng-selected="fileSelected(myFileVideo)"/>
+		                                    <!-- myFile -->
+		                                    <!-- <div class="clearfix"></div>
+		                                    <p class="error" ng-show="vdoform.upldvdo.$invalid && vdoform.upldvdo.$touched">Please Select File To Upload Video</p> -->
+		                                </div>
+		                            </div>
+		                            <!-- <div class="form-group">
+		                                <label for="" class="control-label col-md-2">Preview</label>
+		                                <div class="col-md-4">
+		                                    <video controls ngf-src="picFile" controls="false"></video>
+		                                </div>
+		                                <div class="col-md-5">
+		                                   <span class="progress1" ng-show="picFile.progress >= 0">
+		                                    
+		                                    <div>
+		                                        <p ng-bind="picFile.progress + '%'"></p>
+		                                    </div>
+		                                  </span>
+		                                </div>
+		                                
+		                            </div> -->
+		                            <div class="clearfix"></div><hr>
+		                            <div class="form-group">
+		                                <div class="col-md-12 text-center">
+		                                    <button type="submit" ng-disabled="vdoform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save</button>
+		                                    <!-- onclick="$('.modal').modal('hide')" -->
+		                                </div>
+		                            </div>
+		                        </form>
+		                    </div>
+		                </div>
+		            </div>
+		        </div>
+		        <!--====  End of Add Video Modal  ====-->
+		      
+		      <!--========================================
+		      =            Delete Notes Modal            =
+		      =========================================-->
+		      <div class="modal fade deleteVideo" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+		          <div class="modal-dialog" role="document">
+		            <div class="modal-content">
+		              <div class="modal-header">
+		                <button type="button" class="close" data-dismiss="modal">&times;
+		                </button>
+		                <h4 class="modal-title">Delete Video
+		                </h4>
+		              </div>
+		              <div class="modal-body">
+		                <h4>Are you sure you want to Note <strong>{{deletevideoData.name}}?</strong>
+		                </h4>
+		                <br>
+		                <a class="btn btn-danger btn-sm" ng-click="deleteVideo(deletevideoData.conVideoId)" onclick="$('.modal').modal('hide')">
+		                  <i class="fa fa-trash">
+		                  </i>&nbsp;&nbsp;Delete
+		                </a>
+		                <a class="btn btn-default btn-sm" data-dismiss="modal">
+		                  <i class="fa fa-trash">
+		                  </i>&nbsp;&nbsp;Cancel
+		                </a>
+		              </div>
+		            </div>
+		          </div>
+		      </div>
+		      <!--====  End of Delete Notes Modal  ====-->
+
+	      	<!--=========================================
+		    =            View Video On Modal            =
+		    ==========================================-->
+		    
+		    <div class="modal fade viewModal" pause-on-close tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+		      <div class="modal-dialog modal-lg" role="document">
+		        <div class="modal-content">
+		          <div class="modal-header">
+		            <button type="button" class="close" data-dismiss="modal">&times;
+		            </button>
+		            <h4 class="modal-title">{{videoModalData.name}}</h4>
+		          </div>
+		          <div class="modal-body">
+		             <video ng-src="{{videoModalData.path | trusted}}" controls="true"></video>
+		             <div class="well">
+		                Description:&nbsp;&nbsp;
+		               <span ng-if="videoModalData.description != 'undefined'">{{videoModalData.description}}</span>
+		               <span ng-if="videoModalData.description == 'undefined'"><i>Description not available</i></span>
+		             </div>
+		          </div>
+		        </div>
+		      </div>
+		    </div>
+		    
+		    <!--====  End of View Video On Modal  ====-->
+             
+            
+    	</div>
+    </div>
+   </div>
+ </div>
+  
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Masters/Topic/Video/VideoTabCtrl.js"></script>
+

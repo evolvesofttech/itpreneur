@@ -1,0 +1,499 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="PaymentinwardCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Payment Inward
+              <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{data_paymentin.length}}</span></span>
+              </h3>
+            </div>
+            <div class="panel-body">
+
+              <!-- toaster message --> 
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+              
+              <div class="button-group">
+                <a data-toggle="modal" data-target=".addpaymentin" class="btn btn-default btn-labeled btn-sm" ng-click="AddHideActivityStatus()">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp;Payment
+                </a>
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+                <button ng-click="exportAction('excel','Payment Inward')" class="btn btn-default btn-labeled btn-sm pull-right" ng-disabled="data_paymentin.length > 0 ? false : true">
+                  <i class="fa fa-file-excel-o"></i>&nbsp;&nbsp;Export to Excel</button>
+              </div>
+
+              <div class="table-responsive">
+              <table ng-table="usersTable_paymentin" show-filter="true" class="table table-bordered table-striped text-center export-table">
+                <tbody>
+                  <tr ng-repeat="bo in data_paymentin">
+                    <td data-title="'Receipt No.'" filter="{'receiptno': 'text'}" sortable="'receiptno'">{{bo.receiptno}}
+                    </td>
+                    <td data-title="'Student Name'" filter="{'firstname': 'text'}" sortable="'firstname'">{{bo.firstname}}&nbsp;{{bo.middlename}}&nbsp;{{bo.lastname}}
+                    </td>
+                    <td data-title="'Branch'" filter="{'branchname': 'text'}" sortable="'branchname'">{{bo.branchname}}
+                    </td>
+                    <td data-title="'Course'" filter="{'coursename': 'text'}" sortable="'coursename'">{{bo.coursename}}
+                    </td>
+                    <td data-title="'Fee Type'" filter="{'feestype': 'text'}" sortable="'feestype'">{{bo.feestype}}
+                    </td>
+                    <td data-title="'Payment Amount'" filter="{'paymentamount': 'text'}" sortable="'paymentamount'">{{bo.paymentamount}}
+                    </td>
+                     <td data-title="'Due Amount'" filter="{'dueamount': 'text'}" sortable="'dueamount'">{{bo.dueamount}}
+                    </td>
+                     <td data-title="'Payment Mode'" filter="{'modeofpayment': 'text'}" sortable="'modeofpayment'">{{bo.modeofpayment}}
+                    </td>
+                    <td data-title="'Payment Date'" filter="{'paymentdate': 'text'}" sortable="'paymentdate'">{{bo.paymentdate}}
+                    </td>
+                    <td data-title="'Status'" filter="{'status': 'text'}" sortable="'status'"> 
+                     <select class="form-control inputEle" ng-model="model1" ng-change="OnStatusChange(bo.pPaymentinwardId, model1)" ng-init="model1 = bo.status" ng-disabled="bo.status == 'Cleared' || !fullAccess">
+                      <!-- || !disableStatus -->
+                     <!-- ng-disabled="bo.status == 'Cleared' || role != 'Admin' || role != 'ITP Admin' || role != 'Accounts Manager' || role != 'Sales Manager' || role != 'Placement Manager'" -->
+                          <option value="Cleared">Cleared</option>
+                          <option value="Uncleared">Uncleared</option>
+                        </select>
+                      </td>
+                      <td data-title="'Created By'" filter="{'createdbyusername': 'text'}" sortable="'createdbyusername'">{{bo.createdbyusername}}
+                      </td>
+                      <td data-title="'Updated By'" filter="{'updatedusername': 'text'}" sortable="'updatedusername'">{{bo.updatedusername}}
+                      </td>
+                    
+                    <td data-title="'Actions'" class="w150">
+                      <button data-toggle="modal" data-target=".addpaymentin" class="btn btn-success btn-xs" ng-click="editpaymentin(bo.pPaymentinwardId, bo.paymentamount)" tooltip-placement="top" uib-tooltip="Edit" ng-disabled="bo.status=='Cleared'">
+                        <i class="fa fa-pencil-square-o">
+                        </i>
+                      </button> 
+                      <a data-toggle="modal" data-target=".viewpaymentin" class="btn btn-info btn-xs" ng-click="viewpaymentin(bo.pPaymentinwardId, data_paymentin)" tooltip-placement="top" uib-tooltip="View">
+                        <i class="fa fa-eye">
+                        </i>
+                      </a>
+                      <button class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletepaymentin" ng-click="delpaymentin(bo.pPaymentinwardId, data_paymentin)" tooltip-placement="top" uib-tooltip="Delete" ng-disabled="bo.status=='Cleared'">
+                        <i class="fa fa-trash">
+                        </i>
+                      </button>
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              </div>
+              <hr>
+              <!-- start edit modal -->
+              <div class="modal fade addpaymentin" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">Payment Inward
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <form class="form-horizontal" name="addPaymentin" ng-submit="save(paymentinData)" novalidate>
+                        <div class="form-group required">
+                          <label class="control-label col-sm-2" for="">Student</label>
+                              <div class="col-sm-4" ng-hide="hideNameAll">
+                                <input type="hidden" ng-model="Enq">
+                                  <!-- <select ng-model="enquiryactivitiesData.eEnquiryFormId" class="form-control inputEle" ng-options="stu.eEnquiryFormId as (stu.lastname + ' ' + stu.firstname + ' ' + stu.middlename) for stu in Students" ng-required="true" ng-disabled="disableName"> 
+                                  </select> -->
+                                  <ui-select ng-model="selected"  theme="select2" title="Choose Student" on-select="getId(selected)" ng-hide="hideStudentList"  >
+
+                                    <ui-select-match  placeholder="Select a Student in the list or search his name...">{{$select.selected.lastname}}&nbsp;{{$select.selected.firstname}}&nbsp;{{$select.selected.middlename}}</ui-select-match>
+                                    
+                                    <ui-select-choices repeat="person in Students | propsFilter: {firstname: $select.search, lastname: $select.search}" >
+                                      
+                                      <span ng-bind-html="person.lastname | highlight: $select.search"></span>&nbsp;
+                                      <span ng-bind-html="person.firstname | highlight: $select.search"></span>&nbsp;
+                                      <span ng-bind-html="person.middlename | highlight: $select.search"></span>
+
+
+                                      <div class="clearfix"></div>
+
+                                      <small>Branch: {{person.branchname}}</small>
+                                      
+                                    </ui-select-choices>
+                                    
+                                  </ui-select>
+                                  <input type="text"  class="form-control" ng-model="selectedStudentName" disabled ng-show="hideStudentList">
+                                  <!-- <p class="error" ng-show="addPaymentin.student1.$invalid && addPaymentin.student1.$touched">Select student name</p> -->
+                              </div>
+                          <label class="control-label col-md-2" for="">Branch
+                          </label>
+                          <div class="col-md-4">
+                            <input type="hidden" ng-model="bBranchId1" class="form-control inputEle">
+                          <input type="text" name="branch" ng-model="bname" class="form-control inputEle" readonly>
+                          </div>
+                        </div>
+
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Course</label>
+                          <div class="col-md-4">
+                        <input type="hidden" ng-model="cCourseId1" class="form-control inputEle">
+                          <input type="text" name="course" ng-model="cname" class="form-control inputEle" readonly>
+                            
+                          </div>
+                          <label class="control-label col-md-2" for="">Batch</label>
+                          <div class="col-md-4">
+                        <input type="hidden" ng-model="cBatchId1" class="form-control inputEle">
+                          <input type="text" name="batch" ng-model="btchname" class="form-control inputEle" readonly>
+                          </div>
+                        </div>
+
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Course Fee</label>
+                          <div class="col-md-4">
+                          
+                            <input type="text" name="cFee" ng-model="cfee" class="form-control inputEle" readonly>
+                          </div>
+                        </div>
+
+
+                        <div class="form-group">
+
+                        <label class="control-label col-md-2" for="">Manual Receipt No</label>
+                          <div class="col-md-4">
+                              <input type="number" name="manul" class="form-control inputEle" ng-model="paymentinData.manualreceiptno" placeholder="Enter Reciept No">
+                          </div>
+                          <!-- <label class="control-label col-md-2" for="">Reciept No</label>
+                          <div class="col-md-4">
+                              <input type="number" class="form-control inputEle" ng-model="paymentinData.receiptno" placeholder="Enter Amount "> 
+                              
+                          </div> -->
+                          <label class="control-label col-md-2" for="">Document Date</label>
+                          <div class="col-md-4">
+                             <datepicker date-format="yyyy-MM-dd" >
+                              <input name="date" ng-model="paymentinData.documentdate" placeholder="Enter Date" class="form-control" restrict-to="[0-9]" type="text" ng-required="true" />
+                           </datepicker>
+                           <div class="clearfix"></div>
+                           <p class="error" ng-show="addPaymentin.date.$invalid && addPaymentin.date.$touched">Enter Date</p>
+                          </div>
+                        </div>
+                        
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Fees Type</label>
+                          <div class="col-md-4">
+                            <select name="fee" ng-model="paymentinData.eFeescheduleregistrationId"  class="form-control inputEle" ng-options="ft.eFeescheduleregistrationId as ft.feestype for ft in FeeType" ng-change="feeChange(paymentinData.eFeescheduleregistrationId, FeeType)"  ng-required="true" ng-disabled="disableFeesType">
+                              <option value="">Select Fees Type</option>
+                            </select>
+                            <p class="error" ng-show="addPaymentin.fee.$invalid && addPaymentin.fee.$touched">Select Fees Type</p> 
+                          </div>
+
+                          <label class="control-label col-md-2" for="">Pending Amount</label>
+                          <div class="col-md-4">
+                             <input type="number" class="form-control inputEle" ng-model="due" placeholder="Enter Amount " disabled>  
+                          </div>   
+                        </div>
+
+                        <div class="form-group required">
+                            <label class="control-label col-sm-2" for="">Payment Mode</label>
+                            <div class="col-sm-4">
+                              
+                               <label class="radio-inline">
+                               <input type="radio" name="paymentstatus" ng-model="paymentinData.paymentstatus" value="Full Payment" ng-required="true"  ng-click="fullPaymentClick(due)">Full Payment
+                               </label>
+                               <label class="radio-inline">
+                               <input type="radio" name="paymentstatus" ng-model="paymentinData.paymentstatus" value="Partial Payment"  ng-click="partialPaymentClick()" ng-required="true">Partial Payment
+                               </label>
+                               <!-- <p class="error" ng-show="addPaymentin.paymentstatus.$invalid && addPaymentin.paymentstatus.$touched">Select Payment Mode</p> -->
+                            </div>
+
+                            <label class="control-label col-md-2" for="">Amount</label>
+                          <div class="col-md-4">
+                              <input type="number" name="amount1" class="form-control inputEle" ng-model="paymentinData.paymentamount" placeholder="Enter Amount " ng-disabled="fullpay"  ng-required="true" min="1" max="{{due}}">
+                              <div class="clearfix"></div>
+                              <p class="error" ng-show="addPaymentin.amount1.$invalid && addPaymentin.amount1.$touched">Enter Amount</p>
+                              <p class="error" ng-show="addPaymentin.amount1.$error.max">Amount should be less than pending fee</p>
+                              
+                          </div>   
+                        </div>
+
+                        <div class="form-group required">
+                        <label class="control-label col-sm-2" for="">Payment Mode</label>
+                            <div class="col-sm-4">
+                              
+                               <label class="radio-inline">
+                               <input type="radio" name="modeofpayment" ng-model="paymentinData.modeofpayment" value="Cash" ng-required="true" ng-click="cashChecked()">Cash
+                               </label>
+                               <label class="radio-inline">
+                               <input type="radio" name="modeofpayment" ng-model="paymentinData.modeofpayment" value="Cheque" ng-required="true" ng-click="chequeChecked()">Cheque
+                               </label>
+                               <label class="radio-inline">
+                               <input type="radio" name="modeofpayment" ng-model="paymentinData.modeofpayment" value="Card" ng-required="true" ng-click="cardChecked()">Card Payment
+                               </label>
+                               <label class="radio-inline">
+                               <input type="radio" name="modeofpayment" ng-model="paymentinData.modeofpayment" value="E T" ng-required="true" ng-click="ETChecked()">E T
+                               </label>
+                               <!-- <p class="error" ng-show="addPaymentin.modeofpayment.$invalid && addPaymentin.modeofpayment.$touched">Select Payment Mode</p> -->
+                            </div>
+                        </div>
+
+                        <div class="form-group required">   
+                          <div ng-show="paymentinData.modeofpayment=='Card'">
+                            <label class="control-label col-sm-2" for="">Trasaction Id</label>
+                            <div class="col-sm-4">
+                              <input type="text" name="tras1" class="form-control inputEle" ng-model="paymentinData.transactionno" placeholder="Enter Trasaction Id" ng-required="ca" >
+                              <p class="error" ng-show="addPaymentin.tras1.$invalid && addPaymentin.tras1.$touched">Enter Trasaction Id</p>
+                            </div>
+                          </div>
+
+                          <div ng-show="paymentinData.modeofpayment=='E T'">
+                            <label class="control-label col-sm-2" for="">Trasaction Id</label>
+                            <div class="col-sm-4">
+                              <input type="text" name="tras" class="form-control inputEle" ng-model="paymentinData.transactionno" placeholder="Enter Trasaction Id" ng-required="et" >
+                              <p class="error" ng-show="addPaymentin.tras.$invalid && addPaymentin.tras.$touched">Enter Trasaction Id</p>
+                            </div>
+                          </div>
+                          </div>
+
+                          <div class="form-group required" >
+                            <div ng-show="paymentinData.modeofpayment=='Cheque'" >
+                            <label class="control-label col-sm-2" for="">Cheque No</label>
+                            <div class="col-sm-4">
+                               <input type="number" name="cheque" class="form-control inputEle" ng-model="paymentinData.chequeno" placeholder="Enter Cheque No" ng-required="chq" >
+                               <p class="error" ng-show="addPaymentin.cheque.$invalid && addPaymentin.cheque.$touched">Enter Cheque No</p>
+                            </div>
+                            </div>
+                            <div ng-show="paymentinData.modeofpayment=='Cheque'">
+                            <label class="control-label col-sm-2" for="">Cheque Date</label>
+                              <div class="col-sm-4">
+                                 <datepicker date-format="yyyy-MM-dd" >
+                                  <input ng-model="paymentinData.chequedate" placeholder="Enter Date" class="form-control" type="text" restrict-to="[0-9]" ng-required="chq"/>
+                               </datepicker>
+                              </div>
+                            </div>                            
+                          </div>
+                       
+                       
+                        <div class="form-group required" >
+
+                         <div ng-show="paymentinData.modeofpayment=='Cheque'">
+                              <label class="control-label col-sm-2" for="">Bank Name</label>
+                                <div class="col-sm-4">
+                                  <input type="text" name="bank" class="form-control inputEle" ng-model="paymentinData.bankname" placeholder="Enter Bank Name" ng-required="chq" >
+                                  <p class="error" ng-show="addPaymentin.bank.$invalid && addPaymentin.bank.$touched">Enter Bank Name</p>
+                                </div>
+                              </div>
+                            
+                          <label class="control-label col-sm-2" for="">Payment Date</label>
+                          <div class="col-sm-4">
+                             <datepicker date-format="yyyy-MM-dd" date-min-limit="{{currentDate}}"> 
+                              <input name="date1" ng-model="paymentinData.paymentdate"   placeholder="Enter Date" class="form-control" type="text" restrict-to="[0-9]" ng-required="true"/ >
+                           </datepicker>
+                           <div class="clearfix"></div>
+                           <p class="error" ng-show="addPaymentin.date1.$invalid && addPaymentin.date1.$touched">Enter Date</p>
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label class="control-label col-sm-2" for="">Status</label>
+                           <div class="col-sm-4">
+                             <select name="paystatus" ng-required="true" ng-model="paymentinData.status" class="form-control inputEle" ng-init="paymentinData.status = 'Uncleared'" ng-disabled="!fullAccess">
+                              <option value="Cleared">Cleared</option>
+                              <option value="Uncleared">Uncleared</option>
+                            </select>
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="addPaymentin.paystatus.$invalid && addPaymentin.paystatus.$touched">Please Select Status</p>
+                          </div>
+                        </div>
+                        <br>
+                        <div class="form-group">
+                          <div class="col-md-12 text-center">
+                            <button type="submit"  ng-disabled="addPaymentin.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                            </button>
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <!-- <br> -->
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end edit modal  -->
+              <!-- start view modal -->
+              <div class="modal fade viewpaymentin" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">Payment Inward
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="control-label col-md-2" for="">Student Name: </label>
+                            <div class="col-md-4">
+                                  {{viewpaymentinData.firstname}}
+                            </div>
+
+                            <label class="control-label col-md-2" for="">Branch: </label>
+                            <div class="col-md-4">
+                                {{viewpaymentinData.branchname}}
+                            </div>
+                        </div>
+
+                        <div class="clearfix"></div>
+                        <hr>
+ 
+                        <div class="form-group">
+                          <label class="control-label col-md-2" for="">Course: </label>
+                          <div class="col-md-4">
+                            {{viewpaymentinData.coursename}}
+                          </div>
+
+                          <label class="control-label col-md-2" for="">Batch: </label>
+                          <div class="col-md-4">
+                              {{viewpaymentinData.batchname}}
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <hr>
+                        <div class="form-group">
+                            <label class="control-label col-md-2" for="">Payment Date:</label>
+                            <div class="col-md-4">
+                                {{viewpaymentinData.paymentdate}}
+                            </div>
+                            <label class="control-label col-md-2" for="">Document Date:</label>
+                              <div class="col-md-4">
+                                  {{viewpaymentinData.documentdate}}
+                              </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <hr>
+                        <div class="form-group">
+                            <label class="control-label col-md-2" for="">Manual Reciept No:</label>
+                            <div class="col-md-4">
+                                {{viewpaymentinData.manualreceiptno}}
+                            </div>
+                            <label class="control-label col-md-2" for="">Fees Type:</label>
+                              <div class="col-md-4">
+                                  {{viewpaymentinData.feestype}}
+                              </div>
+                        </div>
+                        <div class="clearfix"></div> 
+                        <hr>          
+                        <div class="form-group">
+                            <label class="control-label col-md-2" for="">Pending Fees:</label>
+                            <div class="col-md-4">
+                                {{viewpaymentinData.dueamount}}
+                            </div>
+                            <label class="control-label col-md-2" for="">Amount:</label>
+                              <div class="col-md-4">
+                                  {{viewpaymentinData.paymentamount}}
+                              </div>
+                        </div>
+                        <div class="clearfix"></div> 
+                        <hr>
+                        <div class="form-group">
+                            <label class="control-label col-md-2" for="">Payment Status:</label>
+                            <div class="col-md-4">
+                                {{viewpaymentinData.paymentstatus}}
+                            </div>
+
+                            <label class="control-label col-md-2" for="">Payment Mode:</label>
+                            <div class="col-md-4">
+                                {{viewpaymentinData.modeofpayment}}
+                            </div>
+                        </div> 
+                        <div class="form-group" ng-show="viewCard">
+                        <div class="clearfix"></div>
+                        <hr>
+                        <label class="control-label col-md-2" for="">Trasaction Id:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewpaymentinData.transactionno}}
+                        </label>
+                      </div>
+
+
+                      <div class="form-group" ng-show="ET">
+                        <div class="clearfix"></div>
+                        <hr>
+                        <label class="control-label col-md-2" for="">Trasaction Id:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewpaymentinData.transactionno}}
+                        </label>
+                      </div>
+                      
+                      <div class="clearfix"></div>
+                      <hr>
+
+                      <div ng-show="viewCheque">
+                        <div class="form-group">
+                          <label class="control-label col-md-2" for=""> Cheque No:
+                          </label>
+                          <label class="control-label col-md-4" for="">{{viewpaymentinData.chequeno}}
+                          </label>
+                        
+                          <label class="control-label col-md-2" for=""> Cheque Date:
+                          </label>
+                          <label class="control-label col-md-4" for="">{{viewpaymentinData.chequedate}}
+                          </label>
+                        </div>
+                        <div class="clearfix"></div>
+                        <hr>
+
+                        <div class="form-group">
+                          <label class="control-label col-md-2" for="">Bank Name:
+                          </label>
+                          <label class="control-label col-md-4" for="">{{viewpaymentinData.bankname}}
+                          </label>
+                        </div>
+                      </div> <!--view cheque ends-->
+
+
+                      <div class="clearfix"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end view modal -->
+              <!-- start delete modal -->
+              <div class="modal fade deletepaymentin" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Delete Payment Inward
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Are you sure you want to delete 
+                          <strong>{{deletepaymentinData.feestype}}?
+                          </strong>
+                        </h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="delete(deletepaymentinData.pPaymentinwardId)" onclick="$('.modal').modal('hide')">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Delete
+                        </a>
+                        <a class="btn btn-default btn-sm" data-dismiss="modal">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Cancel
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!-- end delete modal -->
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Payment/PaymentinwardCtrl.js"></script>
+

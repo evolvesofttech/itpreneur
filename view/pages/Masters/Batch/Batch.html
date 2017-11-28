@@ -1,0 +1,223 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="batchCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Batch
+              <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{batch.length}}</span></span>
+              </h3>
+            </div>
+            <div class="panel-body">
+
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+
+              <div class="button-group">
+                <a data-toggle="modal" data-target=".addbatch" ng-click="addbatchclick()" class="btn btn-default btn-labeled btn-sm">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp;Add Batch
+                </a>
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+              </div>
+              <table ng-table="usersTable" show-filter="true" class="table table-bordered table-striped text-center">
+                <tbody>
+                  <tr ng-repeat="bo in data">
+                    <td data-title="'Batch'" filter="{'batchname': 'text'}" sortable="'batchname'">{{bo.batchname}}
+                    </td>
+                     <td data-title="'From Date'" filter="{'fromdate': 'text'}" sortable="'fromdate'">{{bo.fromdate | date}}
+                    </td>
+                    <td data-title="'To Date'" filter="{'todate': 'text'}" sortable="'todate'">{{bo.todate | date}}
+                    </td>
+                    <td data-title="'From Time'" filter="{'fromtime': 'text'}" sortable="'fromtime'">{{bo.fromtime}}
+                    </td>
+                    <td data-title="'To Time'" filter="{'totime': 'text'}" sortable="'totime'">{{bo.totime}}
+                    </td>
+
+                    <td data-title="'Actions'">
+                      <a data-toggle="modal" data-target=".addbatch" class="btn btn-success btn-xs" ng-click="editBatch(bo.cBatchId)" tooltip-placement="top" uib-tooltip="Edit">
+                        <i class="fa fa-pencil-square-o">
+                        </i>
+                      </a> 
+                      <a data-toggle="modal" data-target=".viewbatch" class="btn btn-info btn-xs" ng-click="viewBatch(bo.cBatchId, data)" tooltip-placement="top" uib-tooltip="View">
+                        <i class="fa fa-eye">
+                        </i>
+                      </a>
+                      <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletebatch" ng-click="delBatch(bo.cBatchId, data)" tooltip-placement="top" uib-tooltip="Delete">
+                        <i class="fa fa-trash">
+                        </i>
+                      </a>
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <hr>
+              <!-- start edit modal -->
+              <div class="modal fade addbatch" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title" ng-init="headingMessage ='Add Batch'">{{headingMessage}}</h4>
+                    </div>
+                    <div class="modal-body">
+                      <form class="form-horizontal" name="addBatch" ng-submit="save(batchData)" novalidate>
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Batch
+                          </label>
+                          <div class="col-md-10">
+                            <input type="text" name="batch" class="form-control inputEle" ng-model="batchData.batchname" placeholder="Enter Batch Name" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="addBatch.batch.$invalid && addBatch.batch.$touched">Please Enter Batch Name</p>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="control-label col-md-2" for="">Description
+                          </label>
+                          <div class="col-md-10">
+                            <input type="text" class="form-control inputEle" ng-model="batchData.description" placeholder="Enter Description"> 
+                          </div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="control-label col-sm-2" for="">From</label>
+                            <div class="col-sm-4">
+                               <datepicker date-format="yyyy-MM-dd">
+                                  <input ng-model="batchData.fromdate" placeholder="Enter Date" class="form-control" type="text"/>
+                               </datepicker>
+                            </div>
+
+                            <label class="control-label col-sm-2" for="">To</label>
+                            <div class="col-sm-4">
+                               <datepicker date-format="yyyy-MM-dd">
+                                  <input ng-model="batchData.todate" placeholder="Enter Date" class="form-control" type="text"/>
+                               </datepicker>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Start Time
+                          </label>
+                          <div class="col-md-4">
+                            <!-- <input type="Time" name="st" class="form-control inputEle" ng-model="batchData.fromtime" placeholder="Enter Start Time" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="addBatch.st.$invalid && addBatch.st.$touched">Please Enter Start Time</p> -->
+                            <div class="input-group"
+                               moment-picker="batchData.fromtime"
+                               format="HH:mm">
+                              <span class="input-group-addon">
+                                  <i class="octicon octicon-clock"></i>
+                              </span>
+                              <input class="form-control"
+                                     placeholder="Select a time"
+                                     ng-model="batchData.fromtime"
+                                     ng-model-options="{ updateOn: 'blur' }">
+                            </div>
+                          </div>
+                          <label class="control-label col-md-2" for="">End Time
+                          </label>
+                          <div class="col-md-4">
+                            <!-- <input type="Time" name="et" class="form-control inputEle" ng-model="batchData.totime" placeholder="Enter End Time" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="addBatch.et.$invalid && addBatch.et.$touched">Please Enter End Time</p> -->
+                            <div class="input-group"
+                               moment-picker="batchData.totime"
+                               format="HH:mm">
+                              <span class="input-group-addon">
+                                  <i class="octicon octicon-clock"></i>
+                              </span>
+                              <input class="form-control"
+                                     placeholder="Select a time"
+                                     ng-model="batchData.totime"
+                                     ng-model-options="{ updateOn: 'blur' }">
+                            </div>
+                          </div>
+                        </div>
+                       
+                        <div class="form-group">
+                          <div class="col-md-offset-4 col-md-3">
+                            <button type="submit" ng-disabled="addBatch.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                            </button>
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end edit modal  -->
+              <!-- start view modal -->
+              <div class="modal fade viewbatch" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">Batch
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">Batch Name:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewbatchData.batchname}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                       <br>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end view modal -->
+              <!-- start delete modal -->
+              <div class="modal fade deletebatch" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Delete Batch
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Are you sure you want to delete 
+                          <strong>{{deletebatchData.batchname}}?
+                          </strong>
+                        </h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="delete(deletebatchData.cBatchId)" onclick="$('.modal').modal('hide')">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Delete
+                        </a>
+                        <a class="btn btn-default btn-sm" data-dismiss="modal">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Cancel
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!-- end delete modal -->
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Masters/Batch/BatchCtrl.js"></script>
+

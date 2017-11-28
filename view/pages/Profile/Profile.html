@@ -1,0 +1,314 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+
+
+<div class="page-content" sidebar-directive="state" >
+    <div class="container-fluid">
+        <div class="row no-margin" ng-controller="ProfileCtrl">
+         
+            <div class="col-md-12 no-padding">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Profile</h3>
+                    </div>
+                    <div class="panel-body">
+                        <!-- alert messages -->
+                        <flash-message duration="5000" show-close="true" on-dismiss="myCallback(flash)">
+                        </flash-message>
+                        <!-- alert messages -->
+                        <form class="form-horizontal mb40" name="ProfileDataform" ng-submit="UpdateEnrollment(ProfileData)" novalidate>
+                        <input type="hidden" ng-model="ProfileData.paymentstatus">
+                            <div class="button-group">
+                                
+                                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</a>
+                               <!--  <a href="{{ProfileData.path}}" target="_blank" class="btn btn-default btn-labeled btn-sm">
+                                    <i class="fa fa-download"></i>&nbsp;&nbsp;Resume</a> -->
+                            
+                                <button type="submit" class="btn btn-success btn-labeled btn-sm">
+                                <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Update</button>
+
+                                
+
+                                  <div class="form-group pull-right"> 
+                                
+                                <label style="float: left; line-height: 30px;"> Placement Status</label>
+                                <div class="col-sm-6" >
+                                 <select ng-model="ProfileData.placementstatus" name="plcstat" class="form-control inputEle" disabled>
+                                      <option  value="Open">Open</option>
+                                      <option  value="Placed">Placed</option>
+                                      <option  value="Blacklisted">Blacklisted</option>
+                                    </select>
+                                     <div class="clearfix"></div>
+                                     <p class="error" ng-show="ProfileDataform.plcstat.$invalid && ProfileDataform.plcstat.$touched">Select Status</p>
+                                </div>
+
+                                <div ng-show="ProfileData.placementstatus=='Open'">
+                                <i class="fa fa-circle" style="color: #00e699; font-size: 23px; line-height: 30px; margin-right: 1px; margin-left: -7px;"></i>
+                                </div>
+
+                                <div ng-show="ProfileData.placementstatus=='Placed'">
+                                <i class="fa fa-circle" style="color: #8db0f2; font-size: 23px; line-height: 30px; margin-right: 1px; margin-left: -7px;"></i>
+                                </div>
+
+                                <div ng-show="ProfileData.placementstatus=='Blacklisted'">
+                                <i class="fa fa-circle" style="color: #ff4d4d; font-size: 23px; line-height: 30px; margin-right: 1px; margin-left: -7px;"></i>
+                                </div>
+
+                              </div>
+                            </div>
+                            <hr>
+                        <input type="hidden" ng-model="ProfileData.eEnquiryFormId" name="">
+                            <div class="form-group required">
+                                <label class="control-label col-sm-2" for="">Branch</label>
+                                <div class="col-sm-4">
+                                   <input type="text"  class="form-control inputEle" ng-model="ProfileData.branchname" ng-required="true" disabled>
+                                </div>
+
+                                  <label class="control-label col-sm-2" for="">Date</label>
+                                <div class="col-sm-4">
+                                   <datepicker date-format="yyyy-MM-dd">
+                                      <input type="text" name="dat" ng-model="ProfileData.date" placeholder="Enter Date" class="form-control" restrict-to="[0-9]" disabled/>
+                                   </datepicker>
+                                   <div class="clearfix"></div>
+                                   <p class="error" ng-show="ProfileDataform.dat.$invalid && ProfileDataform.dat.$touched">Please Enter Date</p> 
+                                </div>
+                             </div>
+
+                             <div class="form-group required">
+                               <label class="control-label col-sm-2" for="">Candidate Name</label>
+                                <div class="col-sm-3">
+                                   <input type="text" name="cadina" class="form-control inputEle" ng-model="ProfileData.firstname" placeholder="Enter First Name" disabled >
+                                   <div class="clearfix"></div>
+                                   <p class="error" ng-show="ProfileDataform.cadina.$invalid && ProfileDataform.cadina.$touched">Please Enter FirstName</p>
+                                </div>
+
+                              
+                                <div class="col-sm-3">
+                                   <input type="text" name="midl" class="form-control inputEle" ng-model="ProfileData.middlename" placeholder="Enter Middle Name" disabled >
+                                   <div class="clearfix"></div>
+                                   <p class="error" ng-show="ProfileDataform.midl.$invalid && ProfileDataform.midl.$touched">Please Enter MiddleName</p>
+                                </div>
+
+                                 <!-- <label class="control-label col-sm-2" for="">Candidate Name</label> -->
+                                <div class="col-sm-4">
+                                   <input type="text" name="las" class="form-control inputEle" ng-model="ProfileData.lastname" placeholder="Enter Surname" disabled >
+                                   <div class="clearfix"></div>
+                                   <p class="error" ng-show="ProfileDataform.las.$invalid && ProfileDataform.las.$touched">Please Enter LastName</p>
+                                </div>
+                              </div>
+
+                              <hr>
+                              <div class="form-group">
+                                  <input type="hidden" ng-model="ProfileData.cCourseId">
+                                  <input type="hidden" ng-model="ProfileData.cDiscountId">
+                                  <input type="hidden" ng-model="ProfileData.amount">
+                                  <input type="hidden" ng-model="ProfileData.cBatchId"> 
+                                </div>
+
+                                
+                                <div class="form-group">
+                                  <label class="control-label col-sm-2" for="">Course</label>
+                                  <div class="col-sm-4">
+                                     <input type="text" name="course" class="form-control inputEle" ng-model="ProfileData.coursename" disabled>
+                                  </div>
+                                  <label class="control-label col-sm-2" for="">Batch</label>
+                                  <div class="col-sm-4">
+                                     <input type="text" name="batchname" class="form-control inputEle" ng-model="ProfileData.batchname" disabled>
+                                  </div>
+                                </div>
+                                <div class="form-group">
+                                <label class="control-label col-sm-2" for="">Course Fee</label>
+                                  <div class="col-sm-4">
+                                     <input type="text" name="course" class="form-control inputEle" ng-model="ProfileData.totalfee" disabled>
+                                  </div>
+                                </div>
+                                <hr>
+                               <div class="form-group">
+                                 <label class="control-label col-sm-2" for="">College/Company Name</label>
+                                  <div class="col-sm-4">
+                                     <input type="text" name="compname" class="form-control inputEle" ng-model="ProfileData.collegename" placeholder="Enter College/Company Name">
+                                     <!-- <div class="clearfix"></div>
+                                    <p class="error" ng-show="ProfileDataform.compname.$invalid && ProfileDataform.compname.$touched">Please Enter Company Name</p> -->
+                                  </div>
+
+                                  <!-- <label class="control-label col-sm-2" for="">Status</label>
+                                  <div class="col-sm-4">
+                                      <select ng-model="ProfileData.cStatusId" class="form-control inputEle" name="sta" ng-options="enq.cStatusId as enq.statusname for enq in EnquiryStatus" disabled>
+                                        <option value="">Select Enquiry Status</option>
+                                      </select>
+                                  </div> -->
+                             </div>
+
+                              <input type="hidden" ng-model="ProfileData.cBatchId">
+                               
+                             <div class="form-group required">
+                              <label class="control-label col-sm-2" for="">Address</label>
+                                <div class="col-sm-10">
+                                   <textarea class="form-control inputEle" name="addr" ng-model="ProfileData.presentaddress" placeholder="Enter Permenant Address"  ng-required="true" > </textarea>
+                                   <div class="clearfix"></div>
+                                    <p class="error" ng-show="ProfileDataform.addr.$invalid && ProfileDataform.addr.$touched">Please Enter Address</p>
+                                </div>
+                           </div>
+                           <div class="form-group">
+                              <label class="control-label col-sm-2" for="">Local Area</label>
+                              <div class="col-sm-4">
+                                 <input type="text" name="enquirylocal" class="form-control inputEle" ng-model="ProfileData.localarea" placeholder="Enter Local Area">
+                              </div>
+                              <label class="control-label col-sm-2" for="">Native Place</label>
+                              <div class="col-sm-4">
+                                <input type="text" name="enquirynative" class="form-control inputEle" ng-model="ProfileData.nativeplace" placeholder="Enter Native Place">
+                              </div>
+                           </div>
+                           <div class="form-group required">
+                              <label class="control-label col-sm-2" for="">Gender</label>
+                              <div class="col-sm-4">
+                                 <label class="radio-inline">
+                                 <input type="radio" name="gender" ng-model="ProfileData.gender" value="Male" ng-required="true">Male
+                                 </label>
+                                 <label class="radio-inline">
+                                 <input type="radio" name="gender" ng-model="ProfileData.gender" value="Female" ng-required="true">Female
+                                 </label>
+                                 <label class="radio-inline">
+                                 <input type="radio" name="gender" ng-model="ProfileData.gender" value="Transgender" ng-required="true">Transgender
+                                 </label>
+                              </div>
+                              <label class="control-label col-sm-2" for="">Marital Status</label>
+                              <div class="col-sm-4">
+                                 <label class="radio-inline">
+                                 <input type="radio" name="mt" ng-model="ProfileData.maritalstatus" value="Unmarried" ng-required="true">Unmarried
+                                 </label>
+                                 <label class="radio-inline">
+                                 <input type="radio" name="mt" ng-model="ProfileData.maritalstatus" value="Married" ng-required="true">Married
+                                 </label>
+                                 <label class="radio-inline">
+                                 <input type="radio" name="mt" ng-model="ProfileData.maritalstatus" value="Divorce" ng-required="true">Divorce
+                                 </label>
+                              </div>
+                           </div>
+                           <div class="form-group">
+                              <label class="control-label col-sm-2" for="">Landline</label>
+                              <div class="col-sm-4">
+                                 <input type="text" class="form-control inputEle" ng-model="ProfileData.telresource" restrict-to="[0-9]"> 
+                              </div>
+                              <label class="control-label col-sm-2 mandatory" for="">Contact No.</label>
+                              <div class="col-sm-4">
+                                 <input type="number" name="cont" class="form-control inputEle" ng-model="ProfileData.contactno" placeholder="Enter Contact Number" ng-required="true" maxlength="10" minlength="10" disabled >
+                              </div>
+                           </div>
+
+                           <div class="form-group">
+                              <label class="control-label col-sm-2 mandatory" for="">Email Id</label>
+                                <div class="col-sm-4">
+                                   <input type="email" name="emai" class="form-control inputEle" ng-model="ProfileData.email" placeholder="Enter Email Id" ng-required="true" ng-pattern="/^[a-zA-Z]+[a-zA-Z0-9._]+@[a-zA-Z]+\.[a-zA-Z.]{2,5}$/">
+                                   <div class="clearfix"></div>
+                                 <p class="error" ng-show="ProfileDataform.emai.$invalid && ProfileDataform.emai.$touched">Please Enter Email Id</p>
+                                </div>
+                                <label class="control-label col-sm-2" for="">Alternate Email Id</label>
+                                <div class="col-sm-4">
+                                   <input type="email" name="altemail" class="form-control inputEle" ng-model="ProfileData.alternateemail" placeholder="Enter Email Id"ng-pattern="/^[a-zA-Z]+[a-zA-Z0-9._]+@[a-zA-Z]+\.[a-zA-Z.]{2,5}$/">
+                                </div>
+                             </div>
+                                       
+                           <div class="form-group required">
+                             <label class="control-label col-sm-2" for="">Date Of Birth</label>
+                              <div class="col-sm-4">
+                                 <datepicker date-format="yyyy-MM-dd" date-max-limit= "{{currentDate}}">
+                                    <input ng-model="ProfileData.dob" name="dob" placeholder="Enter Birthdate" class="form-control" type="text" restrict-to="[0-9]" disabled/>
+                                 </datepicker>
+                                 <div class="clearfix"></div>
+                               <p class="error" ng-show="ProfileDataform.dob.$invalid && ProfileDataform.dob.$touched">Please Enter Contact No</p>
+                              </div>
+
+                             <label class="control-label col-sm-2" for="">Candidate Type</label>
+                            <div class="col-sm-4">
+                                <select ng-model="ProfileData.cStatusId" name="candi" class="form-control inputEle" ng-options="enq.cStatusId as enq.statusname for enq in EnquiryStatus" disabled>
+                                  <option value="">Select Status</option>
+                                </select>
+                                <div class="clearfix"></div>
+                               <p class="error" ng-show="ProfileDataform.candi.$invalid && ProfileDataform.candi.$touched">Please Select Candidate Type</p>
+                            </div> 
+                           </div>
+
+                           <div class="form-group">
+                            <label class="control-label col-sm-2 mandatory" for="">Hear About Us</label>
+                             <div class="col-sm-4">
+                                <select ng-model="ProfileData.cSourceId" name="hear" class="form-control inputEle" ng-options="enq.cSourceId as enq.sourcename for enq in Source" disabled ng-change="sourceChange(ProfileData.cSourceId, Source)">
+                                  <option value="">Select Source Name</option>
+                                </select>
+                                <div class="clearfix"></div>
+                                <p class="error" ng-show="ProfileDataform.hear.$invalid && ProfileDataform.hear.$touched">Please Select Hear About Us</p>
+                            </div>
+
+                             <div ng-show="showStudent">
+                                <label class="control-label col-sm-2" for="">Select Student</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" ng-model="ProfileData.reference" disabled>
+                                </div>
+                              </div>
+
+                              <div ng-show="showStaff">
+                                <label class="control-label col-sm-2" for="">Select Staff</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" ng-model="ProfileData.reference" disabled>
+                                </div>
+                              </div>
+                           </div>
+
+                             <div class="form-group">
+                                <label class="control-label col-sm-2" for="">Sub-Status</label>
+                                <div class="col-sm-4" >
+                                    <select ng-model="ProfileData.statusenroll" class="form-control inputEle" ng-change="OnEnrollchange(ProfileData.statusenroll)" disabled>
+                                      <option value="Draft">Draft</option>
+                                       <option value="Completed">Completed</option>
+                                    </select>
+                                </div>
+
+                                <label class="control-label col-sm-2" for="">Highest Qualification</label>
+                                <div class="col-sm-4">
+                                    <select ng-model="ProfileData.cDegreeId" name="high" class="form-control inputEle" ng-options="stf.cDegreeId as stf.degreename for stf in HighestQualification" disabled>
+                                    </select>
+                                </div>
+                                
+                              </div>
+
+                              <div class="form-group">
+                                <label class="control-label col-sm-2 mandatory" for="">Year of Passing</label>
+                                <div class="col-sm-4">
+                                   <input type="number" name="yearofpassing" class="form-control inputEle" ng-model="ProfileData.yearofpassing" placeholder="Enter Year of Passing" ng-required="true">
+                                   <div class="clearfix"></div>
+                                    <p class="error" ng-show="ProfileDataform.yearofpassing.$invalid && ProfileDataform.yearofpassing.$touched">Please Enter Year of Passing</p>
+                                </div>
+                              </div>
+
+                              <div class="clearfix"></div>
+                              <div class="form-group">
+                                <label class="control-label col-sm-2" for="">Assign To</label>
+                                <div class="col-sm-4">
+                                    <select ng-model="ProfileData.assignto" class="form-control inputEle" ng-options="stf.adUserId as (stf.firstname + ' ' + stf.middlename + ' ' + stf.lastname) for stf in Staff" disabled>
+                                    </select>
+                                </div>
+                              </div>
+
+                            <br>
+                            <div class="form-group required">
+                                <div class="col-md-12 text-center">
+                                    <!-- <button type="submit" class="btn btn-success">Update</button> -->
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- end controller div -->
+    </div>
+
+
+</div>
+
+
+<script src="view/pages/Profile/ProfileCtrl.js"></script>

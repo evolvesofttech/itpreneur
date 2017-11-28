@@ -1,0 +1,368 @@
+<!--================================
+=            Controller            =
+=================================-->
+<style type="text/css">
+  .isexe {
+    margin-left: 10px;
+    /* line-height: 24px; */
+    top: 4px;
+    position: relative;
+  }
+  .isexe input{
+    position: relative;
+    top: 3px;
+  }
+</style>
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="createUserCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Users
+              <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{SalesExecutive.length}}</span></span>
+              </h3>
+            </div>
+            <div class="panel-body">
+
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+
+              <div class="button-group">
+                <a data-toggle="modal" data-target=".addsalesexecutive" class="btn btn-default btn-labeled btn-sm" ng-click="addUserClick()">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp;Create Users
+                </a>
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+              </div>
+              <table ng-table="usersTable" show-filter="true" class="table table-bordered table-striped text-center">
+                <tbody>
+                  <tr ng-repeat="bo in data_user">
+                    <td data-title="'Name'" filter="{'firstname': 'text'}" sortable="'firstname'">{{bo.firstname}}&nbsp;&nbsp;{{bo.middlename}}&nbsp;&nbsp;{{bo.lastname}}
+                    </td>
+                     <td data-title="'User Type'" filter="{'usertype': 'text'}" sortable="'usertype'">{{bo.usertype}}</td>
+                     <td data-title="'Executive'" filter="{'issalesexecutive': 'text'}" sortable="'issalesexecutive'">{{bo.issalesexecutive}}</td>
+                    <td data-title="'Email'" filter="{'email': 'text'}" sortable="'email'">{{bo.email}}</td>
+                    <td data-title="'Contact'" filter="{'contactno': 'text'}" sortable="'contactno'">{{bo.contactno}}</td>
+                   
+                    <td data-title="'Designation'" filter="{'designationname': 'text'}" sortable="'designationname'">{{bo.designationname}}</td>
+                    <td data-title="'Username'" filter="{'username': 'text'}" sortable="'username'">{{bo.username}}</td>
+                    
+
+                    <td data-title="'Actions'" class="w150">
+                      <a href="#/EditUser/{{bo.adUserdetailId}}" class="btn btn-success btn-xs" tooltip-placement="top" uib-tooltip="Edit"><i class="fa fa-pencil-square-o"></i>
+                              </a>
+                      <a data-toggle="modal" data-target=".viewsalesexecutive" class="btn btn-info btn-xs" ng-click="viewSalesExecutive(bo.adUserdetailId, data_user)" tooltip-placement="top" uib-tooltip="View">
+                        <i class="fa fa-eye">
+                        </i>
+                      </a>
+                      <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deleteUser" ng-click="delCreateUser(bo.adUserdetailId, data_user)" tooltip-placement="top" uib-tooltip="Delete">
+                        <i class="fa fa-trash">
+                        </i>
+                      </a>
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <hr>
+              <!-- start edit modal -->
+              <div class="modal fade addsalesexecutive" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">Create User
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <form class="form-horizontal" name="adduserform" ng-submit="saveUser(userData1)" novalidate>
+                        <br>
+
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">User Type</label>
+                          <div class="col-md-4">
+                             <label class="radio-inline">
+                             <input type="radio" name="usertype" ng-model="userData1.usertype" value="Staff" ng-required="true" ng-click="staffClick()">Staff
+                             </label>
+                             <label class="radio-inline">
+                             <input type="radio" name="usertype" ng-model="userData1.usertype" value="Trainer" ng-required="true" ng-click="trainerClick()">Trainer
+                             </label> 
+                             <label class="isexe" ng-hide="hideSalesExecutive">Is Sales Executive:
+                                <input type="checkbox" ng-model="userData1.issalesexecutive" ng-true-value="'Yes'" ng-click="checkIsExecutive(userData1.issalesexecutive)">
+                              </label>
+                          </div>
+                        
+                          <label class="control-label col-md-2" for="">Branch</label>
+                          <div class="col-md-4">
+                            <select ng-model="userData1.bBranchId" name="enquirybranch" class="form-control inputEle" ng-options="bran.bBranchId as bran.branchname for bran in Branch"  ng-change="branchChange(userData1.bBranchId, Branch)" ng-required="true">
+                              <option value="">Select Branch</option>
+                            </select> 
+                             <div class="clearfix"></div>
+                            <p class="error" ng-show="adduserform.enquirybranch.$invalid && adduserform.enquirybranch.$touched">Please Select Branch</p>
+                          </div>
+                        </div> <!--institute ends-->
+
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Name
+                          </label>
+                          <div class="col-md-3">
+                            <input type="text" name="fname" class="form-control inputEle" ng-model="userData1.firstname" placeholder="Enter First Name" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="adduserform.fname.$invalid && adduserform.fname.$touched">Please Enter First Name</p>
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text" name="mname" class="form-control inputEle" ng-model="userData1.middlename" placeholder="Enter Middle Name" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="adduserform.mname.$invalid && adduserform.mname.$touched">Please Enter Middle Name</p>
+                          </div>
+                          <div class="col-md-4">
+                            <input type="text" name="lname" class="form-control inputEle" ng-model="userData1.lastname" placeholder="Enter Last Name" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="adduserform.lname.$invalid && adduserform.lname.$touched">Please Enter Last Name</p>
+                          </div>
+                        </div> <!--name ends-->
+
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Gender</label>
+                          <div class="col-md-4">
+                             <label class="radio-inline">
+                             <input type="radio" name="gender" ng-model="userData1.gender" value="Male" ng-required="true">Male
+                             </label>
+                             <label class="radio-inline">
+                             <input type="radio" name="gender" ng-model="userData1.gender" value="Female" ng-required="true">Female
+                             </label>
+                             <label class="radio-inline">
+                             <input type="radio" name="gender" ng-model="userData1.gender" value="Transgender" ng-required="true">Transgender
+                             </label>
+                             <!-- <p class="error" ng-show="adduserform.gender.$invalid && adduserform.gender.$touched">Select Gender</p> -->
+                          </div>
+                          <label class="control-label col-md-2" for="">Marital Status</label>
+                          <div class="col-md-4">
+                             <label class="radio-inline">
+                             <input type="radio" name="mt" ng-model="userData1.maritalstatus" value="Unmarried" ng-required="true">Unmarried
+                             </label>
+                             <label class="radio-inline">
+                             <input type="radio" name="mt" ng-model="userData1.maritalstatus" value="Married" ng-required="true">Married
+                             </label>
+                             <label class="radio-inline">
+                             <input type="radio" name="mt" ng-model="userData1.maritalstatus" value="Divorced" ng-required="true">Divorce
+                             </label>
+                          </div>
+                       </div> <!--gender marital status-->
+
+                       <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Contact No.</label>
+                          <div class="col-md-4">
+                             <input type="number" name="cont" class="form-control inputEle" ng-model="userData1.contactno" placeholder="Enter Contact Number" ng-required="true" maxlength="10" minlength="10" required>
+                             <div class="clearfix"></div>
+                             <p class="error" ng-show="adduserform.cont.$error.required">Please Enter Valid Contact Number</p>
+                             <p class="error" ng-show="adduserform.cont.$error.maxlength">Please Enter 10 digits Number</p>
+                             <p class="error" ng-show="adduserform.cont.$error.minlength">Too Short Number !!!</p>
+                          </div>
+                          <label class="control-label col-md-2" for="">Date Of Birth</label>
+                          <div class="col-md-4">
+                             <datepicker date-format="yyyy-MM-dd" date-max-limit= "{{currentDate}}">
+                              <input ng-model="userData1.dob" name="dob" placeholder="Enter Birthdate" class="form-control" restrict-to="[0-9]" type="text" ng-required="true"/>
+                             </datepicker>
+                             <div class="clearfix"></div>
+                              <p class="error" ng-show="adduserform.dob.$invalid && adduserform.dob.$touched">Please Enter Date</p>
+                          </div>
+                       </div> <!--contact dob ends-->
+
+                       <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Email</label>
+                          <div class="col-md-4">
+                             <input type="email" class="form-control inputEle" name="email" ng-model="userData1.email" placeholder="Enter Email Address" ng-required="true" required>
+                             <div class="clearfix"></div>
+                              <p class="error" ng-show="adduserform.email.$invalid && adduserform.email.$touched">Please Enter Email</p>
+                          </div>
+                          <label class="control-label col-md-2" for="">Designation</label>
+                          <div class="col-md-4">
+                             <select ng-model="userData1.cDesignationId" name="designation" class="form-control inputEle" ng-options="desi.cDesignationId as desi.designationname for desi in Designation" ng-required="true">
+                                <option value="">Select Status</option>
+                              </select>
+                              <div class="clearfix"></div>
+                              <p class="error" ng-show="adduserform.designation.$invalid && adduserform.designation.$touched">Please Enter Designation</p>
+                          </div>
+                       </div> <!--email designation ends-->
+
+                       <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Username</label>
+                          <div class="col-md-4">
+                             <input type="text" class="form-control inputEle" name="username" ng-model="userData1.username" placeholder="Enter Username" ng-required="true" required>
+                             <div class="clearfix"></div>
+                              <p class="error" ng-show="adduserform.username.$invalid && adduserform.username.$touched">Please Enter Username</p>
+                          </div>
+                          <label class="control-label col-md-2" for="">Password</label>
+                          <div class="col-md-4">
+                             <input type="password" class="form-control inputEle" name="password" ng-model="userData1.password" placeholder="Enter Password" ng-required="true" maxlength="20" minlength="8" ng-pattern="/^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$/" required>
+                             <div class="clearfix"></div>
+                              <p class="error" ng-show="adduserform.password.$error.required">Please Enter Password</p>
+                              <p class="error" ng-show="adduserform.password.$error.minlength">
+                               Password should be atleast 8 characters long
+                               and should contain one number,one character and one special
+                               character</p>
+                              <p class="error" ng-show="adduserform.password.$error.maxlength"> Password Too Long !</p>
+                          </div>
+                       </div> <!--email designation ends-->
+
+                       <div class="clearfix"></div>
+                       <br>
+                       
+                        <div class="form-group">
+                          <div class="col-md-12 text-center">
+                            <button type="submit" ng-disabled="adduserform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                            </button>
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end edit modal  -->
+
+              <!-- start view modal -->
+              <div class="modal fade viewsalesexecutive" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">Users
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label class="control-label  col-md-3" for="">User Type:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewuserData.usertype}}
+                        </label>
+                     
+                        <label class="control-label  col-md-3" for="">Branch:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewuserData.branchname}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <hr>
+
+                       <div class="form-group">
+                        <label class="control-label  col-md-3" for="">Name:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewuserData.firstname}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{viewuserData.middlename}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{viewuserData.lastname}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <hr>
+
+                       <div class="form-group">
+                        <label class="control-label  col-md-3" for="">Gender:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewuserData.gender}}
+                        </label>
+                     
+                        <label class="control-label  col-md-3" for="">Marital Status:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewuserData.maritalstatus}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <hr>
+
+                       <div class="form-group">
+                        <label class="control-label  col-md-3" for="">Contact No.:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewuserData.contactno}}
+                        </label>
+                     
+                        <label class="control-label  col-md-3" for="">Date of Birth:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewuserData.dob}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <hr>
+
+                       <div class="form-group">
+                        <label class="control-label  col-md-3" for="">Email:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewuserData.email}}
+                        </label>
+                     
+                        <label class="control-label  col-md-3" for="">Designation:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewuserData.designationname}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <hr>
+
+                       <div class="form-group">
+                        <label class="control-label  col-md-3" for="">Username:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewuserData.username}}
+                        </label>
+                      
+                        <label class="control-label  col-md-3" for="">Password:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewuserData.password}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <br>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end view modal -->
+
+              <!-- start delete modal -->
+              <div class="modal fade deleteUser" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Delete User
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Are you sure you want to delete following user <br>
+                          <strong>{{deleteCreateuserData1.firstname}}&nbsp;&nbsp;{{deleteCreateuserData1.middlename}}&nbsp;&nbsp;{{deleteCreateuserData1.lastname}}&nbsp;&nbsp; having designation &nbsp;&nbsp;{{deleteCreateuserData1.designationname}}?
+                          </strong>
+                        </h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="deleteCreateUser(deleteCreateuserData1.adUserdetailId, deleteCreateuserData1.adUserId)" onclick="$('.modal').modal('hide')">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Delete
+                        </a>
+                        <a class="btn btn-default btn-sm" data-dismiss="modal">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Cancel
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!-- end delete modal -->
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Users/Sales/CreateUserCtrl.js"></script>
+

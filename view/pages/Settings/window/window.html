@@ -1,0 +1,327 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div ng-controller="windowCtrl">
+        <div class="row no-margin">
+          <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+                  <div class="panel-heading">
+                      <h3 class="panel-title">Window</h3>
+                  </div>
+                  <div class="panel-body">
+                      <!-- alert messages -->
+                      <flash-message duration="5000" show-close="true" on-dismiss="myCallback(flash)">
+                      </flash-message>
+                      <!-- alert messages -->
+                      <div class="button-group">
+                          <a data-toggle="modal" data-target=".addWindow" class="btn btn-default btn-labeled btn-sm">
+                            <i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Add Window</a>
+                          <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                            <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                          </a>
+                      </div>
+                      <div class="row">
+                          <table ng-table="usersTable" show-filter="true" class="table table-bordered table-striped text-center">
+                            <tbody>
+                                <tr ng-repeat="win in data" class="text-center">
+                                    <td data-title="'Window'" filter="{ 'windowName': 'text' }">{{win.windowName}}</td>
+                                    <td data-title="'Actions'" class="w150">
+                                        <a data-toggle="modal" data-target=".addWindow" ng-click="editWindow(win.adWindowId)" class="btn btn-success btn-xs" tooltip-placement="top" uib-tooltip="Edit"><i class="fa fa-pencil-square-o"></i></a>
+
+                                        <a class="btn btn-info btn-xs" disabled>
+                                          <i class="fa fa-eye"></i>
+                                        </a>
+
+                                        <a class="btn btn-danger btn-xs" ng-click="delWindow(win.adWindowId, data)" data-toggle="modal" data-target=".deletewindow" tooltip-placement="top" uib-tooltip="Delete"><i class="fa fa-trash"></i></a>
+
+                                        <a class="btn btn-primary btn-xs" disabled>
+                                          <i class="fa fa-plus">
+                                          </i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </div>
+
+        <!-- starts add window modal -->
+        <div class="modal fade addWindow" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Add Window</h4>
+                    </div>
+                    <div class="modal-body">
+                        <!--=====================================
+                            =            Add Window Form            =
+                            ======================================-->
+                            <form name="windowform" novalidate class="form-horizontal login-form" ng-submit="saveWindow(WindowData)" novalidate>
+                              <input type="hidden" ng-model="WindowData.adWindowId">
+                              <div class="form-group form-group required" >
+                                <label class="control-label col-md-3" for="">Add Window</label>
+                                <div class="col-md-7">
+                                  <input type="text" name="wind" class="form-control inputEle" ng-model="WindowData.windowName"  placeholder="Enter Window" ng-required="true">
+                                   <div class="clearfix"></div>
+                                  <p class="error" ng-show="windowform.wind.$invalid && windowform.wind.$touched">Please Enter Window</p>
+                                </div>
+                              </div>
+                                <br>
+                              <div class="form-group">
+                                <div class="col-md-12 text-center">
+                                  <button type="submit"  ng-disabled="windowform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Add Window</button>
+                                </div>
+                              </div>
+                            </form>
+                            <!--====  End of Assign Role to Window  ====-->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end add window modal -->
+
+        <!-- delete modal -->
+        <div class="modal fade deletewindow" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;
+                </button>
+                <h4 class="modal-title">Delete Window
+                </h4>
+              </div>
+              <div class="modal-body">
+                <h4>Are you sure you want to delete 
+                  <strong>{{deletewindowData.windowName}}?
+                  </strong>
+                </h4>
+                <br>
+                <a class="btn btn-danger btn-sm" ng-click="deleteWindow(deletewindowData.adWindowId)" onclick="$('.modal').modal('hide')">
+                  <i class="fa fa-trash">
+                  </i>&nbsp;&nbsp;Delete
+                </a>
+                <a class="btn btn-default btn-sm" data-dismiss="modal">
+                  <i class="fa fa-trash">
+                  </i>&nbsp;&nbsp;Cancel
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- delete modal -->
+      </div>
+    </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script>
+  //Window Controller
+    angular.module("theGuru").controller("windowCtrl", function($scope, $log, $routeParams, CRUD_SERVICE, baseUrlSrvc, $filter, ngTableParams, $timeout, $route, Flash, $rootScope, $sessionStorage, $window) {
+        
+        //Windows
+        $window.document.title = "ITPreneur - Window";
+        $scope.windowArray = [];
+        $scope.OperType = $routeParams.ID;
+
+        /*====================================
+        =            Page Refresh            =
+        ====================================*/
+
+        $scope.refreshPage = function() {
+            $timeout(function() {
+               $scope.$apply(function () {
+                $route.reload();
+              });
+          },100);
+        }
+
+        /*=====  End of Page Refresh  ======*/
+
+        //console.log($scope.OperType);
+        //1 Mean New Entry
+        var urlWindowList = baseUrlSrvc.baseUrl + 'listWindow';
+        GetAllWindowRecords(urlWindowList);
+        //To Get All Records
+        function GetAllWindowRecords(url) {
+            var promiseWindowGet = CRUD_SERVICE.getAllData(urlWindowList);
+            promiseWindowGet.then(function(pl) {
+                    $scope.Window = pl.data;
+                    $scope.windowArray.push($scope.Window);
+                    //console.log($scope.windowArray);
+
+                      $scope.usersTable = new ngTableParams({
+                          page: 1,
+                          count: 10
+                      }, {
+                         total: $scope.Window.length, 
+                          getData: function ($defer, params) {
+
+                            if (params.settings().$scope == null) {
+                                params.settings().$scope = $scope;
+                              }
+                          
+                              $scope.data = params.sorting() ? $filter('orderBy')($scope.windowArray[0], params.orderBy()) : $scope.windowArray[0];
+                              $scope.data = params.filter() ? $filter('filter')($scope.data, params.filter()) : $scope.data;
+                             $scope.data = $scope.data.slice((params.page() - 1) * params.count(), params.page() * params.count());
+                             $defer.resolve($scope.data)
+                          }
+                      });
+                },
+                function(errorPl) {
+                    $log.error('Some Error in Getting Records.', errorPl);
+                });
+        }
+
+        /*============================================
+        =            Clear Modal on Click            =
+        ============================================*/
+        
+        $scope.clearModalOnClose = function() {
+            $scope.WindowData = {};
+        }
+        
+        /*=====  End of Clear Modal on Click  ======*/
+
+        $scope.editWindow = function(id) {
+             //console.log(id); 
+
+             var urlWindowList = baseUrlSrvc.baseUrl + 'listWindow';
+
+            var promiseWindowGet = CRUD_SERVICE.getAllData(urlWindowList);
+            promiseWindowGet.then(function(pl) {
+                    $scope.window_a = pl.data;
+
+                    for (var i = 0; i < $scope.window_a.length; i++) {
+                        if ($scope.window_a[i].adWindowId == id) {
+                            $scope.WindowData = $scope.window_a[i];
+                            //console.log($scope.WindowData);
+                        }
+                    }
+
+                },
+                function(errorPl) {
+                    $log.error('Some Error in Getting Records.', errorPl);
+                });
+        }
+
+        //To Create new record and Edit an existing Record.
+            $scope.saveWindow = function(data) {
+                //console.log(data);
+
+                if (data.adWindowId) {
+
+                    data.updatedby=$sessionStorage.updatedby;
+                    data.inInstituteId=$sessionStorage.inInstituteId;
+                    data.bBranchId=$sessionStorage.bBranchId;
+                    data.adUserId = $sessionStorage.adUserId;
+
+
+                    var FormData = {
+                        formdata: data,
+                        url: baseUrlSrvc.baseUrl + 'addUpdateWindow'
+                    };
+                    var promisePost = CRUD_SERVICE.post(FormData);
+                    promisePost.then(function(pl) {
+                        $scope.adWindowId = pl.data.adWindowId;
+                        $timeout(function() {
+                            $scope.$apply(function () {
+                            $route.reload();
+                            });
+                        },100);
+                         Flash.create('success', $scope.SuccessMessage);
+                        ClearModels();
+                    }, function(err) {
+                        //console.log(err);
+                        $timeout(function() {
+                            $scope.$apply(function () {
+                            $route.reload();
+                            });
+                        },100);
+                         Flash.create('success', $scope.SuccessMessage);
+                    });
+                } else {
+
+                    data.createdby=$sessionStorage.createdby;
+                    data.inInstituteId=$sessionStorage.inInstituteId;
+                    data.bBranchId=$sessionStorage.bBranchId;
+                    data.updatedby=$sessionStorage.updatedby;
+                    data.adUserId = $sessionStorage.adUserId;
+
+                    //  //console.log(/edit);
+                    var FormData = {
+                        formdata: data,
+                        url: baseUrlSrvc.baseUrl + 'addUpdateWindow'
+                    };
+
+                    var promisePut = CRUD_SERVICE.put($routeParams.ID, FormData);
+                    promisePut.then(function(pl) {
+                        $timeout(function() {
+                            $scope.$apply(function () {
+                            $route.reload();
+                            });
+                        },100);
+                         Flash.create('success', $scope.SuccessMessage);
+                        ClearModels();
+                    }, function(err) {
+                        //console.log("Some Error Occured." + err);
+                        $timeout(function() {
+                            $scope.$apply(function () {
+                            $route.reload();
+                            });
+                        },100);
+                         Flash.create('danger', $scope.DangerMessage);
+                    });
+                }
+            }
+
+        /*=====================================
+        =            Delete Window            =
+        =====================================*/
+        $scope.delWindow = function(id, wdata) {
+          $scope.temp_var = $filter('filter')(wdata, { "adWindowId": id });
+
+           $scope.deletewindowData= {
+              "adWindowId": $scope.temp_var[0].adWindowId,
+              "windowName": $scope.temp_var[0].windowName
+           };
+        }
+        //To Delete window
+        $scope.deleteWindow = function(id) {
+            //console.log(id);
+            var FormData = {
+                id: id,
+                url: baseUrlSrvc.baseUrl + 'deleteWindow'
+            };
+            var promiseDelete = CRUD_SERVICE.delete(FormData);
+            promiseDelete.then(function(pl) {
+                $timeout(function() {
+                    $scope.$apply(function () {
+                    $route.reload();
+                    });
+                },100);
+                 Flash.create('success', $scope.SuccessMessage);
+                //ClearModels();
+            }, function(err) {
+                //console.log("Some Error Occured." + err);
+                $timeout(function() {
+                    $scope.$apply(function () {
+                    $route.reload();
+                    });
+                },100);
+                 Flash.create('danger', $scope.DangerMessage);
+            });
+        }
+        /*=====  End of Delete Window  ======*/
+        
+
+
+    });
+</script>

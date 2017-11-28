@@ -1,0 +1,683 @@
+<!--================================
+=            Controller            =
+=================================-->
+<style type="text/css">
+  .assignspan {
+    position: relative;
+    top: 6px;
+    font-weight: bold;
+  }
+  .w40 {
+    width: 40px;
+  }
+</style>
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state" >
+<div class="container-fluid">
+
+<div class="row no-margin" ng-controller="enrollmentCtrl as Inst">
+<div class="col-md-12 no-padding">
+  <div class="panel panel-info">
+      <div class="panel-heading">
+          <h3 class="panel-title">Admission List
+          <span class="pull-right"><small>Total: </small><span class="badge">{{enquiry.length}}</span></span>
+          </h3>
+      </div>
+      <div class="panel-body">
+      
+          <!-- toaster message -->
+          <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+          <!-- toaster message -->
+
+          <div class="button-group">
+              <a data-toggle="modal" data-target=".addenrollment" class="btn btn-default btn-labeled btn-sm" ng-click="addEnquiryClick()">
+                  <i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Add Admission</a>
+
+              <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</a>
+
+              <button data-toggle="modal" data-target=".assignmodal" ng-click="assignButtonClick()" class="btn btn-primary btn-labeled btn-sm" ng-disabled="user11.data_Enq.length > 0 ? false : true">
+                        <i class="fa fa-user"></i>&nbsp;&nbsp;Assign</button>
+
+              <button class="btn btn-default btn-labeled btn-sm" ng-click="checkAll()" ng-show="data"><i class="fa fa-check-circle"></i>&nbsp;&nbsp;Select All</button>
+
+                <button class="btn btn-default btn-labeled btn-sm" ng-click="uncheckAll()" ng-show="data"><i class="fa fa-times-circle"></i>&nbsp;&nbsp;Deselect All</button>
+          </div>
+          <table ng-table="usersTable" show-filter="true" class="table table-bordered table-striped text-center">
+              <tbody>
+                  <tr ng-repeat="ins in data" ng-hide="ins.eEnquiryFormId == '0'">
+                  <td data-title="''" class="w40">
+                    <input type="checkbox" checklist-model="user11.eEnquiryFormId" checklist-value="ins.eEnquiryFormId" ng-change="checkEnq(ins.eEnquiryFormId, checked, ins.email, (ins.firstname + ' ' + ins.middlename + ' ' + ins.lastname))">
+                  </td>
+                  <td data-title="'Form No.'" filter="{ 'enquiryformno': 'text' }">{{ins.enquiryformno}}</td>
+                  <td data-title="'Branch Name'" filter="{ 'branchname': 'text' }">{{ins.branchname}}</td>
+                    <td data-title="'Candidate Name'" filter="{ 'firstname': 'text' }">{{ins.firstname}}&nbsp;&nbsp;{{ins.middlename}}&nbsp;&nbsp;{{ins.lastname}}</td>
+                    <td data-title="'Email Id'" filter="{ 'email': 'text' }">{{ins.email}}</td>
+                    <td data-title="'Assigned To'" filter="{'assignusername': 'text' }">{{ins.assignusername}}</td>
+                    <td data-title="'Status'" filter="{ 'windowtype': 'text' }">
+                      <span style="font-size: 12px;" class="label" ng-class="{'label-primary' : ins.windowtype=='Enquiry', 'label-info' : ins.windowtype=='Registration', 'label-success' : ins.windowtype=='Enrollment'}">{{ins.windowtype}}</span>
+                    </td>
+                     <td data-title="'Sub-Status'" filter="{'statusenroll': 'text' }">{{ins.statusenroll}}</td>
+                   
+                    <td data-title="'Actions'" class="w150">
+                        <a href="#/editenrollment/{{ins.eEnquiryFormId}}" class="btn btn-success btn-xs" tooltip-placement="top" uib-tooltip="Edit"><i class="fa fa-pencil-square-o"></i>
+                        </a>
+
+                        <a ng-click="viewEnrollment(ins.eEnquiryFormId, data)" data-toggle="modal" data-target=".viewenrollment" class="btn btn-info btn-xs" tooltip-placement="top" uib-tooltip="View"><i class="fa fa-eye"></i>
+                        </a>
+
+                        <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deleteEnroll" ng-click="delEnrollment(ins.eEnquiryFormId, data)" tooltip-placement="top" uib-tooltip="Delete"><i class="fa fa-trash"></i>
+                        </a>
+
+                        <a class="btn btn-primary btn-xs" disabled>
+                          <i class="fa fa-plus">
+                          </i>
+                        </a>
+                    </td>
+                  </tr>
+              </tbody>
+          </table>
+
+          <hr>
+          
+          <div class="modal fade addenrollment" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+              <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content" sc_school_id>
+                      <div class="modal-header">
+                          <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                          <h4 class="modal-title">Add Admission</h4>
+                      </div>
+                      <div class="modal-body">
+                        <form class="form-horizontal" name="enrollmentDataform" ng-submit="saveEnrollment(enrollmentData)" novalidate>
+                                 <input type="hidden" ng-model="enrollmentData.eEnquiryFormId" name="">
+
+                               <div class="form-group required">
+                               <label class="control-label col-sm-2" for="">Status</label>
+                                <div class="col-sm-4">
+                                   <label class="radio-inline">
+                                   <input type="radio"  ng-model="new" name="availibility" value="New" ng-click="enableAll()">New
+                                   </label>
+                                   <label class="radio-inline">
+                                   <input type="radio" ng-model="existing"  name="availibility" value="Existing" ng-click="enableAll1()">Existing
+                                   </label>
+                                </div>
+
+                                <label class="control-label col-sm-2" for="">Branch</label>
+                                <div class="col-sm-4">
+                                    <select name="bran" ng-model="enrollmentData.bBranchId" class="form-control inputEle" ng-options="bran.bBranchId as bran.branchname for bran in currentRoleBranches1" ng-change="branchChange(enrollmentData.bBranchId, currentRoleBranches1)" ng-required="true">
+                                      <option value="">select Branch</option>
+                                    </select> 
+                                    <div class="clearfix"></div>
+                                   <p class="error" ng-show="enrollmentDataform.bran.$invalid && enrollmentDataform.bran.$touched">Please Select Branch</p> 
+                                </div>
+                               </div>
+
+                               <hr>
+
+                               <div class="form-group required">
+                                
+                              <label class="control-label col-sm-2" for="">Date</label>
+                                <div class="col-sm-4">
+                                   <datepicker date-format="yyyy-MM-dd">
+                                      <input type="text" name="dat" ng-model="enrollmentData.date" placeholder="Enter Date" class="form-control" restrict-to="[0-9]" ng-required="true" />
+                                   </datepicker>
+                                   <div class="clearfix"></div>
+                                   <p class="error" ng-show="enrollmentDataform.dat.$invalid && enrollmentDataform.dat.$touched">Please Enter Date</p> 
+                                </div>
+
+                                <div ng-show="existing" >
+                                  <label class="control-label col-sm-2" for="">Select Student</label>
+                                  <div class="col-sm-4">
+                                      <select ng-model="enrollmentData.eEnquiryFormId" name="stud" class="form-control inputEle" ng-options="stu.eEnquiryFormId as (stu.firstname + ' ' + stu.middlename + ' ' + stu.lastname) for stu in Students" ng-change="OnStudentChange1(enrollmentData.eEnquiryFormId)" ng-required="stureq">
+                                        <!-- <option value="">Select Source Name</option> -->
+                                      </select>
+                                      <div class="clearfix"></div>
+                                      <p class="error" ng-show="enrollmentDataform.stud.$invalid && enrollmentDataform.stud.$touched">Please Select Student</p>
+                                  </div>
+                                </div>
+
+                              </div>
+
+                               <hr>
+
+                              <div class="form-group required" ng-hide="showStaticCourseInfo">
+                                  <input type="hidden" ng-model="enrollmentData.cCourseId">
+                                 <label class="control-label col-sm-2" for="">Course Name</label>
+                                  <label class="control-label col-sm-4" for="" style="text-align: left;"><b>{{enrollmentData.coursename}}</b></label>
+
+                                  <label class="control-label col-sm-2" for="">Total Fee (including discount)</label>
+                                  <label class="control-label col-sm-4" style="text-align: left;"><b>{{enrollmentData.totalfee}}</b></label>
+                               </div>
+
+                               <div ng-hide="showDyanmicCourseInfo">
+                                 <div class="form-group required">
+                                    <label class="control-label col-sm-2" for="">Course</label>
+                                    <div class="col-sm-3">
+                                        <select ng-model="enrollmentData.cCourseId" name="cou" class="form-control inputEle" ng-options="co.cCourseId as co.coursename for co in Course" ng-change="courseChange(enrollmentData.cCourseId)" ng-required="true">
+                                          <option value="">Select Course</option>
+                                        </select> 
+                                        <div class="clearfix"></div>
+                                        <p class="error" ng-show="enrollmentDataform.cou.$invalid && enrollmentDataform.cou.$touched">Please Select Course</p>
+                                    </div>
+                                    <label class="control-label col-sm-2" for="" style="text-align: left;"><b>Course Fee: {{totalFee}}</b></label>
+
+
+                                    <label class="control-label col-sm-2" for="">Apply Discount</label>
+                                    <div class="col-sm-3">
+                                       <label class="radio-inline">
+                                       <input type="radio"  ng-model="Auto" name="Auto" value="One" ng-click="oneClick()">From List
+                                       </label>
+                                       <label class="radio-inline">
+                                       <input type="radio" ng-model="Auto"  name="Auto" value="Two" ng-click="twoClick()">Enter Manually
+                                       </label>
+                                    </div>
+                                 </div>
+
+                                 <div class="form-group">
+
+                                    <label class="control-label col-sm-2" for="">Discount</label>
+                                    <div class="col-sm-3" ng-show="Auto == 'One'">
+                                        <select ng-model="enrollmentData.cDiscountId" class="form-control inputEle" ng-options="co.cDiscountId as co.title for co in Discount" ng-change="discountChange(enrollmentData.cDiscountId)">
+                                          <option value="">Select Discount</option>
+                                        </select> 
+                                    </div>
+
+
+                                    <!-- <label class="control-label col-sm-2" for="">Amount</label> -->
+                                    <div class="col-sm-3" ng-show="Auto == 'Two'">
+                                       <input type="number"  class="form-control inputEle" ng-model="manualamount" placeholder="Enter Amount" ng-blur="manualAmtMinus(manualamount)">
+                                       <!-- <span style="display: inline-block;margin-top: 5px;cursor: pointer;" ng-click="applyAmount(manualamount)">Apply</span> -->
+                                    </div>
+                                    <label class="control-label col-sm-2" style="text-align: left;" for="" ng-hide="manualLabel">
+                                    <b>Discount(%): {{DiscountPercentage}}</b>
+                                    </label>
+                                    <label class="control-label col-sm-3" style="text-align: left;" for="" ng-hide="manualDiscLabel">
+                                    <b>Discount Amount (Rs): {{manualamount}}</b>
+                                    </label>
+                                    <label class="control-label col-sm-2" style="text-align: left;padding: 5px;background-color: #ddd;" for="">
+                                    <b>Total Fee: {{calculatedFee}}</b>
+                                    </label>
+                                    
+                                 </div>
+
+                                  <div class="form-group required">
+                                    <label class="control-label col-sm-2" for="">Batch</label>
+                                    <div class="col-sm-4">
+                                      <select ng-model="enrollmentData.cBatchId" name="bat" class="form-control inputEle" ng-options="btch.cBatchId as btch.batchname for btch in Batch" ng-required="true">
+                                        <option value="">Select Batch</option>
+                                      </select> 
+                                       <div class="clearfix"></div>
+                                     <p class="error" ng-show="enrollmentDataform.bat.$invalid && enrollmentDataform.bat.$touched">Please Select Batch</p>
+                                    </div>
+                                 </div>
+                               </div>
+
+                               <hr>
+
+                               <div class="form-group required">
+                                 <label class="control-label col-sm-2" for="">Candidate Name</label>
+                                  <div class="col-sm-3">
+                                     <input type="text" name="cadina" class="form-control inputEle" ng-model="enrollmentData.firstname" placeholder="Enter First Name" ng-required="true" ng-disabled="disableAllInput">
+                                     <div class="clearfix"></div>
+                                     <p class="error" ng-show="enrollmentDataform.cadina.$invalid && enrollmentDataform.cadina.$touched">Please Enter FirstName</p>
+                                  </div>
+
+                                
+                                  <div class="col-sm-3">
+                                     <input type="text" name="midl" class="form-control inputEle" ng-model="enrollmentData.middlename" placeholder="Enter Middle Name" ng-required="true" ng-disabled="disableAllInput">
+                                     <div class="clearfix"></div>
+                                     <p class="error" ng-show="enrollmentDataform.midl.$invalid && enrollmentDataform.midl.$touched">Please Enter MiddleName</p>
+                                  </div>
+
+                                   <!-- <label class="control-label col-sm-2" for="">Candidate Name</label> -->
+                                  <div class="col-sm-4">
+                                     <input type="text" name="las" class="form-control inputEle" ng-model="enrollmentData.lastname" placeholder="Enter Surname" ng-required="true" ng-disabled="disableAllInput">
+                                     <div class="clearfix"></div>
+                                     <p class="error" ng-show="enrollmentDataform.las.$invalid && enrollmentDataform.las.$touched">Please Enter LastName</p>
+                                  </div>
+                                </div>
+
+                                 <div class="form-group">
+                                   <label class="control-label col-sm-2" for="">College/Company Name</label>
+                                    <div class="col-sm-4">
+                                       <input type="text" name="compname" class="form-control inputEle" ng-model="enrollmentData.collegename" placeholder="Enter College/Company Name" ng-disabled="disableAllInput">
+                                    </div>
+                                    
+                                 </div>
+
+                                 <div class="form-group">
+                                <label class="control-label col-sm-2 mandatory" for="">Email Id</label>
+                                    <div class="col-sm-4">
+                                       <input type="email" name="emai" class="form-control inputEle" ng-model="enrollmentData.email" placeholder="Enter Email Id" ng-required="true" ng-pattern="/^[a-zA-Z]+[a-zA-Z0-9._]+@[a-zA-Z]+\.[a-zA-Z.]{2,5}$/" ng-disabled="disableAllInput">
+                                       <div class="clearfix"></div>
+                                     <p class="error" ng-show="enrollmentDataform.emai.$invalid && enrollmentDataform.emai.$touched">Please Enter Email Id</p>
+                                    </div>
+
+                                    <label class="control-label col-sm-2" for="">Alternate Email Id</label>
+                                    <div class="col-sm-4">
+                                      <input type="email" name="altemail" class="form-control inputEle" ng-model="enrollmentData.alternateemail" placeholder="Enter Email Id" ng-pattern="/^[a-zA-Z]+[a-zA-Z0-9._]+@[a-zA-Z]+\.[a-zA-Z.]{2,5}$/" ng-disabled="disableAllInput">
+                                    </div>
+                                 </div>
+
+                               <div class="form-group required">
+                                <label class="control-label col-sm-2" for="">Address</label>
+                                <div class="col-sm-10">
+                                   <textarea class="form-control inputEle" name="addr" ng-model="enrollmentData.presentaddress" placeholder="Enter Permenant Address" ng-disabled="disableAllInput" ng-required="true" ng-disabled="disableAllInput"> </textarea>
+                                   <div class="clearfix"></div>
+                                    <p class="error" ng-show="enrollmentDataform.addr.$invalid && enrollmentDataform.addr.$touched">Please Enter Address</p>
+                                </div>
+                             </div>
+                             <div class="form-group">
+                                <label class="control-label col-sm-2" for="">Local Area</label>
+                                <div class="col-sm-4">
+                                   <input type="text" name="enquirylocal" class="form-control inputEle" ng-model="enrollmentData.localarea" placeholder="Enter Local Area" ng-disabled="disableAllInput">
+                                </div>
+                                <label class="control-label col-sm-2" for="">Native Place</label>
+                                <div class="col-sm-4">
+                                   <input type="text" name="enquirynative" class="form-control inputEle" ng-model="enrollmentData.nativeplace" placeholder="Enter Native Place" ng-disabled="disableAllInput">
+                                </div>
+                             </div>
+                             <div class="form-group required">
+                                <label class="control-label col-sm-2" for="">Gender</label>
+                                <div class="col-sm-4">
+                                   <label class="radio-inline">
+                                   <input type="radio" name="gender" ng-model="enrollmentData.gender" value="Male" ng-required="true">Male
+                                   </label>
+                                   <label class="radio-inline">
+                                   <input type="radio" name="gender" ng-model="enrollmentData.gender" value="Female" ng-required="true">Female
+                                   </label>
+                                   <label class="radio-inline">
+                                   <input type="radio" name="gender" ng-model="enrollmentData.gender" value="Transgender" ng-required="true">Transgender
+                                   </label>
+                                </div>
+                                <label class="control-label col-sm-2" for="">Marital Status</label>
+                                <div class="col-sm-4">
+                                   <label class="radio-inline">
+                                   <input type="radio" name="mt" ng-model="enrollmentData.maritalstatus" value="Unmarried" ng-required="true">Unmarried
+                                   </label>
+                                   <label class="radio-inline">
+                                   <input type="radio" name="mt" ng-model="enrollmentData.maritalstatus" value="Married" ng-required="true">Married
+                                   </label>
+                                   <label class="radio-inline">
+                                   <input type="radio" name="mt" ng-model="enrollmentData.maritalstatus" value="Divorce" ng-required="true">Divorce
+                                   </label>
+                                </div>
+                             </div>
+                             <div class="form-group">
+                                <label class="control-label col-sm-2" for="">Landline</label>
+                                <div class="col-sm-4">
+                                   <input type="text" class="form-control inputEle" ng-model="enrollmentData.telresource" restrict-to="[0-9]"> 
+                                </div>
+                                <label class="control-label col-sm-2 mandatory" for="">Contact No.</label>
+                                <div class="col-sm-4">
+                                   <input type="number" name="cont" class="form-control inputEle" ng-model="enrollmentData.contactno" placeholder="Enter Contact Number" ng-required="true" ng-required="true" maxlength="10" minlength="10" required ng-disabled="disableAllInput">
+                                   <div class="clearfix"></div>
+                                   <p class="error" ng-show="enrollmentDataform.cont.$invalid && enrollmentDataform.cont.$touched">Please Enter Contact No</p>
+                                </div>
+                                
+                             </div>
+                             <div class="form-group required">
+                                 <label class="control-label col-sm-2" for="">Date Of Birth</label>
+                                  <div class="col-sm-4">
+                                     <datepicker date-format="yyyy-MM-dd" date-max-limit= "{{currentDate}}">
+                                        <input ng-model="enrollmentData.dob" name="dob" placeholder="Enter Birthdate" class="form-control" type="text" restrict-to="[0-9]" ng-disabled="disableAllInput" ng-required="true"/>
+                                     </datepicker>
+                                     <div class="clearfix"></div>
+                                   <p class="error" ng-show="enrollmentDataform.dob.$invalid && enrollmentDataform.dob.$touched">Please Enter Contact No</p>
+                                  </div>
+
+                                 <label class="control-label col-sm-2" for="">Candidate Type</label>
+                                <div class="col-sm-4">
+                                    <select ng-model="enrollmentData.cStatusId" name="candi" class="form-control inputEle" ng-options="enq.cStatusId as enq.statusname for enq in EnquiryStatus" ng-required="true" ng-disabled="disableAllInput">
+                                      <option value="">Select Status</option>
+                                    </select>
+                                    <div class="clearfix"></div>
+                                   <p class="error" ng-show="enrollmentDataform.candi.$invalid && enrollmentDataform.candi.$touched">Please Select Candidate Type</p>
+                                </div> 
+                               </div>
+
+                               <div class="form-group">
+
+                                  <label class="control-label col-sm-2" for="">Hear About Us</label>
+                                  <div class="col-sm-4">
+                                      <select ng-model="enrollmentData.cSourceId" name="hear" class="form-control inputEle" ng-options="enq.cSourceId as enq.sourcename for enq in Source" ng-required="true" ng-change="sourceChange(enrollmentData.cSourceId, Source)" ng-disabled="disableAllInput">
+                                        <option value="">Select Source Name</option>
+                                      </select>
+                                      <div class="clearfix"></div>
+                                      <p class="error" ng-show="enrollmentDataform.hear.$invalid && enrollmentDataform.hear.$touched">Please Select Hear About Us</p>
+                                  </div>
+
+                                  <div ng-show="showStudent">
+                                    <label class="control-label col-sm-2" for="">Select Student</label>
+                                    <div class="col-sm-4">
+                                        <select ng-model="reference" class="form-control inputEle" ng-options="stu.eEnquiryFormId as (stu.firstname + ' ' + stu.middlename + ' ' + stu.lastname) for stu in Students1" ng-change="changeStudent(reference, Students)" >
+                                          <!-- <option value="">Select Source Name</option> -->
+                                        </select>
+                                    </div>
+                                  </div>
+
+                                  <div ng-show="showStaff">
+                                    <label class="control-label col-sm-2" for="">Select Staff</label>
+                                    <div class="col-sm-4">
+                                        <select ng-model="reference1" class="form-control inputEle" ng-options="stf.adUserdetailId as (stf.firstname + ' ' + stf.middlename + ' ' + stf.lastname) for stf in Staff" ng-change="changeStaff(reference1, Staff)">
+                                          <!-- <option value="">Select Source Name</option> -->
+                                        </select>
+                                    </div>
+                                  </div>
+                                  
+                              </div> <!--hear about us form group ends-->
+                              
+                                <div class="form-group">
+                                    <input type="hidden" ng-model="enrollmentData.windowtype" ng-init="enrollmentData.windowtype ='Enrollment'">
+                                 
+                              </div> <!--enquiry form group ends-->
+
+                              <div class="form-group ">
+                                <label class="control-label col-sm-2" for="">Highest Qualification</label>
+                                <div class="col-sm-4">
+                                    <select ng-model="enrollmentData.cDegreeId" name="high" class="form-control inputEle" ng-options="stf.cDegreeId as stf.degreename for stf in HighestQualification">
+                                    </select>
+                                    <!-- <div class="clearfix"></div>
+                                    <p class="error" ng-show="enrollmentDataform.high.$invalid && enrollmentDataform.high.$touched">Please Select Highest Qualification</p> -->
+                                </div>
+
+                               <label class="control-label col-sm-2 mandatory" for="">Year of Passing</label>
+                                <div class="col-sm-4">
+                                   <input type="number" name="yearofpassing" class="form-control inputEle"  ng-model="enrollmentData.yearofpassing" placeholder="Enter Year of Passing" ng-required="true">
+                                   <div class="clearfix"></div>
+                                    <p class="error" ng-show="enrollmentDataform.yearofpassing.$invalid && enrollmentDataform.yearofpassing.$touched">Please Enter Year of Passing</p>
+                                </div>
+                              </div> 
+                             
+                              <div class="form-group ">
+                               <label class="control-label col-sm-2" for="">Description</label>
+                                <div class="col-sm-10">
+                                   <textarea class="form-control inputEle"  ng-model="enrollmentData.description" placeholder="Enter Description" ng-disabled="disableAllInput" rows="3"></textarea>
+                                </div>   
+                              </div>
+
+                              <div class="clearfix"></div>
+                              <div class="form-group">
+                                <label class="control-label col-sm-2" for="">Assign To</label>
+                                <div class="col-sm-4">
+                                    <select ng-model="enrollmentData.assignto" class="form-control inputEle" ng-options="stf.adUserId as (stf.firstname + ' ' + stf.middlename + ' ' + stf.lastname) for stf in Staff" ng-disabled="disableAllInput">
+                                    </select>
+                                </div>
+                              </div>
+
+                              
+                               <br>
+                               <div class="form-group">
+                                <div class="col-md-12 text-center">
+                                  <button type="submit" ng-disabled="enrollmentDataform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                                  </button>
+                                </div>
+                              </div>
+                              <div class="clearfix"></div>
+
+                        </form>
+                      </div>
+                  </div>
+                </div>
+              </div>
+
+             <!--============================================
+            =            Delete Admission Modal            =
+            =============================================-->
+            <div class="modal fade deleteEnroll" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Delete Admission</h4>
+                    </div>
+                    <div class="modal-body">
+                        <h4>Are you sure you want to delete <strong>{{deleteenrollmentData.firstname}}{{deleteenrollmentData.lastname}}?</strong></h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="deleteEnrollment(deleteenrollmentData.eEnquiryFormId)" onclick="$('.modal').modal('hide')"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a>
+
+                        <a class="btn btn-default btn-sm" data-dismiss="modal"><i class="fa fa-trash"></i>&nbsp;&nbsp;Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--====  End of Delete Admission Modal  ====-->
+
+            <!--===============================
+            =            Assign To            =
+            ================================-->
+            <div class="modal fade assignmodal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal">&times;</button>
+                          <h4 class="modal-title">Assign Enquiry</h4>
+                      </div>
+                      <div class="modal-body">
+                          <form class="form-horizontal" name="assignform" ng-submit="assignSubmit(assignData)" novalidate>
+                            <div class="form-group">
+                              <label class="control-label col-md-3">Admission Students</label>
+                              <div class="col-md-9">
+                                <span class="assignspan" ng-repeat="std in studentnames">[ {{std.name}} ]&nbsp;&nbsp;&nbsp;</span>
+                              </div>
+                              
+                            </div>
+                            <div class="clearfix"></div>
+                            <br>
+
+                            <div class="form-group">
+                              <label class="control-label col-md-3" for="">Branch</label>
+                               <div class="col-md-6">
+                                  <select name="branch" ng-model="assignData.bBranchId" name="enquirybranch" class="form-control" ng-options="bran.bBranchId as bran.branchname for bran in currentRoleBranches1" ng-required="true" ng-change="branchChangeForUser(assignData.bBranchId)">
+                                    <option value="">Select Branch</option>
+                                  </select>
+                                  <div class="clearfix"></div>
+                                <p class="error" ng-show="leadinfoDataform.branch.$invalid && leadinfoDataform.branch.$touched">Please Select Branch</p> 
+                              </div>
+                            </div>
+                            <div class="clearfix"></div><br>
+
+                            <div class="form-group">
+                              <label class="control-label col-md-3">Assign to User</label>
+                              <div class="col-md-6">
+                                <select ng-model="assignData.assignto" class="form-control inputEle" ng-options="stf.adUserId as (stf.firstname + ' ' + stf.middlename + ' ' + stf.lastname) for stf in Staff11" ng-required="true">
+                              </select>
+                              </div>
+                              
+                            </div>
+                            <div class="clearfix"></div>
+                            <hr>
+                            <div class="form-group">
+                                <div class="col-md-12 text-center">
+                                  <button type="submit" ng-disabled="assignform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Assign
+                                  </button>
+                                </div>
+                              </div>
+                              <div class="clearfix"></div>
+                              <br>
+                          </form>
+                      </div>
+                  </div>
+              </div>
+            </div>
+            <!--====  End of Assign To  ====-->
+
+
+              <div class="modal fade viewenrollment" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog modal-lg" role="document">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                              <h4 class="modal-title">View Admission</h4>
+                              <!--<a href="" ng-print print-element-id="printThisElement">Print</a> -->
+                          </div>
+                          <div class="modal-body">
+                              <input type="hidden" ng-model="enrollmentData.eEnquiryFormId">
+                              <div class="form-group">
+                                  <label class="control-label col-md-2" for="">Branch: </label>
+                                  <div class="col-md-4">
+                                      {{viewenrollmentData.branchname}}
+                                  </div>
+
+                                   <label class="control-label col-md-2" for="">Date: </label>
+                                  <div class="col-md-4">
+                                      {{viewenrollmentData.date | date}}
+                                  </div>
+                              </div>
+
+                              <div class="clearfix"></div>
+                              <hr>
+
+                              <div class="form-group">
+
+                               <label class="control-label col-md-2" for="">Course Name: </label>
+                                  <div class="col-md-4">
+                                      {{viewenrollmentData.coursename}}
+                                  </div>
+
+                                  <label class="control-label col-md-2" for="">Course Fee: </label>
+                                  <div class="col-md-4">
+                                      {{viewenrollmentData.coursefee}}
+                                  </div>     
+                              </div>
+
+
+
+                              <div class="clearfix"></div>
+                              <hr>
+
+
+
+                               <div class="form-group">
+
+                               <label class="control-label col-md-2" for="">Discount Name: </label>
+                                  <div class="col-md-4">
+                                      {{viewenrollmentData.title}}
+                                  </div>
+
+                                  <label class="control-label col-md-2" for="">Batch Name: </label>
+                                  <div class="col-md-4">
+                                      {{viewenrollmentData.batchname}}
+                                  </div>     
+                              </div>
+
+                              <div class="clearfix"></div>
+                              <hr>
+
+                              <div class="form-group">
+                                  <label class="control-label col-md-2" for="">Candidate: </label>
+                                  <div class="col-md-4">
+                                      {{viewenrollmentData.firstname}}{{viewenrollmentData.middlename}}{{viewenrollmentData.lastname}}
+                                  </div>
+
+                                   <label class="control-label col-md-2" for="">Status: </label>
+                                  <div class="col-md-4">
+                                      {{viewenrollmentData.statusname}}
+                                  </div>
+                              </div>
+                              <div class="clearfix"></div>
+                              <hr>
+                              <div class="form-group">
+                                  <label class="control-label col-md-2" for="">College Name:
+                                  </label>
+                                  <div class="col-md-4">
+                                      {{viewenrollmentData.collegename}}
+                                  </div>
+                                  <label class="control-label col-md-2" for="">Address:
+                                   </label>
+                                  <div class="col-md-4">
+                                      {{viewenrollmentData.presentaddress}}
+                                  </div>
+                              </div>
+                              <div class="clearfix"></div>
+                             
+                              <hr>
+                              <div class="form-group">
+                                  <label class="control-label col-md-2" for="">Local Area: </label>
+                                  <div class="col-md-4">
+                                      {{viewenrollmentData.localarea}}
+                                  </div>
+
+                                  <label class="control-label col-md-2" for="">Native Place: </label>
+                                  <div class="col-md-4">
+                                      {{viewenrollmentData.nativeplace}}
+                                  </div>
+                              </div>
+                              <div class="clearfix"></div>
+                              
+                              <hr>
+                              <div class="form-group">
+                                  <label class="control-label col-md-2" for="">Gender: </label>
+                                  <div class="col-md-4">
+                                      {{viewenrollmentData.gender}}
+                                  </div>
+                                   <label class="control-label col-md-2" for="">Marital Status: </label>
+                                  <div class="col-md-4">
+                                      {{viewenrollmentData.maritalstatus}}
+                                  </div>
+                              </div>
+                              <div class="clearfix"></div>
+                              <hr>
+                             
+                              <div class="form-group">
+                                  <label class="control-label col-md-2" for="">Landline: </label>
+                                  <div class="col-md-4">
+                                      {{viewenrollmentData.telresource}}
+                                  </div>
+                                  <label class="control-label col-md-2" for="">Contact No: </label>
+                                  <div class="col-md-4">
+                                      {{viewenrollmentData.contactno}}
+                                  </div>
+                              </div>
+                              <div class="clearfix"></div>
+                              <hr>
+                             
+                              <div class="form-group">
+                                  <label class="control-label col-md-2" for="">Email Id: </label>
+                                  <div class="col-md-4">
+                                      {{viewenrollmentData.email}}
+                                  </div>
+                                   <label class="control-label col-md-2" for="">Date of Birth: </label>
+                                  <div class="col-md-4">
+                                      {{viewenrollmentData.dob | date}}
+                                  </div>
+                              </div>
+                              <div class="clearfix"></div>
+                              <hr>
+
+                               <div class="form-group">
+                                  <label class="control-label col-md-2" for="">Total Fee: </label>
+                                  <div class="col-md-4">
+                                      {{viewenrollmentData.totalfee}}
+                                  </div>
+
+                                   <label class="control-label col-md-2" for="">Description: </label>
+                                  <div class="col-md-4">
+                                      {{viewenrollmentData.description}}
+                                  </div>
+                              </div>
+                             <div class="clearfix"></div>
+                              <!-- </form> -->
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+          </div>
+
+          </div>
+      </div>
+  </div>
+      
+ 
+  </div> <!-- controller ends -->
+
+
+</div>
+</div>
+<!--====  End of Controller  ====-->
+
+
+<script src="view/pages/Sales/Enrollment/EnrollmentCtrl.js"></script>
+

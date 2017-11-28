@@ -1,0 +1,167 @@
+<!--================================
+=            Controller            =
+=================================-->
+
+      <div class="row no-margin" ng-controller="EditTopicCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            
+            <div class="panel-body">
+              
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+              <div class="button-group">
+                <a data-toggle="modal" data-target=".addnotes" ng-click="addNotesbtn()" class="btn btn-default btn-labeled btn-sm">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp;Add Notes
+                </a>
+              </div>
+              
+              <table ng-table="usersTable_notes" show-filter="true" class="table table-bordered table-striped text-center">
+	             <tbody>
+	                <tr ng-repeat="note in data_notes">
+	                  <td data-title="'Notes Name'" filter="{ 'name': 'text' }">{{note.name}}</td>
+	                  <td data-title="'Description'" filter="{ 'description': 'text' }">{{note.description}}</td>
+	                  <td data-title="'Actions'" class="w150">
+
+	                    <a data-toggle="modal" data-target=".addnotes" class="btn btn-success btn-xs" ng-click="editNotes(note.conNotesId)" tooltip-placement="top" uib-tooltip="Edit">
+                            <i class="fa fa-pencil-square-o">
+                            </i>
+                          </a> 
+                          <a data-toggle="modal" data-target=".viewfile" class="btn btn-info btn-xs" ng-click="viewFileModal(note.conNotesId, data_notes)" tooltip-placement="top" uib-tooltip="View">
+                            <i class="fa fa-eye">
+                            </i>
+                          </a>
+                          <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletenotes" ng-click="delNotes(note.conNotesId,data_notes)" tooltip-placement="top" uib-tooltip="Delete">
+                            <i class="fa fa-trash">
+                            </i>
+                         </a>
+                         <a class="btn btn-default btn-xs" href="{{note.path}}" target="_blank" tooltip-placement="top" uib-tooltip="Download">
+	                        <i class="fa fa-download">
+	                        </i>
+	                      </a>
+
+	                  </td>
+	                </tr>
+	              </tbody>
+	            </table>
+	            <!-- table ends -->
+              <hr>
+              <!-- start edit modal -->
+              <div class="modal fade addnotes" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title" ng-init="headingMessage='Add Notes'">{{headingMessage}}</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form name="notesform" class="form-horizontal" enctype="multipart/form-data" ng-submit="saveJsonNotes(notesData)">
+                                <input type="hidden" ng-model="notesData.conNotesId">
+                                <div class="form-group form-group required">
+                                    <label class="control-label col-md-3" for="">Name</label>
+                                    <div class="col-md-8">
+                                        <input type="text"  name="titlenm" class="form-control inputEle" ng-model="notesData.name" placeholder="Enter the notes title"  ng-required="true">
+                                        <div class="clearfix"></div>
+                                         <p class="error" ng-show="notesform.titlenm.$invalid && notesform.titlenm.$touched">Please Enter Title</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group form-group required">
+                                    <label class="control-label col-md-3" for="">Description</label>
+                                    <div class="col-md-8">
+                                        <textarea class="form-control inputEle" ng-model="notesData.description" placeholder="Enter notes description"> </textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group form-group required">
+                                    <label class="control-label col-sm-3" for="">Upload File</label>
+                                    <div class="col-sm-8">
+                                        <input type="file" id="fileup" name="fileup" class="form-control" file-model="myFile" accept=".doc, .docx,.txt,.pdf" ng-selected="fileSelected(myFile)" ng-model="noteFile"/>
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div><hr>
+                                <div class="form-group">
+                                    <div class="col-md-12 text-center">
+                                        <button type="submit" ng-disabled="notesform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+              <!-- start view modal -->
+              <!--======================================
+	          =            View Files Modal            =
+	          =======================================-->
+	          <div class="modal fade viewfile" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+	            <div class="modal-dialog modal-lg" role="document">
+	              <div class="modal-content">
+	                <div class="modal-header">
+	                  <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+	                  </button>
+	                  <h4 class="modal-title">{{noteViewData_View.name}}</h4>
+	                </div>
+	                <div class="modal-body">
+	                   <div ng-if="fileExtension == 'txt'">
+	                     <pre ng-include ng-src="{{url | trusted}}"></pre>
+	                     <iframe ng-src="{{url | trusted}}" height="700" width="100%"></iframe>
+	                   </div>
+
+	                   <div ng-if="fileExtension == 'pdf'" class="pdf">
+	                    <embed ng-src="{{url | trusted}}" width="100%" height="800" type='application/pdf'>
+	                   </div>
+
+	                   <div class="doc" ng-if="fileExtension == 'doc' || fileExtension == 'docx'">
+	                     <iframe ng-src='{{NotesDocUrl | trusted}}' style="position: relative;width:100%; height: 100%;min-height: 700px;"></iframe>
+	                   </div>
+	                   <div class="clearfix"></div>
+	                   <br>
+	                   <div class="well">
+	                     <p>Description: {{noteViewData_View.description}}</p>
+	                   </div>
+	                </div>
+	              </div>
+	            </div>
+	          </div>
+	          <!--====  End of View Files Modal  ====-->
+              <!--========================================
+          =            Delete Notes Modal            =
+          =========================================-->
+          <div class="modal fade deletenotes" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;
+                    </button>
+                    <h4 class="modal-title">Delete Note
+                    </h4>
+                  </div>
+                  <div class="modal-body">
+                    <h4>Are you sure you want to Note <strong>{{deletenotesData.name}}?</strong>
+                    </h4>
+                    <br>
+                    <a class="btn btn-danger btn-sm" ng-click="deleteNotes(deletenotesData.conNotesId)" onclick="$('.modal').modal('hide')">
+                      <i class="fa fa-trash">
+                      </i>&nbsp;&nbsp;Delete
+                    </a>
+                    <a class="btn btn-default btn-sm" data-dismiss="modal">
+                      <i class="fa fa-trash">
+                      </i>&nbsp;&nbsp;Cancel
+                    </a>
+                  </div>
+                </div>
+              </div>
+          </div>
+          <!--====  End of Delete Notes Modal  ====-->
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Masters/Topic/EditTopicCtrl.js"></script>
+

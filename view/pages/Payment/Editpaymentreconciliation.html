@@ -1,0 +1,172 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+<div class="page-content" sidebar-directive="state" >
+    <div class="container-fluid">
+        <div class="row no-margin" ng-controller="PaymentreconCtrl as Inst">
+         
+            <div class="col-md-12 no-padding">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Edit Payment Reconciliation</h3>
+                    </div>
+                    <div class="panel-body">
+                        <!-- alert messages -->
+                        <flash-message duration="5000" show-close="true" on-dismiss="myCallback(flash)">
+                        </flash-message>
+                        <!-- alert messages -->
+                        <form class="form-horizontal mb40" name="addreconciliation" ng-submit="save(paymentreconData)" novalidate>
+
+                          <div class="button-group">
+                              <a href="#/Payment Reconciliation" class="btn btn-default btn-labeled btn-sm">
+                                  <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back</a>
+                              <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</a>
+                          
+                              <button type="submit" ng-disabled="updatedisabled" class="btn btn-success btn-labeled btn-sm">
+                              <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Update</button>
+                          </div>
+                          <hr>
+                          <input type="hidden" ng-model="paymentreconData.pPaymentreconciliationId" name="">
+                          <div class="form-group">
+                          <label class="control-label col-sm-2" for="">Branch</label>
+                            <div class="col-sm-4">
+                                <select ng-model="paymentreconData.bBranchId" name="enquirybranch" class="form-control inputEle" ng-options="bran.bBranchId as bran.branchname for bran in currentRoleBranches1"  ng-change="branchChange(paymentreconData.bBranchId, currentRoleBranches1)" ng-required="true">
+                                  <option value="">select Branch</option>
+                                </select> 
+                                <div class="clearfix"></div>
+                           <p class="error" ng-show="addreconciliation.enquirybranch.$invalid && addreconciliation.enquirybranch.$touched">Select Branch</p>
+                            </div>
+                          </div>
+                        
+                          <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Month/Year
+                          </label>
+                          <div class="col-md-4">
+                            <datepicker date-format="yyyy-mm" >
+                            <input type="text" name="month" ng-model="monthyearmodel" restrict-to="[0-9]" placeholder="Enter Date"   class="form-control" disabled>
+                           </datepicker>  
+                          </div>
+                          
+                          <label class="control-label col-sm-2" for="">Status</label>
+                          <div class="col-sm-3">
+                            <select ng-model="paymentreconData.status " name="status" class="form-control "  ng-required="true">
+                              <option value="Draft">Draft</option>
+                              <option value="Complete">Complete</option>
+                            </select>
+                             <div class="clearfix"></div>
+                            <p class="error" ng-show="addreconciliation.status.$invalid && addreconciliation.status.$touched">Select Status</p>
+                        </div>
+                        </div>
+                        <div class="form-group ">
+                          <label class="control-label col-md-2" for="">Description
+                          </label>
+                          <div class="col-md-10">
+                            <textarea class="form-control inputEle" ng-model="paymentreconData.description" placeholder="Enter Description" > </textarea>
+                          </div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Payment In</label>
+                          <div class="col-md-4">
+                               <input type="number" class="form-control inputEle" ng-model="paymentreconData.paymentin" placeholder="Enter Payment In" disabled>
+                              
+                          </div>
+                          <label class="control-label col-md-2" for="">Payment Out</label>
+                          <div class="col-md-4">
+                               <input type="number" class="form-control inputEle" ng-model="paymentreconData.paymentout" placeholder="Enter Payment Out" disabled>
+                              
+                          </div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Bank Opening</label>
+                          <div class="col-md-4">
+                              <input type="number" class="form-control inputEle" ng-model="paymentreconData.bankopening" placeholder="Enter Bank Opening" disabled> 
+                              
+                          </div>
+                          <label class="control-label col-md-2" for="">Bank Closing</label>
+                          <div class="col-md-4">
+                              <input type="number" class="form-control inputEle" ng-model="paymentreconData.bankclosing" placeholder="Enter Bank Closing" disabled>  
+                          </div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Cash Opening</label>
+                          <div class="col-md-4">
+                              <input type="number" class="form-control inputEle" ng-model="paymentreconData.cashopening" placeholder="Enter Cash Opening " disabled> 
+                          </div>
+                          <label class="control-label col-md-2" for="">Cash Closing</label>
+                          <div class="col-md-4">
+                              <input type="number" name="bankclose"  class="form-control inputEle" ng-model="paymentreconData.cashclosing" placeholder="Enter Cash Closing " ng-required="true" ng-blur="CashClose(paymentreconData.paymentout, paymentreconData.bankclosing, paymentreconData.cashclosing, paymentreconData.paymentin, paymentreconData.bankopening, paymentreconData.cashopening, paymentreconData.adjustmentamount)" >
+                              <div class="clearfix"></div>
+                            <p class="error" ng-show="addreconciliation.bankclose.$invalid && addreconciliation.bankclose.$touched">Enter Bank Closing Amount</p>  
+                          </div>
+                          
+                        </div>
+                        <div class="form-group">
+                          <label class="control-label col-md-2" for="">Reconciliation/adjustment Amount</label>
+                          <div class="col-md-4">
+                              <input type="number" class="form-control inputEle" ng-model="paymentreconData.adjustmentamount" placeholder="Enter Amount " ng-blur="CashClose(paymentreconData.paymentout, paymentreconData.bankclosing, paymentreconData.cashclosing, paymentreconData.paymentin, paymentreconData.bankopening, paymentreconData.cashopening, paymentreconData.adjustmentamount)">   
+                          </div>
+                        </div>
+                        <div class="form-group" >
+                          <label class="control-label col-md-2" for="">Description
+                          </label>
+                          <div class="col-md-10">
+                            <textarea class="form-control inputEle" ng-model="paymentreconData.descriptionadjustmentamount" placeholder="Enter Description" ng-required="paymentreconData.adjustmentamount != 0" > </textarea>
+                          </div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Final Total</label>
+                          <div class="col-md-4">
+                              <input type="number" class="form-control inputEle" ng-model="paymentreconData.finalamount" placeholder="Enter Final Total " ng-value="((paymentreconData.paymentout + paymentreconData.bankclosing + paymentreconData.cashclosing )- (paymentreconData.paymentin + paymentreconData.bankopening + paymentreconData.cashopening) )+(paymentreconData.adjustmentamount)" readonly> 
+                              
+                          </div>
+                        </div>
+                        <br>
+                        <!-- <div class="form-group">
+                          <div class="col-md-offset-5 col-md-5 ">
+                            <button type="submit" ng-disabled="addDesignation.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                            </button>
+                          </div>
+                        </div> -->
+                        <div class="clearfix"></div>  
+                      </form>
+                      <!-- tab starts -->
+                      <div id="exTab2">
+                          <ul class="nav nav-tabs">
+                              
+                              <li ng-class="{active:Inst.isSet(1)}">
+                                  <a ng-click="Inst.setTab(1)">Add Bank</a>
+                              </li>
+                              
+                          </ul>
+                          <div class="tab-content">
+                              
+                              <!--===========================
+                              =            Tab 1            =
+                              ============================-->
+                              <div class="tab-pane active" ng-show="Inst.isSet(1)">
+
+                                  <div ng-if="Inst.isSet(1)" ng-include="'view/pages/Payment/Add Bank/Addbank.html'"></div>
+                                   
+                              </div>
+                              <!--====  End of Tab 1  ====-->
+
+                              
+                              
+                              <!--====  End of Tab 7  ====-->
+                              
+                          </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- end controller div -->
+    </div>
+
+
+</div>
+
+
+<script src="view/pages/Payment/PaymentreconciliationCtrl.js"></script>

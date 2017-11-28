@@ -1,0 +1,114 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="TopicCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Topic
+              <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{Topics.length}}</span></span>
+              </h3>
+            </div>
+            <div class="panel-body">
+
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+              
+              <div class="button-group">
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+              </div>
+              <table ng-table="usersTable" show-filter="true" class="table table-bordered table-striped text-center">
+                <tbody>
+                  <tr ng-repeat="bo in data">
+                    <td data-title="'Courses'" filter="{'coursename': 'text'}" sortable="'coursename'">{{bo.coursename}}
+                    </td>
+                    <td data-title="'Technology/Subject'" filter="{'technologyname': 'text'}" sortable="'technologyname'">{{bo.technologyname}}
+                    </td>
+                    <td data-title="'Actions'">
+                      <a href="#/View Topic/{{bo.cCourseId}}/{{bo.cTechnologyMasterId}}" class="btn btn-info btn-xs" tooltip-placement="top" uib-tooltip="View Topics">
+                        <i class="fa fa-eye">
+                        </i>
+                      </a> 
+                      <a data-toggle="modal" data-target=".addtopic" class="btn btn-default btn-xs" ng-click="addTopic(bo)" tooltip-placement="top" uib-tooltip="Add Topic To {{bo.coursename}}/{{bo.technologyname}}">
+                        <i class="fa fa-plus">
+                        </i>
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <hr>
+              
+              <!-- start edit modal -->
+              <div class="modal fade addtopic" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">Add Topic
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <form class="form-horizontal" name="topicform" ng-submit="saveTopic(TopicData)" novalidate>
+                        <div class="form-group required">
+                          <label class="control-label col-md-3" for="">Course
+                          </label>
+                          <div class="col-md-7">
+                            <input type="text" class="form-control" ng-model="TopicData.coursename" disabled>
+                            <input type="hidden" class="form-control" ng-model="TopicData.cCourseId" disabled>
+                          </div>
+                        </div><!-- form-group -->
+
+                        <div class="form-group required">
+                          <label class="control-label col-md-3" for="">Technology
+                          </label>
+                          <div class="col-md-7">
+                            <input type="text" class="form-control" ng-model="TopicData.technologyname" disabled>
+                            <input type="hidden" class="form-control" ng-model="TopicData.cTechnologyMasterId" disabled>
+                          </div>
+                        </div><!-- form-group -->
+
+                        <div class="form-group required">
+                          <label class="control-label col-md-3" for="">Topic
+                          </label>
+                          <div class="col-md-7">
+                            <input type="text" class="form-control" name="topicname" ng-model="TopicData.topicname" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="topicform.topicname.$invalid && topicform.topicname.$touched">Please Enter Topic Name</p>
+                          </div>
+                        </div><!-- form-group -->
+                        <div class="clearfix"></div>
+                        <br>
+                        <div class="form-group">
+                          <div class="col-md-12 text-center">
+                            <button type="submit" ng-disabled="topicform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                            </button>
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end edit modal  -->
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Masters/Topic/TopicCtrl.js"></script>
+

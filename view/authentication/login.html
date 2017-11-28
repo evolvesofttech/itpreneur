@@ -1,0 +1,89 @@
+<!--=======================================
+=            Login Page Styles            =
+========================================-->
+<style>
+  body {
+    padding: 0;
+    margin: 0;
+    background: url(assets/images/2.jpg) center center no-repeat/cover;
+    background-attachment: fixed;
+    height: 100vh;
+  }
+  .error {
+    padding-top: 0px;
+  }
+  .flex-form-container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: rgba(255,255,255,0.9);
+  }
+  .form-container {
+    width: 350px;
+    height: 400px;
+    padding: 15px;
+  }
+  .logo {
+    margin-bottom: 30px;
+  }
+</style>
+<!--====  End of Login Page Styles  ====-->
+<script>
+
+//console.log('begin')
+  angular.module('theGuru')
+   .controller('loginCtrl', function($scope,$location,$http,CRUD_SERVICE,baseUrlSrvc,$filter,$route,hideHeader,$sessionStorage, $window) {
+	  $scope.hideheader=$route.current.hideHeader;
+    $window.document.title = "ITPreneur - Login";
+
+     hideHeader.addHeader($route.current.hideHeader);
+  
+});
+    
+//console.log('end')
+</script>
+<div class="row no-margin" ng-controller="loginCtrl">
+  <div class="col-md-offset-6 col-md-6" style="padding: 0;height: 100vh">
+  
+
+  <div class="flex-form-container" style="height: 100vh;">
+
+    <img src="assets/images/logo.png" class="logo">
+    <!--================================
+    =            Login Form            =
+    =================================-->
+    <div class="form-container" style="width: 350px;height:350px;padding: 30px;">
+      <form name="loginForm" class="form-horizontal" ng-submit="login(user)" novalidate>
+          <p class="alert alert-danger error text-center" ng-show="invalidCred" style="padding: 10px 0;">Username / Password is Invalid</p>
+
+          <div class="input-group form-group required" style="margin-left: 0;margin-right: 0;">
+            <span class="input-group-addon"><i class="fa fa-user"></i></span>
+            <input type="text" class="form-control inputEle" name="username" ng-model="user.username"  placeholder="Username" ng-required="true" autofocus>
+          </div>
+          <p class="error" ng-show="loginForm.username.$invalid && loginForm.username.$touched">Enter Username</p>
+          <br>
+
+          <div class="input-group form-group required" style="margin-left: 0;margin-right: 0;">
+            <span class="input-group-addon"><i class="fa fa-key"></i></span>
+            <input type="password" class="form-control inputEle" name="password" ng-model="user.password"  placeholder="Password" ng-required="true">
+          </div>
+          <p class="error" ng-show="loginForm.password.$invalid && loginForm.password.$touched">Enter Password</p>
+
+          <br>
+          <div class="form-group" style="margin-left: 0;margin-right: 0;">
+              <button type="submit" ng-disabled="loginForm.$invalid" class="btn btn-primary btn-block">Login</button>
+          </div>
+          <br>
+          <div class="form-group" style="margin-left: 0;margin-right: 0;">
+            <p><a href="#/forgotpassword/0" style="color:red;cursor: pointer;">Forgot Password</a></p>
+          </div>
+        </form>
+      </div>
+      <!--====  End of Login Form  ====-->
+  </div>
+
+  </div>
+</div>
+

@@ -1,0 +1,243 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div class="row no-margin" ng-controller="scoreboardEnrollmentCtrl">
+  <div class="col-md-12 no-padding">
+    <div class="panel panel-info">
+      <div class="panel-body">
+        
+        <!-- toaster message -->
+        <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+        <!-- toaster message -->
+
+        <div class="button-group">
+          <a data-toggle="modal" data-target=".addscoreboard" ng-click="addscoreboard()" class="btn btn-default btn-labeled btn-sm" ng-hide="hideBtn">
+            <i class="fa fa-plus-circle">
+            </i>&nbsp;&nbsp;Add Score
+          </a>
+          <!-- <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+            <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+          </a> -->
+        </div>
+        <table ng-table="usersTable_scoreboard" show-filter="true" class="table table-bordered table-striped text-center">
+          <tbody>
+            <tr ng-repeat="bo in data_scoreboard">
+              <td data-title="'Technical Exam Score'" filter="{'technicalexamscore': 'text'}" sortable="'technicalexamscore'">{{bo.technicalexamscore}}
+              </td>
+               <td data-title="'HR Round Score'" filter="{'hrroundscore': 'text'}" sortable="'hrroundscore'">{{bo.hrroundscore}}
+              </td>
+              <td data-title="'Aptitude Exam Score'" filter="{'aptitudeexamscore': 'text'}" sortable="'aptitudeexamscore'">{{bo.aptitudeexamscore}}
+              </td>
+               <td data-title="'Admission Date'" filter="{'admissiondate': 'text'}" sortable="'admissiondate'">{{bo.admissiondate | date}}
+              </td>
+              <td data-title="'Comments'" filter="{'comments': 'text'}" sortable="'comments'">{{bo.comments}}
+              </td>
+               <!-- <td data-title="'Batch'" filter="{'batchname': 'text'}" sortable="'batchname'">{{bo.batchname}}
+              </td> -->
+              <td data-title="'Actions'" class="w150">
+                <a class="btn btn-success btn-xs" ng-click="editScoreboard(bo.eRegistrationofficeuseId)" data-toggle="modal" data-target=".addscoreboard" tooltip-placement="top" uib-tooltip="Edit"><i class="fa fa-edit"></i></a>
+                
+                <a data-toggle="modal" data-target=".viewscoreboard" class="btn btn-info btn-xs" ng-click="viewScoreboard(bo.eRegistrationofficeuseId, data_scoreboard)" tooltip-placement="top" uib-tooltip="View">
+                  <i class="fa fa-eye">
+                  </i>
+                </a>
+                <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletescoreboard" ng-click="delScoreboard(bo.eRegistrationofficeuseId, data_scoreboard)" tooltip-placement="top" uib-tooltip="Delete">
+                  <i class="fa fa-trash">
+                  </i>
+                </a>
+                
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <hr>
+        
+        <!-- start edit modal -->
+        <div class="modal fade addscoreboard" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="clearModalOnCloseScore()" data-dismiss="modal">&times;
+                </button>
+                 <h4 class="modal-title" ng-init="headingMessage='Add Score board'">{{headingMessage}}</h4>
+              </div>
+              <div class="modal-body">
+                
+              <form class="form-horizontal" name="scoreform" ng-submit="saveScoreboard(scoreboardData)" novalidate>
+              <input type="hidden" ng-model="eEnquiryFormId">
+              <input type="hidden" ng-model="bBranchId">
+               <div class="form-group required">
+                  <label class="control-label col-sm-4" for="">Student</label>
+                  <div class="col-sm-8">
+                      <input ng-model="fullName" class="form-control inputEle" disabled>    
+                  </div> 
+                </div>  
+              <div class="form-group">
+                <label class="control-label col-sm-4" for="">Technical Exam Score</label>
+                <div class="col-sm-8">
+                   <input type="number" name="scoremarks1" class="form-control inputEle" ng-model="scoreboardData.technicalexamscore" placeholder="Enter Score" ng-required="true" >
+                    <p class="error" ng-show="scoreform.scoremarks1.$invalid && scoreform.scoremarks1.$touched">Please Enter Score </p>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="control-label col-sm-4" for="">Aptitude Exam Score</label>
+                <div class="col-sm-8">
+                   <input type="number" name="scoremarks2" class="form-control inputEle" ng-model="scoreboardData.aptitudeexamscore" placeholder="Enter Score" ng-required="true" >
+                    <p class="error" ng-show="scoreform.scoremarks2.$invalid && scoreform.scoremarks2.$touched">Please Enter Score</p>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="control-label col-sm-4" for="">HR Round Score</label>
+                <div class="col-sm-8">
+                   <input type="number" name="scoremarks3" class="form-control inputEle" ng-model="scoreboardData.hrroundscore" placeholder="Enter Score" ng-required="true" >
+                    <p class="error" ng-show="scoreform.scoremarks3.$invalid && scoreform.scoremarks3.$touched">Please Enter Score</p>
+                </div>
+              </div>
+             
+              <div class="form-group">
+                <label class="control-label col-sm-4" for="">Comments</label>
+                <div class="col-sm-8">
+                   <input type="text" name="comm" class="form-control inputEle" ng-model="scoreboardData.comments" placeholder="Enter Comment" ng-required="true"  >
+                    <p class="error" ng-show="scoreform.comm.$invalid && scoreform.comm.$touched">Please Enter Comments</p>
+                </div>
+              </div>
+              
+               <div class="form-group">
+                <label class="control-label col-sm-4" for="">Admission Date</label>
+                  <div class="col-sm-8">
+                     <datepicker date-format="yyyy-MM-dd">
+                        <input ng-model="scoreboardData.admissiondate" name="adate" restrict-to="[0-9]" placeholder="Enter Date" class="form-control" type="text" ng-required="true" />
+                     </datepicker>
+                      <p class="error" ng-show="scoreform.adate.$invalid && scoreform.adate.$touched">Please Select Admission Date</p>
+                  </div>
+                  
+              </div>
+               <br>
+               <div class="form-group">
+                      <div class="col-md-12 text-center">
+                        <button type="submit" ng-disabled="scoreform.$invalid"  class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                        </button>
+                      </div>
+                    </div>
+                    <div class="clearfix"></div>
+              </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end edit modal  -->
+
+
+        <!-- start view modal -->
+        <div class="modal fade viewscoreboard" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="clearModalOnCloseScore()" data-dismiss="modal">&times;
+                </button>
+                <h4 class="modal-title">View Score Board
+                </h4>
+              </div>
+              <div class="modal-body">
+                
+                <!-- form -->
+                  <form class="form-horizontal" novalidate>
+
+                  <input type="hidden" ng-model="eEnquiryFormId">
+                   <div class="form-group">
+                    <label class="control-label col-sm-6" for="">Student:</label>
+                    <label class="control-label col-sm-6" for="" style="text-align: left;">{{fullName}}</label>
+                  </div>
+                 
+                 <div class="clearfix"></div>
+                  <hr>
+                   <div class="form-group">
+                    <label class="control-label col-sm-6" for="">Technical Exam Score:</label>
+                    <label class="control-label col-sm-6" for="" style="text-align: left;">{{viewscoreboardData.technicalexamscore}}</label>
+                  </div>
+                 
+                 <div class="clearfix"></div>
+                  <hr>
+                  <div class="form-group">
+                    <label class="control-label col-sm-6" for="">Aptitude Exam Score:</label>
+                    <label class="control-label col-sm-6" for="" style="text-align: left;">{{viewscoreboardData.aptitudeexamscore}}</label>
+                  </div>
+                 
+                 <div class="clearfix"></div>
+                  <hr>
+                  <div class="form-group">
+                    <label class="control-label col-sm-6" for="">HR Round Score:</label>
+                    <label class="control-label col-sm-6" for="" style="text-align: left;">{{viewscoreboardData.hrroundscore}}</label>
+                  </div>
+                 
+                 <div class="clearfix"></div>
+                  <hr>
+                  <div class="form-group">
+                    <label class="control-label col-sm-6" for="">Comments:</label>
+                    <label class="control-label col-sm-6" for="" style="text-align: left;">{{viewscoreboardData.comments}}</label>
+                  </div>
+
+                 
+                  <div class="clearfix"></div>
+                  <hr>
+                   <div class="form-group">
+                    <label class="control-label col-sm-6" for="">Admission Date:</label>
+                      <label class="control-label col-sm-6" for="" style="text-align: left;">{{viewscoreboardData.admissiondate | date}}</label>
+                     <!--  <label class="control-label col-sm-3" for="">Batch:</label>
+                      <label class="control-label col-sm-3" for="" style="text-align: left;">{{viewscoreboardData.batchname}}</label> -->
+                  </div>
+
+                  </form>
+                <!-- form -->
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end view modal -->
+
+        <!-- start delete modal -->
+        <div class="modal fade deletescoreboard" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;
+                  </button>
+                  <h4 class="modal-title">Delete Score Board
+                  </h4>
+                </div>
+                <div class="modal-body">
+                  <h4>Are you sure you want to delete ?
+                  </h4>
+                  <br>
+                  <a class="btn btn-danger btn-sm" ng-click="deleteScoreboard(deletescoreboardData.eRegistrationofficeuseId)" onclick="$('.modal').modal('hide')">
+                    <i class="fa fa-trash">
+                    </i>&nbsp;&nbsp;Delete
+                  </a>
+                  <a class="btn btn-default btn-sm" data-dismiss="modal">
+                    <i class="fa fa-trash">
+                    </i>&nbsp;&nbsp;Cancel
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        <!-- end delete modal -->
+       
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--====  End of Controller  ====-->
+
+ <script src="view/pages/Sales/Enrollment/Score Board/ScoreboardCtrl.js"></script>
+
+
+    
+
+   

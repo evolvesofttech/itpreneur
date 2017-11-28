@@ -1,0 +1,241 @@
+<div class="row no-margin" ng-controller="registerCtrl">
+    <div class="col-md-12 no-padding">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Register</h3>
+            </div>
+            <div class="panel-body">
+            <!-- alert messages -->
+            <div class="alert alert-danger fade in" ng-show="danger">
+                <a class="close" data-dismiss="alert">&times;</a>
+                <strong>Error!</strong> A problem has been occurred while submitting your data.
+            </div>
+                    
+            <div class="alert alert-success fade in" ng-show="success">
+                <a class="close" data-dismiss="alert">&times;</a>
+                <strong>Success!</strong> Your message has been sent successfully.
+            </div>
+            <!-- alert messages -->
+                <form name="addschool" class="form-horizontal" ng-submit="save(newuser)">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="">First Name</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control inputEle" ng-model="newuser.firstname" placeholder="Enter First Name">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="">Last Name</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control inputEle" ng-model="newuser.lastname" placeholder="Enter Last Name">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="">Date of Birth</label>
+                                <div class="col-md-8">
+                                    <input type="date" class="form-control inputEle" ng-model="newuser.dateofbirth">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="">Email ID</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control inputEle" ng-model="newuser.emailid" placeholder="Enter Email ID">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="">City</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control inputEle" ng-model="newuser.city" placeholder="Enter City">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="">Username</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control inputEle" ng-model="newuser.username" placeholder="Enter Username">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="">Password</label>
+                                <div class="col-md-8">
+                                    <input type="password" class="form-control inputEle" ng-model="newuser.password" placeholder="Enter Password">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="">Confirm Password</label>
+                                <div class="col-md-8">
+                                    <input type="password" class="form-control inputEle" ng-model="newuser.reenterpassword" placeholder="Confirm Password">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="">Board</label>
+                                <div class="col-md-8">
+                                    <select ng-model="newuser.cBoardId" ng-options="bo.cBoardId as bo.boardName for bo in Board" ng-change="OnBoardChange(newuser.cBoardId)" class="form-control">
+                                        <option value="">Select Board</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="">Medium</label>
+                                <div class="col-md-8">
+                                    <select ng-model="newuser.cMediumId" ng-options="me.cMediumId as me.mediumName for me in Medium" class="form-control">
+                                        <option value="">Select Medium</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="">Role</label>
+                                <div class="col-md-8">
+                                    <select ng-model="newuser.adRoleId" class="form-control inputEle" 
+                                      ng-options="st.adRoleId as st.roleName for st in Role">
+                                      <option value="">select Role</option>
+                                  </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mt20">
+                            <div class="form-group text-center">
+                                <div class="col-md-12">
+                                  <button type="submit" class="btn btn-success">Create Account</button>&nbsp;&nbsp;&nbsp;
+                                  <span style="line-height: 32px;">Already registered? <a href="#/login">Sign In</a></span>
+                                </div>
+                              </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==================================================For Registration===============================================
+
+    angular.module("theGuru").controller("registerCtrl", 
+        function($scope, $log, $routeParams, CRUD_SERVICE, baseUrlSrvc, $filter) {
+        //console.log("register");
+        $scope.registerArray = [];
+        $scope.OperType = $routeParams.ID;
+
+        //console.log($scope.OperType);
+        //1 Mean New Entry
+        var urlList = baseUrlSrvc.baseUrl + 'listRegistration';
+        GetAllRecords(urlList);
+        //To Get All Records
+        function GetAllRecords(url) {
+            var promiseGet = CRUD_SERVICE.getAllData(urlList);
+            promiseGet.then(function(pl) {
+                    $scope.register = pl.data;
+                    $scope.registerArray.push($scope.register);
+                    //console.log($scope.registerArray);
+                },
+                function(errorPl) {
+                    $log.error('Some Error in Getting Records.', errorPl);
+                });
+        }
+
+        //-----------------------------this is for School board select options---------------------
+        var boardListUrl = baseUrlSrvc.baseUrl + 'listBoard';
+        var promiseBoardGet = CRUD_SERVICE.getAllData(boardListUrl);
+        promiseBoardGet.then(function(pl) {
+                $scope.Board = pl.data;
+
+            },
+            function(errorPl) {
+                $log.error('Some Error in Getting Records.', errorPl);
+            });
+        //-----------------------------end of School board select-------------------------------
+
+        $scope.OnBoardChange = function(id) {
+            //console.log(id);
+            var mediumListUrl = baseUrlSrvc.baseUrl + 'listMedium';
+            var promiseMediumGet = CRUD_SERVICE.getAllData(mediumListUrl);
+            promiseMediumGet.then(function(pl) {
+                    $scope.MediumData = pl.data;
+
+                    $scope.Medium = $filter('filter')($scope.MediumData, { "cBoardId": id });
+                },
+                function(errorPl) {
+                    $log.error('Some Error in Getting Records.', errorPl);
+                });
+        }
+
+        //Role
+        //console.log("Role");
+        $scope.roleArray = [];
+        $scope.OperType = $routeParams.ID;
+
+        //console.log($scope.OperType);
+        //1 Mean New Entry
+        var urlRoleList = baseUrlSrvc.baseUrl + 'listRole';
+        GetAllRoleRecords(urlRoleList);
+        //To Get All Records
+        function GetAllRoleRecords(url) {
+            var promiseRoleGet = CRUD_SERVICE.getAllData(urlRoleList);
+            promiseRoleGet.then(function(pl) {
+                    $scope.Role = pl.data;
+                    $scope.roleArray.push($scope.Role);
+                    //console.log($scope.roleArray);
+                },
+                function(errorPl) {
+                    $log.error('Some Error in Getting Records.', errorPl);
+                });
+        }
+
+
+        //To Create new record and Edit an existing Record.
+        $scope.save = function(data) {
+            //console.log(data);
+
+            data.inInstituteId=0;
+              data.scSchoolId=0;
+
+            if ($scope.OperType === '0') {
+                var FormData = {
+                    formdata: data,
+                    url: baseUrlSrvc.baseUrl + 'registration'
+                };
+                var promisePost = CRUD_SERVICE.post(FormData);
+                promisePost.then(function(pl) {
+                    // $scope.boardId = pl.data.boardId;
+                    // GetAllRecords(urlList);
+                    // $scope.success = true;
+                    // $scope.danger = false;
+                    // ClearModels();
+                }, function(err) {
+                    //console.log(err);
+                    $scope.success = false;
+                    $scope.danger = true;
+                });
+            } else {
+                //  //console.log(/edit);
+                var FormData = {
+                    formdata: data,
+                    url: baseUrlSrvc.baseUrl + 'registration'
+                };
+                //Edit the record
+                // debugger;
+
+                var promisePut = CRUD_SERVICE.put($routeParams.ID, FormData);
+                promisePut.then(function(pl) {
+                    //$scope.Message = "Data Updated Successfuly";
+                    // GetAllRecords(urlList);
+                    $scope.success = true;
+                    $scope.danger = false;
+                    ClearModels();
+                }, function(err) {
+                    //console.log("Some Error Occured." + err);
+                    $scope.success = false;
+                    $scope.danger = true;
+                });
+            }
+        };
+    });
+
+    // ===============================End of Registration=============================================
+</script>

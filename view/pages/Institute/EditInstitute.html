@@ -1,0 +1,116 @@
+<style>
+    .teacherform .col-sm-4 {
+        line-height: 32px;
+        font-weight: bold;
+    }
+</style>
+<!--================================
+=            Controlelr            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+        <div class="row no-margin" ng-controller="instituteCtrl as Inst">
+         
+            <div class="col-md-12 no-padding">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Edit Institute</h3>
+                    </div>
+                    <div class="panel-body">
+                        <!-- alert messages -->
+                        <flash-message duration="5000" show-close="true" on-dismiss="myCallback(flash)">
+                        </flash-message>
+                        <!-- alert messages -->
+                        <form class="form-horizontal mb40" name="instituteform" ng-submit="saveInstitute(instituteData)" novalidate>
+                            <div class="button-group">
+                                <a href="#/Institute" class="btn btn-default btn-labeled btn-sm">
+                                    <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back</a>
+                                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</a>
+                            
+                                <button type="submit" class="btn btn-success btn-labeled btn-sm">
+                                <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Update</button>
+                            </div>
+                            <hr>
+                        <!-- <form class="form-horizontal mb40" ng-submit="save(instituteData)" novalidate> -->
+                            <div class="form-group">
+                                <input type="hidden" ng-model="instituteData.inInstituteId">
+                                <label class="control-label col-md-2 mandatory" for="">Institute Name</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control inputEle" ng-model="instituteData.institutename" ng-disabled="instituteData.institutename == 'Admin'">
+                                    <div class="clearfix" ng-required="true" ></div>
+                                  <p class="error" ng-show="instituteform.inst.$invalid && instituteform.inst.$touched">Please Enter Institute Name</p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-2" for="">Description</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control inputEle" ng-model="instituteData.description">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-2 mandatory" for="">Email</label>
+                                <div class="col-md-3">
+                                    <input type="text" name="mail" class="form-control inputEle" ng-model="instituteData.emailid" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" ng-required="true" >
+                                    <div class="clearfix"></div>
+                                  <p class="error" ng-show="instituteform.mail.$invalid && instituteform.mail.$touched">Please Enter Valid Email</p>
+                                </div>
+                                <label class="control-label col-md-2" for="">Website</label>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control inputEle" ng-model="instituteData.website">
+                                </div>
+                            </div>
+                            <div class="form-group required">
+                                <label class="control-label col-md-2" for="">Contact Number</label>
+                                <div class="col-md-3">
+                                    <input type="text" name="cont" class="form-control inputEle" ng-model="instituteData.contactno" placeholder="Enter Number" maxlength="10" ng-required="true" restrict-to="[0-9]">
+                                    <div class="clearfix" ></div>
+                                  <p class="error" ng-show="instituteform.cont.$invalid && instituteform.cont.$touched">Please Enter Contact Number</p>
+                                </div>
+                                <label class="control-label col-md-2" for="">Username</label>
+                                <div class="col-md-3">
+                                    <input type="text" name="un" class="form-control inputEle" ng-model="instituteData.username" ng-required="true" ng-disabled="instituteData.institutename == 'Admin'">
+                                    <div class="clearfix"></div>
+                                  <p class="error" ng-show="instituteform.un.$invalid && instituteform.un.$touched">Please Enter User Name</p>
+                                </div>
+                            </div>
+
+                            <br>
+                            <div class="form-group form-group required">
+                                <div class="col-md-12 text-center">
+                                    <!-- <button type="submit" class="btn btn-success">Update</button> -->
+                                </div>
+                            </div>
+                        </form>
+                        <!-- tab starts -->
+                        <div id="exTab2">
+                            <ul class="nav nav-tabs">
+                                <li ng-class="{active:Inst.isSet(1)}">
+                                    <a ng-click="Inst.setTab(1)">Financial Year</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <!--===========================
+                                =            Tab 1            =
+                                ============================-->
+                                <div class="tab-pane active" ng-show="Inst.isSet(1)">
+
+                                    <div ng-include="'view/pages/Institute/FinancialYear.html'"></div>
+
+                                </div>
+                                <!--====  End of Tab 1  ====-->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- end controller div -->
+    </div>
+</div>
+<!--====  End of Controlelr  ====-->
+
+<script src="view/pages/Institute/InstituteCtrl.js"></script>

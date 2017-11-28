@@ -1,0 +1,94 @@
+<style>
+  .card-block {
+  flex: 1 1 auto;
+  padding: 1.25rem; }
+
+.card-header {
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 0;
+  background-color: #eceff1;
+  border-bottom: 1px solid #cfd8dc; }
+  ul li {
+    font-size: 14px;
+    font-weight: bold;
+  }
+</style>
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="instructionCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <!-- <div class="panel-heading">
+              <h3 class="panel-title">Instruction</h3>
+            </div> -->
+            <div class="panel-body">
+              
+              <div class="button-group">
+                <a href="#/Test" class="btn btn-default btn-sm">
+                  <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back
+                </a>
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+              </div>
+
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="card">
+                    <div class="card-header">
+                        <strong>{{ SingleTest.title }} - Instructions</strong>
+                    </div><!--card header-->
+                    <div class="card-block">
+                      <h4>The online entrance test is simple to get through.
+                      We assume that the applicant taking the online test has a basic familiarity with computers and is comfortable with the use of keyboard and mouse.</h4><br>
+                      <h4>This test consists of two sections: (1) a multiple-choice question section and (2) a constructed-response assignment section. Each question in the first section is a
+                      multiple-choice question with four answer choices. Read each question and answer
+                      choice carefully and choose the ONE best answer.
+                      Try to answer all questions. In general, if you have some knowledge about a question, it
+                      is better to try to answer it. You will not be penalized for guessing.
+                      The second section contains one constructed-response assignment. Directions for the
+                      constructed-response assignment section appear immediately before the assignment.
+                      You may work on the multiple-choice questions and the constructed-response
+                      assignment in any order that you choose. Be sure to allocate your time carefully so you
+                      are able to complete the entire test within the testing session. You may go back and
+                      review your answers at any time during the testing session.
+                      You may NOT use a calculator or reference materials during the testing session.</h4>
+                      <br><br>
+                      <h3><b>Exam Details</b></h3><br>
+                        <ul>
+                          <li>Test Name: {{ SingleTest.title }}</li>
+                          <li>Description: {{ SingleTest.description }}</li>
+                          <li>Course: {{ SingleTest.coursename }}</li>
+                          <li>Technology/Subject: {{ SingleTest.technologyname }}</li>
+                          <li>Topic: {{ SingleTest.coursename }}</li>
+                          <li>Time: {{ SingleTest.time }} Minutes</li>
+                          <li>Total Questions: {{ SingleTest.totalquestions }}</li>
+                          <li>Passing Percentage: {{ SingleTest.passingpercentage }} %</li>
+                          <li>Right Answer Percentage: {{ SingleTest.rightanswer }} %</li>
+                          <li>Wrong Answer Percentage: {{ SingleTest.wronganswer }} %</li>
+                        </ul>
+                      
+                      </div> <!-- card block-->
+
+                      <div class="card-block text-center">
+                        <a type="button" class="btn btn-success" href="#/Start Test/{{OperType}}"><i class="icon-clock"></i>&nbsp;Start</a>
+                        <br><br><br><br>
+                      </div><!-- card block-->
+
+                    </div> <!--card-->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Student/Test/instructionCtrl.js"></script>

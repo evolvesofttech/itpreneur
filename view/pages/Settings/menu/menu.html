@@ -1,0 +1,704 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="settingMenuCtrl">
+          <div class="col-md-12 no-padding">
+              <div class="panel panel-info">
+                  <div class="panel-heading">
+                      <h3 class="panel-title">Menu</h3>
+                  </div>
+                  <div class="panel-body">
+                      <!-- alert messages -->
+                      <flash-message duration="5000" show-close="true" on-dismiss="myCallback(flash)">
+                      </flash-message>
+                      <!-- alert messages -->
+
+                      <div class="button-group">
+                          <a data-toggle="modal" data-target=".addMenu" class="btn btn-default btn-labeled btn-sm">
+                            <i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Add Menu</a>
+
+                            <a data-toggle="modal" data-target=".assignWindow" class="btn btn-default btn-labeled btn-sm">
+                            <i class="fa fa-users"></i>&nbsp;&nbsp;Assign Window</a>
+                            <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                                <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                              </a>
+                      </div>
+                      <div class="row">
+                      	<div class="col-md-6">
+                      		<h4>Menu &amp; Window List</h4>
+                      		<table ng-table="usersTable_b" show-filter="true" class="table table-bordered table-striped text-center">
+      		                    <tbody>
+      		                        <tr ng-repeat="mw in data_b">
+      		                            <td data-title="'Menu'" filter="{ 'menuName': 'text' }">{{mw.menuName}}</td>
+      		                            <td data-title="'Window'" filter="{ 'windowName': 'text' }">{{mw.windowName}}</td>
+      		                            <td data-title="'Actions'" class="w150">
+                                          
+      		                                <a data-toggle="modal" data-target=".assignWindow" ng-click="editMenuWindow(mw.adMenuwindowId)" class="btn btn-success btn-xs" tooltip-placement="top" uib-tooltip="Edit"><i class="fa fa-pencil-square-o"></i>
+                                              </a>
+
+                                              <a class="btn btn-info btn-xs" disabled>
+                                                <i class="fa fa-eye"></i>
+                                              </a>
+
+      		                                <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deleteMenuWindow" ng-click="delMenuWindow(mw.adMenuwindowId, data_b)" tooltip-placement="top" uib-tooltip="Delete"><i class="fa fa-trash"></i>
+                                              </a>
+
+                                              <a class="btn btn-primary btn-xs" disabled>
+                                                <i class="fa fa-plus">
+                                                </i>
+                                              </a>
+
+      		                            </td>
+      		                        </tr>
+      		                    </tbody>
+      		                </table>
+                      	</div>
+                      	<div class="col-md-6">
+                      		<h4>Menu List</h4>
+                      		<table ng-table="usersTable_a" show-filter="true" class="table table-bordered table-striped text-center">
+      		                    <tbody>
+      		                        <tr ng-repeat="me in data_a">
+      		                            <td data-title="'Menu'" filter="{ 'menuName': 'text' }">{{me.menuName}}</td>
+      		                            <td data-title="'Actions'" class="w150">
+      		                                <a data-toggle="modal" data-target=".addMenu" class="btn btn-success btn-xs" ng-click="editMenu(me.adMenuId)"><i class="fa fa-pencil-square-o"></i></a>
+      		                                <!-- <a data-toggle="modal" data-target=".viewmedium" class="btn btn-info btn-xs" ng-click="viewMedium(me.adMenuwindowId)"><i class="fa fa-eye"></i></a> -->
+      		                                <a data-toggle="modal" data-target=".deleteMenu" class="btn btn-danger btn-xs" ng-click="delMenu(me.adMenuId, data_a)"><i class="fa fa-trash"></i></a>
+      		                            </td>
+      		                        </tr>
+      		                    </tbody>
+      		                </table>
+                      	</div>
+                      </div>
+                      <!-- starts add medium modal -->
+                      <div class="modal fade addMenu" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                          <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                                      <h4 class="modal-title">Add Menu</h4>
+                                  </div>
+                                  <div class="modal-body">
+                                    <!--===================================
+              				            	=            Add Menu Form            =
+              				            	====================================-->
+              				                <form name="menuform" class="form-horizontal login-form" ng-submit="saveMenu(MenuData)" novalidate>
+                                        <div class="form-group form-group required" >
+                                          <label class="control-label col-md-3" for="">Add Menu</label>
+                                          <div class="col-md-7">
+                                            <input type="text" name="addmenuname" class="form-control inputEle" ng-model="MenuData.menuName"  placeholder="Enter Menu" ng-required="true">
+                                            <div class="clearfix"></div>
+                                            <p class="error" ng-show="menuform.addmenuname.$invalid && menuform.addmenuname.$touched">Please Enter Menu Name</p>
+                                          </div>
+                                        </div>
+                                          <br>
+                                        <div class="form-group">
+                                          <div class="col-md-12 text-center">
+                                            <button type="submit" ng-disabled="menuform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Add Menu</button>
+                                          </div>
+                                        </div>
+                                    </form>
+              						        <!--====  End of Add Menu Form  ====-->
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <!-- end add medium modal -->
+                      <!-- start view medium modal -->
+                      <div class="modal fade assignWindow" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                          <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                                      <h4 class="modal-title">Assign Window to Menu</h4>
+                                  </div>
+                                  <div class="modal-body">
+                              <!--================================================
+      				                =            Assign Window to menu form            =
+      				                =================================================-->
+      				                <form class="form-horizontal login-form" name="menuWindowForm" ng-submit="saveMenuWindow(menuWindowData)">
+      				                	  <input type="hidden" ng-model="menuWindowData.adMenuwindowId">
+            						          <div class="form-group form-group required" >
+            						            <label class="control-label col-md-3" for="">Menu</label>
+            						            <div class="col-md-7">
+            						            	<select ng-model="menuWindowData.adMenuId" name="assignMenu" class="form-control inputEle" ng-options="st.adMenuId as st.menuName for st in Menu" ng-required="true">
+      		                              <option value="">select Menu</option>
+      			                          </select>
+                                      <div class="clearfix"></div>
+                                      <p class="error" ng-show="menuWindowForm.assignMenu.$invalid && menuWindowForm.assignMenu.$touched">Please Select Menu</p>
+            						            </div>
+            						          </div>
+
+            						          <div class="form-group form-group required" >
+            						            <label class="control-label col-md-3" for="">Window</label>
+            						            <div class="col-md-7">
+            						              <select ng-model="menuWindowData.adWindowId" name="assignWindow" class="form-control inputEle" ng-options="win.adWindowId as win.windowName for win in Window" ng-required="true">
+      			                              <option value="">select Window</option>
+      			                          </select>
+                                      <div class="clearfix"></div>
+                                      <p class="error" ng-show="menuWindowForm.assignWindow.$invalid && menuWindowForm.assignWindow.$touched">Please Select Window</p>
+            						            </div>
+            						          </div>
+            						            <br>
+            						          <div class="form-group">
+            						            <div class="col-md-12 text-center">
+            						              <button type="submit" ng-disabled="menuWindowForm.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Assign Window</button>
+            						            </div>
+            						          </div>
+          						        </form>				                
+      				                <!--====  End of Assign Window to menu form  ====-->
+                                  </div>
+                                  </div>
+                              </div>
+                          </div>
+                          <!-- end view medium modal -->
+
+                          <!-- delete modal -->
+                          <div class="modal fade deleteMenuWindow" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                            <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <button type="button" class="close" data-dismiss="modal">&times;
+                                  </button>
+                                  <h4 class="modal-title">Delete Menu Window
+                                  </h4>
+                                </div>
+                                <div class="modal-body">
+                                  <h4>Are you sure you want to delete 
+                                    <strong>{{deletemenuwindowData.menuName}}&nbsp;&nbsp;{{deletemenuwindowData.windowName}}?
+                                    </strong>
+                                  </h4>
+                                  <br>
+                                  <a class="btn btn-danger btn-sm" ng-click="deleteMenuWindow(deletemenuwindowData.adMenuwindowId)" onclick="$('.modal').modal('hide')">
+                                    <i class="fa fa-trash">
+                                    </i>&nbsp;&nbsp;Delete
+                                  </a>
+                                  <a class="btn btn-default btn-sm" data-dismiss="modal">
+                                    <i class="fa fa-trash">
+                                    </i>&nbsp;&nbsp;Cancel
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- delete modal -->
+
+                          <!-- delete modal -->
+                          <div class="modal fade deleteMenu" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                            <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <button type="button" class="close" data-dismiss="modal">&times;
+                                  </button>
+                                  <h4 class="modal-title">Delete Menu
+                                  </h4>
+                                </div>
+                                <div class="modal-body">
+                                  <h4>Are you sure you want to delete 
+                                    <strong>{{deletemenuData.menuName}}?
+                                    </strong>
+                                  </h4>
+                                  <br>
+                                  <a class="btn btn-danger btn-sm" ng-click="deleteMenu(deletemenuData.adMenuId)" onclick="$('.modal').modal('hide')">
+                                    <i class="fa fa-trash">
+                                    </i>&nbsp;&nbsp;Delete
+                                  </a>
+                                  <a class="btn btn-default btn-sm" data-dismiss="modal">
+                                    <i class="fa fa-trash">
+                                    </i>&nbsp;&nbsp;Cancel
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- delete modal -->
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script>
+	angular.module("theGuru").controller("settingMenuCtrl", function($scope, $log, $routeParams, 
+		CRUD_SERVICE, baseUrlSrvc, $filter, ngTableParams, $route, $timeout, Flash, $rootScope, $sessionStorage, $window) {
+
+    //Menu
+    $window.document.title = "ITPreneur - Menu";
+    $scope.menuArray = [];
+    $scope.OperType = $routeParams.ID;
+
+    /*====================================
+    =            Page Refresh            =
+    ====================================*/
+
+    $scope.refreshPage = function() {
+        $timeout(function() {
+           $scope.$apply(function () {
+            $route.reload();
+          });
+      },100);
+    }
+
+    /*=====  End of Page Refresh  ======*/
+
+    //To Clear all input controls.
+        function ClearMenuModels() {
+            $scope.MenuData = {};
+        }
+
+    /*=====================================
+    =            Get Menu List            =
+    =====================================*/
+    
+    //console.log($scope.OperType);
+    //1 Mean New Entry
+    var urlMenuList = baseUrlSrvc.baseUrl + 'listMenu';
+    GetAllRecords(urlMenuList);
+    //To Get All Records
+    function GetAllRecords(url) {
+        var promiseMenuGet = CRUD_SERVICE.getAllData(urlMenuList);
+        promiseMenuGet.then(function(pl) {
+                $scope.Menu = pl.data;
+                $scope.menuArray.push($scope.Menu);
+                //console.log($scope.menuArray);
+
+                    //========================================for pagination ========================
+                      $scope.usersTable_a = new ngTableParams({
+                          page: 1,
+                          count: 10
+                      }, {
+                         total: $scope.Menu.length, 
+                          getData: function ($defer, params) {
+
+                            if (params.settings().$scope == null) {
+                                params.settings().$scope = $scope;
+                              }
+                          
+                              $scope.data_a = params.sorting() ? $filter('orderBy')($scope.menuArray[0], params.orderBy()) : $scope.menuArray[0];
+                              $scope.data_a = params.filter() ? $filter('filter')($scope.data_a, params.filter()) : $scope.data_a;
+                             $scope.data_a = $scope.data_a.slice((params.page() - 1) * params.count(), params.page() * params.count());
+                             $defer.resolve($scope.data_a)
+                             
+                              //$scope.data = $scope.board.slice((params.page() - 1) * params.count(), params.page() * params.count());
+                             // $defer.resolve($scope.data);
+                          }
+                      });
+            },
+            function(errorPl) {
+                $log.error('Some Error in Getting Records.', errorPl);
+            });
+    }
+    
+    /*=====  End of Get Menu List  ======*/
+
+    /*============================================
+        =            Clear Modal on Click            =
+        ============================================*/
+        
+        $scope.clearModalOnClose = function() {
+            $scope.MenuData = {};
+            $scope.menuWindowData = {};
+        }
+        
+        /*=====  End of Clear Modal on Click  ======*/
+    
+
+    /*=======================================
+    =            Get Window List            =
+    =======================================*/
+    
+    //Windows
+    //console.log("Window");
+    $scope.windowArray = [];
+    $scope.OperType = $routeParams.ID;
+
+    //console.log($scope.OperType);
+    //1 Mean New Entry
+    var urlWindowList = baseUrlSrvc.baseUrl + 'listWindow';
+    GetAllWindowRecords(urlWindowList);
+    //To Get All Records
+    function GetAllWindowRecords(url) {
+        var promiseWindowGet = CRUD_SERVICE.getAllData(urlWindowList);
+        promiseWindowGet.then(function(pl) {
+                $scope.Window = pl.data;
+                $scope.windowArray.push($scope.Window);
+                // //console.log($scope.windowArray);
+
+                
+            },
+            function(errorPl) {
+                $log.error('Some Error in Getting Records.', errorPl);
+            });
+    }
+    
+    /*=====  End of Get Window List  ======*/
+    
+    
+    /*=================================
+    =            Save Menu            =
+    =================================*/
+    
+    //To Create new record and Edit an existing Record.
+    $scope.saveMenu = function(data) {
+        //console.log(data);
+       
+        // data.inInstituteId=0;
+        //  data.scSchoolId=0;
+        if (data.adMenuId) {
+
+            data.updatedby=$sessionStorage.updatedby;
+            data.inInstituteId=$sessionStorage.inInstituteId;
+            data.bBranchId=$sessionStorage.bBranchId;
+            data.adUserId = $sessionStorage.adUserId;
+
+
+            var FormData = {
+                formdata: data,
+                url: baseUrlSrvc.baseUrl + 'addUpdateMenu'
+            };
+            var promisePost = CRUD_SERVICE.post(FormData);
+            promisePost.then(function(pl) {
+                $scope.adMenuId = pl.data.adMenuId;
+
+                $timeout(function() {
+                    $scope.$apply(function () {
+                    $route.reload();
+                    });
+                },100);
+                 Flash.create('success', $scope.SuccessMessage);
+                ClearMenuModels();
+               
+            }, function(err) {
+                //console.log(err);
+                $timeout(function() {
+                    $scope.$apply(function () {
+                    $route.reload();
+                    });
+                },100);
+                 Flash.create('danger', $scope.DangerMessage);
+            });
+        } else {
+            data.createdby=$sessionStorage.createdby;
+            data.inInstituteId=$sessionStorage.inInstituteId;
+            data.bBranchId=$sessionStorage.bBranchId;
+            data.updatedby=$sessionStorage.updatedby;
+            data.adUserId = $sessionStorage.adUserId;
+
+            //  //console.log(/edit);
+            var FormData = {
+                formdata: data,
+                url: baseUrlSrvc.baseUrl + 'addUpdateMenu'
+            };
+            //Edit the record
+            // debugger;
+
+            var promisePut = CRUD_SERVICE.put($routeParams.ID, FormData);
+            promisePut.then(function(pl) {
+                $timeout(function() {
+                    $scope.$apply(function () {
+                    $route.reload();
+                    });
+                },100);
+                 Flash.create('success', $scope.SuccessMessage);
+                ClearMenuModels();
+            }, function(err) {
+                //console.log("Some Error Occured." + err);
+                $timeout(function() {
+                    $scope.$apply(function () {
+                    $route.reload();
+                    });
+                },100);
+                 Flash.create('danger', $scope.DangerMessage);
+            });
+        }
+    };
+
+        $scope.editMenu = function(id) {
+             //console.log(id); 
+             
+             var urlMenuList = baseUrlSrvc.baseUrl + 'listMenu';
+
+            var promiseGet = CRUD_SERVICE.getAllData(urlMenuList);
+            promiseGet.then(function (pl) {
+                    $scope.menu_a = pl.data;
+                    //console.log($scope.menu_a);
+                    for (var i = 0; i < $scope.menu_a.length; i++) {
+                        if ($scope.menu_a[i].adMenuId == id) {
+                            $scope.MenuData = $scope.menu_a[i];
+                              //console.log("Menu Window Data",$scope.MenuData);
+                        }
+                    }
+
+                },
+                function (errorPl) {
+                    $log.error('Some Error in Getting Records.', errorPl);
+                });
+        }
+    
+    /*=====  End of Save Menu  ======*/
+    
+    
+    /*============================================
+    =            Get Menu Window List            =
+    ============================================*/
+    
+    //ListMenuWindow
+        //console.log("Menu Window");
+        $scope.menuWindowArray = [];
+        $scope.OperType = $routeParams.ID;
+
+        //console.log($scope.OperType);
+        //1 Mean New Entry
+        var urlMenuWindowList = baseUrlSrvc.baseUrl + 'listMenuWindow';
+        GetAllMenuWindowRecords(urlMenuWindowList);
+        //To Get All Records
+        function GetAllMenuWindowRecords(url) {
+            var promiseMenuWindowGet = CRUD_SERVICE.getAllData(urlMenuWindowList);
+            promiseMenuWindowGet.then(function(pl) {
+                    $scope.MenuWindow = pl.data;
+                    $scope.menuWindowArray.push($scope.MenuWindow);
+                    // //console.log($scope.menuWindowArray);
+
+                    //========================================for pagination ========================
+                  $scope.usersTable_b = new ngTableParams({
+                      page: 1,
+                      count: 10
+                  }, {
+                     total: $scope.MenuWindow.length, 
+                      getData: function ($defer, params) {
+
+                        if (params.settings().$scope == null) {
+                                params.settings().$scope = $scope;
+                              }
+                      
+                          $scope.data_b = params.sorting() ? $filter('orderBy')($scope.menuWindowArray[0], params.orderBy()) : $scope.menuWindowArray[0];
+                          $scope.data_b = params.filter() ? $filter('filter')($scope.data_b, params.filter()) : $scope.data_b;
+                         $scope.data_b = $scope.data_b.slice((params.page() - 1) * params.count(), params.page() * params.count());
+                         $defer.resolve($scope.data_b)
+                         
+                          //$scope.data = $scope.board.slice((params.page() - 1) * params.count(), params.page() * params.count());
+                         // $defer.resolve($scope.data);
+                      }
+                  });
+                },
+                function(errorPl) {
+                    $log.error('Some Error in Getting Records.', errorPl);
+                });
+        }
+    
+    /*=====  End of Get Menu Window List  ======*/
+    
+    
+
+    /*=============================================
+    =            Save Edit Menu Window            =
+    =============================================*/
+    
+    $scope.editMenuWindow = function(id) {
+             //console.log(id); 
+             //Menu
+              var menuListUrl = baseUrlSrvc.baseUrl + 'listMenu';
+            var promiseMenuGet = CRUD_SERVICE.getAllData(menuListUrl);
+            promiseMenuGet.then(function(pl) {
+                    $scope.Menu = pl.data;
+
+                    //console.log($scope.Menu);
+                },
+                function(errorPl) {
+                    $log.error('Some Error in Getting Records.', errorPl);
+                });
+             //Menu
+
+             //window
+              var windowListUrl = baseUrlSrvc.baseUrl + 'listWindow';
+            var promiseWindowGet = CRUD_SERVICE.getAllData(windowListUrl);
+            promiseWindowGet.then(function(pl) {
+                    $scope.Window = pl.data;
+                },
+                function(errorPl) {
+                    $log.error('Some Error in Getting Records.', errorPl);
+                });
+             //window
+             var urlList = baseUrlSrvc.baseUrl + 'listMenuWindow';
+
+            var promiseGet = CRUD_SERVICE.getAllData(urlList);
+            promiseGet.then(function (pl) {
+                    $scope.menuwindow_a = pl.data;
+                    //console.log($scope.menuwindow_a);
+                    for (var i = 0; i < $scope.menuwindow_a.length; i++) {
+                        if ($scope.menuwindow_a[i].adMenuwindowId == id) {
+                            $scope.menuWindowData = $scope.menuwindow_a[i];
+                              //console.log("Menu Window Data",$scope.menuWindowData);
+                        }
+                    }
+
+                },
+                function (errorPl) {
+                    $log.error('Some Error in Getting Records.', errorPl);
+                });
+        }
+
+    //To Create new record and Edit an existing Record.
+    $scope.saveMenuWindow = function(data) {
+        //console.log(data);
+       
+        // data.inInstituteId=0;
+        //  data.scSchoolId=0;
+
+        if (data.adMenuwindowId) {
+
+           data.updatedby=$sessionStorage.updatedby;
+            data.inInstituteId=$sessionStorage.inInstituteId;
+            data.bBranchId=$sessionStorage.bBranchId;
+            data.adUserId = $sessionStorage.adUserId;
+
+
+            var FormData = {
+                formdata: data,
+                url: baseUrlSrvc.baseUrl + 'addUpdateMenuWindow'
+            };
+            var promisePost = CRUD_SERVICE.post(FormData);
+            promisePost.then(function(pl) {
+                $scope.adMenuwindowId = pl.data.adMenuwindowId;
+                $timeout(function() {
+                    $scope.$apply(function () {
+                    $route.reload();
+                    });
+                },100);
+                 Flash.create('success', $scope.SuccessMessage);
+               
+            }, function(err) {
+                //console.log(err);
+                $timeout(function() {
+                    $scope.$apply(function () {
+                    $route.reload();
+                    });
+                },100);
+                 Flash.create('danger', $scope.DangerMessage);
+            });
+        } else {
+            //  //console.log(/edit);
+            data.createdby=$sessionStorage.createdby;
+            data.inInstituteId=$sessionStorage.inInstituteId;
+            data.bBranchId=$sessionStorage.bBranchId;
+            data.updatedby=$sessionStorage.updatedby;
+            data.adUserId = $sessionStorage.adUserId;
+
+            var FormData = {
+                formdata: data,
+                url: baseUrlSrvc.baseUrl + 'addUpdateMenuWindow'
+            };
+            //Edit the record
+            // debugger;
+
+            var promisePut = CRUD_SERVICE.put($routeParams.ID, FormData);
+            promisePut.then(function(pl) {
+                $timeout(function() {
+                    $scope.$apply(function () {
+                    $route.reload();
+                    });
+                },100);
+                 Flash.create('success', $scope.SuccessMessage);
+                ClearModels();
+            }, function(err) {
+                //console.log("Some Error Occured." + err);
+                $timeout(function() {
+                    $scope.$apply(function () {
+                    $route.reload();
+                    });
+                },100);
+                 Flash.create('danger', $scope.DangerMessage);
+            });
+        }
+    };
+    
+    /*=====  End of Save Edit Menu Window  ======*/
+    
+
+    /*========================================
+    =            Delete Functions            =
+    ========================================*/
+
+      $scope.delMenu = function(id, mdata) {
+        //console.log("id", id+mdata);
+          $scope.temp_var1 = $filter('filter')(mdata, { "adMenuId": id });
+
+           $scope.deletemenuData= {
+              "adMenuId": $scope.temp_var1[0].adMenuId,
+              "menuName": $scope.temp_var1[0].menuName
+           };
+        }
+    
+        //To Delete Menu
+        $scope.deleteMenu = function(id) {
+            //console.log(id);
+            var FormData = {
+                id: id,
+                url: baseUrlSrvc.baseUrl + 'deleteMenu'
+            };
+            var promiseDelete = CRUD_SERVICE.delete(FormData);
+            promiseDelete.then(function(pl) {
+                $timeout(function() {
+                    $scope.$apply(function () {
+                    $route.reload();
+                    });
+                },100);
+                 Flash.create('success', $scope.SuccessMessage);
+                ClearModels();
+            }, function(err) {
+                //console.log("Some Error Occured." + err);
+                $timeout(function() {
+                    $scope.$apply(function () {
+                    $route.reload();
+                    });
+                },100);
+                 Flash.create('danger', $scope.DangerMessage);
+            });
+        }
+
+        $scope.delMenuWindow = function(id, mwdata) {
+          $scope.temp_var = $filter('filter')(mwdata, { "adMenuwindowId": id });
+
+           $scope.deletemenuwindowData= {
+              "adMenuwindowId": $scope.temp_var[0].adMenuwindowId,
+              "menuName": $scope.temp_var[0].menuName,
+              "windowName": $scope.temp_var[0].windowName
+           };
+        }
+
+        //To Delete Menu window
+        $scope.deleteMenuWindow = function(id) {
+            //console.log(id);
+            var FormData = {
+                id: id,
+                url: baseUrlSrvc.baseUrl + 'deleteMenuWindow'
+            };
+            var promiseDelete = CRUD_SERVICE.delete(FormData);
+            promiseDelete.then(function(pl) {
+                $timeout(function() {
+                    $scope.$apply(function () {
+                    $route.reload();
+                    });
+                },100);
+                 Flash.create('success', $scope.SuccessMessage);
+                ClearModels();
+            }, function(err) {
+                //console.log("Some Error Occured." + err);
+                $timeout(function() {
+                    $scope.$apply(function () {
+                    $route.reload();
+                    });
+                },100);
+                 Flash.create('danger', $scope.DangerMessage);
+            });
+        }
+    
+    /*=====  End of Delete Functions  ======*/  
+
+});
+</script>

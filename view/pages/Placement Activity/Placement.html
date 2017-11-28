@@ -1,0 +1,1282 @@
+  <!--================================
+=            Controller            =
+=================================-->
+<style type="text/css">
+  .treelist input[type=checkbox] {
+    position: relative;
+    top: 2px;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+  input[type=checkbox] {
+    cursor: pointer;
+  }
+  .dropdown-multiselect .caret {
+    float: right;
+    /* line-height: 25px; */
+    position: relative;
+    top: 7px;
+    left: 5px;
+  }
+  .tflabel {
+    display: inline-block;
+    margin-left: 10px;
+    position: relative;
+    top: -2px;
+  }
+  .treelist i {
+    cursor: pointer;
+  }
+  .treelist {
+    padding: 0;
+    list-style: none;
+  }
+  .treelist1, .treelist2 {
+    list-style: none;
+  }
+  .studentlist {
+    line-height: 30px;
+  }
+
+    .multiselect-parent {
+    width: 100%;
+  }
+  .multiselect-parent .btn-default {
+    width: 100%;
+    text-align: left;
+  }
+  .dropdown-menu-form {
+    width: 100%;
+  }
+.parent {
+  padding: 5px 0;
+}
+.red-color {
+  color: red !important;
+}
+.black-color {
+  color: black !important;
+}
+
+.cell-input,
+.cell-name,
+.indent {
+  display: inline-block;
+}
+
+.ck-nested .parent > .cell-name {
+  cursor: pointer;
+}
+
+.ck-nested .parent > .cell-name > .indent {
+  margin-right: 5px;
+}
+
+.indent:before {
+  font-family: "monospace";
+  margin-right: 5px;
+  content: " * ";
+  display: inline-block;
+}
+
+div.parent > .indent:before {
+  content: " > ";
+  -moz-transition: -moz-transform 0.3s;
+  -o-transition: -o-transform 0.3s;
+  -webkit-transition: -webkit-transform 0.3s;
+  transition: transform 0.3s;
+}
+
+.ck-nested .children {
+  display: none;
+}
+
+.ck-nested .opened > div:parent > .indent:before {
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+
+.ck-nested .opened > .children {
+  display: table-row;
+}
+
+  /*.ng-table-counts {
+    display: block !important;
+    float: left !important;
+  }*/
+</style>
+
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state" >
+   <div class="container-fluid">
+      <div class="row no-margin" ng-controller="PlacementCtrl">
+         <div class="col-md-12 no-padding">
+            <div class="panel panel-info">
+               <div class="panel-heading">
+                  <h3 class="panel-title">Placement Activity
+                     <span class="pull-right"><small>Total: </small><span class="badge" ng-init="StudentList.length = '0'">{{data_Placement.length}}</span></span>
+                  </h3>
+               </div>
+               <div class="panel-body">
+                  <!-- toaster message -->
+                  <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+                  <!-- toaster message -->
+                  
+                  <!-- <form class="form-horizontal"> -->
+                     <div class="form-group ">
+                        <label class="control-label col-sm-2" for="">Company</label>
+                        <div class="col-sm-3">
+                           <select ng-model="placementData.clClientId"  class="form-control inputEle" ng-options="com.clClientId as com.companyname for com in Company"  ng-change="companyChange(placementData.clClientId, Company)" >
+                              <option value="">Select Company</option>
+                           </select>
+                        </div>
+                        <label class="control-label col-sm-2" for="">Jobs</label>
+                        <div class="col-sm-3">
+                           <select ng-model="placementData.clClientjobprofileId"  class="form-control inputEle" ng-options="job.clClientjobprofileId as job.jobprofile for job in Job  |filter:jobstatus = 'Open'"  ng-change="jobChange(placementData.clClientjobprofileId, Job)"  ng-disabled="disableJobs">
+                              <option value="">Select Job</option>
+                           </select>
+                        </div>
+                     </div>
+                     <div class="clearfix"></div>
+                     <br>
+                     
+                     <div class="form-group">
+                        <div class="col-md-3">
+                          <!-- <button class="btn btn-default btn-md" ng-click="checkAll()">Select All</button> -->
+                          <a href="" class="btn btn-default btn-sm" ng-click="checkAll()" ng-show="data_Placement">Select All</a>
+                          <a href="" class="btn btn-default btn-sm" ng-click="uncheckAll()" ng-show="data_Placement">Deselect All</a>
+                        </div>
+                        <div class="col-md-9">
+                          
+                          <button id="download-btn" class="btn btn-default btn-sm pull-right" ng-disabled="user.data_Placement.length > 0 ? false : true">
+                            <i class="fa fa-download"></i>&nbsp;&nbsp;Resume
+                          </button>
+                          <button ng-click="refreshPage()" class="btn btn-default btn-sm pull-right" style="margin-right: 10px;">
+                            <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                          </button>
+
+                          <button ng-click="exportAction('excel','Placement')" class="btn btn-default btn-sm pull-right" style="margin-right: 10px;">
+                            <i class="fa fa-file-excel-o"></i>&nbsp;&nbsp;Export to Excel
+                            </button>
+
+                          <button data-toggle="modal" data-target=".sendemailmodal" class="btn btn-success btn-sm pull-right" ng-click="" ng-disabled="user.data_Placement.length > 0 ? false : true" style="margin-right: 10px;">
+                          <i class="fa fa-envelope"></i>&nbsp;&nbsp;
+                          Invitation Via Mail</button>
+
+                          <button data-toggle="modal" data-target=".advancesearch" class="btn btn-primary btn-sm pull-right" ng-click="advanceSearchClick(placementData.clClientId, placementData.clClientjobprofileId)" ng-disabled="disableAdvanceButton" style="margin-right: 10px;">
+                          <i class="fa fa-search"></i>&nbsp;&nbsp;Advance Search</button>
+
+                          
+
+                        </div>
+                     </div>
+                     <div class="clearfix"></div>
+                     <br>
+                  <!-- </form> -->
+                  
+                  
+                  <table ng-table="usersTable_Placement" id="exportable" show-filter="true" class="table table-bordered table-striped text-center export-table">
+                     <tbody>
+                        <tr ng-repeat="pmt in data_Placement" ng-hide=" ">
+                           <td data-title="''">
+                              <input type="checkbox" checklist-model="user.eEnquiryformId" checklist-value="pmt.eEnquiryformId" ng-change="check(pmt.eEnquiryformId, checked, pmt.email, pmt.path)">
+                           </td>
+                           <!-- <td data-title="'Sr No.'">{{$index+1}}</td> -->
+                         <!--   <td data-title="'enquiryFormNo'" filter="{ 'enquiryFormNo': 'text' }">{{pmt.enquiryFormNo}}</td> -->
+                           <td data-title="'Student Name'" filter="{ 'studentname': 'text' }"><a href="" data-toggle="modal" data-target=".addenrollment" style="cursor: pointer;" ng-click="openAdmissionForm(pmt.eEnquiryformId, data_Placement)" ng-class="{'red-color' : pmt.placementstatus == 'Blacklisted','black-color' : pmt.placementstatus == 'Open'}">{{pmt.studentname}}</a></td>
+
+                           <td data-title="'Branch'" filter="{ 'branchName': 'text' }"><a href="" data-toggle="modal" data-target=".addbranch" style="cursor: pointer;" ng-click="openBranchForm(pmt.bBranchId)">{{pmt.branchName}}</a></td>
+
+                           <td data-title="'Batch'" filter="{ 'batchName': 'text' }"><a href="" data-toggle="modal" data-target=".addbatch" style="cursor: pointer;" ng-click="openBatchForm(pmt.cBatchId)">{{pmt.batchName}}</a></td>
+
+                           <td data-title="'Year of Passing'" filter="{ 'yearofpassing': 'text' }">{{pmt.yearofpassing}}
+                           </td>
+                           <td data-title="'Is Email Sent'" filter="{ 'ismailsend': 'text' }">{{pmt.ismailsend}} <span ng-if="!pmt.ismailsend">No</span>
+                           </td>
+                           <td data-title="'Action'" class="w150">
+                             <button ng-click="viewResumeClick(pmt.eEnquiryformId, data_Placement)" data-toggle="modal" data-target=".viewResumeModal" class="btn btn-info btn-xs" tooltip-placement="top" uib-tooltip="View"><i class="fa fa-eye"></i>
+                             </button>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+                  <div class="clearfix"></div>
+                  <!-- <div class="well">
+                    Active Advance Filter : <div ng-repeat="adv in advanceFilterShowArray"> 
+                    <p>Branch : {{adv.Branch}}</p>
+                    </div>
+                  </div> -->
+
+                  <!--======================================
+                  =            View Files Modal            =
+                  =======================================-->
+                  <div class="modal fade viewResumeModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                    <div class="modal-dialog modal-lg" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                          </button>
+                          <h4 class="modal-title">Details of {{viewResumeData.studentname}}</h4>
+                        </div>
+                        <div class="modal-body">
+
+                            <div class="well">
+                              <div class="row">
+                                <div class="col-md-6">Enquiry Form No: {{viewResumeData.enquiryFormNo}}</div>
+                                <div class="col-md-6">Branch: {{viewResumeData.branchName}}</div>
+                              </div>
+                              <div class="clearfix"></div><hr>
+                              <div class="row">
+                                <div class="col-md-6">Batch: {{viewResumeData.batchName}}</div>
+                                <div class="col-md-6">Email Sent: {{viewResumeData.ismailsend}}</div>
+                              </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <h3 class="text-center" style="margin: 20px 0;">Resume</h3>
+                           <div ng-if="fileExtension == 'txt'">
+                             <pre ng-include src="url"></pre>
+                           </div>
+
+                           <!-- <ng-pdf template-url="url" scale=1></ng-pdf> -->
+                           <div ng-if="fileExtension == 'pdf'" class="pdf">
+                             <pdf-viewer 
+                            delegate-handle="relativity-special-general-theory"
+                            url="url"
+                            scale="1"
+                            show-toolbar="true"></pdf-viewer>
+                           </div>
+
+                           <div class="doc" ng-if="fileExtension == 'doc' || fileExtension == 'docx'">
+                             <iframe ng-src='{{NotesDocUrl}}' style="position: relative;width:100%; height: 100%;min-height: 700px;"></iframe>
+                           </div>
+                           <div class="clearfix"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!--====  End of View Files Modal  ====-->
+
+                  <!--================================
+                  =            Add Branch            =
+                  =================================-->
+                  <div class="modal fade addbranch" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                    <div class="modal-dialog modal-lg" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                          </button>
+                          <h4 class="modal-title">Branch</h4>
+                        </div>
+                        <div class="modal-body">
+                          <form class="form-horizontal" name="addBranch" ng-submit="saveBranch(branchData)" novalidate>
+                          <input type="hidden" ng-model="branchData.bBranchId">
+                            <div class="form-group  required">
+                              <label class="control-label col-md-3" for="">Branch
+                              </label>
+                              <div class="col-md-7">
+                                <input type="text" name="branchName" class="form-control inputEle" ng-model="branchData.branchname" placeholder="Enter Branch Name" ng-required="true">
+                                <div class="clearfix"></div>
+                                <p class="error" ng-show="addBranch.branchName.$invalid && addBranch.branchName.$touched">Please Enter Branch Name</p>
+                              </div>
+                            </div>
+                             <div class="form-group required">
+                              <label class="control-label col-md-3" for="">Description
+                              </label>
+                              <div class="col-md-7">
+                                <input type="text" name="desc" class="form-control inputEle" ng-model="branchData.description" placeholder="Describe your Branch" ng-required="true">
+                                <div class="clearfix"></div>
+                                <p class="error" ng-show="addBranch.desc.$invalid && addBranch.desc.$touched">Please Enter Description</p>
+                              </div>
+                            </div>
+
+                            <div class="form-group required">
+                              <label class="control-label col-md-3" for="">Email</label>
+                              <div class="col-md-7">
+                                  <input type="email" name="emailId" class="form-control inputEle" ng-model="branchData.email" placeholder="Enter Email" ng-disabled="disableEmail" ng-required="true"  ng-pattern="/^[a-zA-Z]+[a-zA-Z0-9._]+@[a-zA-Z]+\.[a-zA-Z.]{2,5}$/">
+                                  <div class="clearfix"></div>
+                                <p class="error" ng-show="addBranch.emailId.$invalid && addBranch.emailId.$touched">Please Enter Email</p>
+                              </div>
+                              </div>
+                            <div class="form-group required">
+                              <label class="control-label col-md-3" for="">Contact Number</label>
+                                <div class="col-md-7">
+                                  <input type="number" name="contactnumber" class="form-control inputEle" ng-model="branchData.contactno" placeholder="Enter Number" ng-disabled="disableContact" maxlength="10" minlength="10" ng-required="true" restrict-to="[0-9]" required>
+                                  <div class="clearfix"></div>
+                                    <p class="error" ng-show="addBranch.contactnumber.$error.required">Please Enter Valid Contact Number</p>
+                                     <p class="error" ng-show="addBranch.contactnumber.$error.maxlength">Please Enter 10 digits Number</p>
+                                     <p class="error" ng-show="addBranch.contactnumber.$error.minlength">Too Short Number !!!</p>
+                                </div>
+                            </div>
+                             <div class="form-group required">
+                               <label class="control-label col-sm-3" for="">Address</label>
+                               <div class="col-sm-7">
+                                  <textarea class="form-control inputEle" name="addr" ng-model="branchData.address" placeholder="Enter Permenant Address" ng-required="true"> </textarea>
+                                   <div class="clearfix"></div>
+                                   <p class="error" ng-show="addBranch.addr.$invalid && addBranch.addr.$touched">Please Enter Address</p>
+                               </div>
+                            </div>
+                             <div class="form-group required">   
+                                <label class="control-label col-md-3" for="">State</label>
+                                <div class="col-md-3">
+                                    <select ng-model="branchData.cStateId" name="state" class="form-control inputEle" ng-options="st.cStateId as st.statename for st in State" ng-change="OnStateChange(branchData.cStateId)" ng-disabled="disableState" ng-focus="ngStateFocus()"  ng-required="true">
+                                        <option value="">select a State</option>
+                                    </select>
+                                    <div class="clearfix"></div>
+                                  <p class="error" ng-show="addBranch.state.$invalid && addBranch.state.$touched">select a State</p>
+                                </div>
+
+                                <label class="control-label col-md-1" for="">City</label>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" name="City" placeholder="Enter City" ng-model="branchData.city" required ng-disabled="disableField" ng-required="true" />
+                                    <div class="clearfix"></div>
+                                  <p class="error" ng-show="addBranch.City.$invalid && addBranch.City.$touched">Please Enter City</p>
+                                </div>
+                              </div>
+
+                              <div class="form-group required">
+                                <label class="control-label col-md-3" for="">District</label>
+                                <div class="col-md-3">
+                                    <select ng-model="branchData.cDistrictId" name="district" class="form-control inputEle" ng-options="ds.cDistrictId as ds.districtname for ds in District" ng-change="OnDistrictChange(branchData.cDistrictId)" ng-disabled="disableDistrict"  ng-required="true">
+                                        <option value="">Select a District</option>
+                                    </select>
+                                   <div class="clearfix"></div>
+                                  <p class="error" ng-show="addBranch.district.$invalid && addBranch.district.$touched">Select a District</p>
+                                </div>
+                                <label class="control-label col-md-1" for="">Taluka</label>
+                                <div class="col-md-3">
+                                    <select ng-model="branchData.cTalukaId" name="taluka" class="form-control inputEle" ng-options="tk.cTalukaId as tk.talukaname for tk in Taluka" ng-disabled="disableTaluka"  ng-required="true">
+                                        <option value="">Select a Taluka</option>
+                                    </select> 
+                                    <div class="clearfix"></div>
+                                  <p class="error" ng-show="addBranch.taluka.$invalid && addBranch.taluka.$touched">Select a Taluka</p>
+                                </div>
+                            </div>
+
+                            <div class="form-group required">
+                              <label class="control-label col-md-3" for="">Pin Code</label>
+                              <div class="col-md-3">
+                                  <input type="number" name="pinCode" class="form-control inputEle" ng-model="branchData.pincode" placeholder="Enter Pin Code" ng-disabled="disableField"  ng-required="true" restrict-to="[0-9]">
+                                   <div class="clearfix"></div>
+                                <p class="error" ng-show="addBranch.pinCode.$invalid && addBranch.pinCode.$touched">Please Enter Pin Code</p>
+                              </div>
+                          </div>
+                          <div class="clearfix"></div>
+                          <hr>
+                            <div class="form-group">
+                              <div class="col-md-12 text-center">
+                                <button type="submit" ng-disabled="addBranch.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                                </button>
+                              </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <br>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!--====  End of Add Branch  ====-->
+
+                  <!--===============================
+                  =            Add Batch            =
+                  ================================-->
+                  <div class="modal fade addbatch" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                          </button>
+                          <h4 class="modal-title">Batch</h4>
+                        </div>
+                        <div class="modal-body">
+                          <form class="form-horizontal" name="batchform" ng-submit="saveBatch(batchData)" novalidate>
+                            <input type="hidden" ng-model="batchData.cBatchId">
+                            <input type="hidden" ng-model="batchData.cCourseId">
+                            <div class="form-group required">
+                              <label class="control-label col-md-2" for="">Batch
+                              </label>
+                              <div class="col-md-10">
+                                <input type="text" name="batch" class="form-control inputEle" ng-model="batchData.batchname" placeholder="Enter Batch Name" ng-required="true">
+                                <div class="clearfix"></div>
+                                <p class="error" ng-show="batchform.batch.$invalid && batchform.batch.$touched">Please Enter Batch Name</p>
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <label class="control-label col-md-2" for="">Description
+                              </label>
+                              <div class="col-md-10">
+                                <input type="text" class="form-control inputEle" ng-model="batchData.description" placeholder="Enter Description"> 
+                              </div>
+                            </div>
+                            <div class="form-group required">
+                              <label class="control-label col-sm-2" for="">From Date</label>
+                                <div class="col-sm-4">
+                                   <datepicker date-format="yyyy-MM-dd">
+                                      <input ng-model="batchData.fromdate" name="fromdt" placeholder="Enter Date" class="form-control" type="text" restrict-to="[0-9]" ng-required="true" ng-change="fromDateChange(batchData.fromdate)"/>
+                                   </datepicker>
+                                   <div class="clearfix"></div>
+                                <p class="error" ng-show="batchform.fromdt.$invalid && batchform.fromdt.$touched">Please Enter Date</p>
+                                </div>
+
+                                <label class="control-label col-sm-2" for="">To Date</label>
+                                <div class="col-sm-4">
+                                   <datepicker date-format="yyyy-MM-dd" date-min-limit="{{from_date}}">
+                                    <input ng-model="batchData.todate" name="todt" placeholder="Enter Date" class="form-control" type="text" restrict-to="[0-9]" ng-required="true"/>
+                                   </datepicker>
+                                   <div class="clearfix"></div>
+                                <p class="error" ng-show="batchform.todt.$invalid && batchform.todt.$touched">Please Enter Date</p>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group required">
+                              <label class="control-label col-md-2" for="">Start Time
+                              </label>
+                              <div class="col-md-4">
+                               
+                                <div class="input-group"
+                                   moment-picker="batchData.fromtime"
+                                   format="HH:mm">
+                                  <span class="input-group-addon">
+                                      <i class="octicon octicon-clock"></i>
+                                  </span>
+                                  <input class="form-control"
+                                         name="fromtm"
+                                         placeholder="Select a time"
+                                         ng-model="batchData.fromtime"
+                                         ng-model-options="{ updateOn: 'blur' }"
+                                         ng-required="true">
+                                </div>
+                                <div class="clearfix"></div>
+                                <p class="error" ng-show="batchform.fromtm.$invalid && batchform.fromtm.$touched">Please Enter Time</p>
+                              </div>
+                              <label class="control-label col-md-2" for="">End Time
+                              </label>
+                              <div class="col-md-4">
+                               
+                                <div class="input-group" 
+                                   moment-picker="batchData.totime"
+                                   format="HH:mm">
+                                  <span class="input-group-addon">
+                                      <i class="octicon octicon-clock"></i>
+                                  </span>
+                                  <input class="form-control"
+                                         name="totm"
+                                         placeholder="Select a time"
+                                         ng-model="batchData.totime"
+                                         ng-model-options="{ updateOn: 'blur' }"
+                                         ng-required="true">
+                                </div>
+                                <div class="clearfix"></div>
+                                <p class="error" ng-show="batchform.totm.$invalid && batchform.totm.$touched">Please Enter Time</p>
+                              </div>
+                            </div>
+
+                            <div class="form-group required">
+                                <label class="control-label col-sm-2" for="">Status</label>
+                                <div class="col-sm-4">
+                                   <label class="radio-inline">
+                                   <input type="radio" name="status" ng-model="batchData.status" value="Active" ng-required="true">Active
+                                   </label>
+                                   <label class="radio-inline">
+                                   <input type="radio" name="status" ng-model="batchData.status" value="Deactive" ng-required="true">Deactive
+                                   </label>
+                                </div> 
+                                <div class="clearfix"></div>
+                                <p class="error" ng-show="batchform.status.$invalid && batchform.status.$touched">Please Enter Status</p>  
+                             </div>
+                             <div class="clearfix"></div>
+                           <hr>
+                            <div class="form-group">
+                              <div class="col-md-12 text-center">
+                                <button type="submit" ng-disabled="batchform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                                </button>
+                              </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <br>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!--====  End of Add Batch  ====-->
+                  
+                  
+
+                  <!--======================================
+                   =            Send Email Modal            =
+                   =======================================-->
+                   <div class="modal fade sendemailmodal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Send Email</h4>
+                            </div>
+                              <div class="modal-body">
+
+                                <form class="form-horizontal" name="sendemaildata" ng-submit="sendEmailData(emailData)" novalidate>
+                                <div class="form-group required">
+                                    <label class="control-label col-md-3" for="">Company:</label>
+                                    <div class="col-md-9">
+                                     <input type="text" ng-model="currCompName" class="form-control" disabled>
+                                    </div>
+                                    
+                                  </div>
+
+                                  <div class="form-group required">
+                                    <label class="control-label col-md-3" for="">Job:</label>
+                                    <div class="col-md-9">
+                                      <input type="text" ng-model="currJobName" class="form-control" disabled>
+                                    </div>
+                                    
+                                  </div>
+
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3" for="">Email:</label>
+                                    <div class="col-md-9">
+                                      <span class="studentlist" ng-repeat="nam in studentNameArray track by $index">[ {{nam}} ]&nbsp;&nbsp;</span>
+                                    </div>
+                                    
+                                  </div>
+                                  
+                                    <!-- <div class="form-group ">
+                                      <label class="control-label col-md-3" for="">Email Content:</label>
+                                      <div class="col-md-9">
+                                        <textarea class="form-control" placeholder="Email Content" ng-model="emailData.body"></textarea>
+                                      </div>
+                                    </div> -->
+                                    <div class="clearfix"></div>
+                                    <br>
+                                    <div class="form-group">
+                                      <div class="col-md-12 text-center">
+                                        <button type="submit" class="btn btn-success" onclick="$('.modal').modal('hide')">Send
+                                        </button>
+                                      </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <br>
+                                  </form>
+                                  
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                   <!--====  End of Send Email Modal  ====-->
+
+
+                   <!--============================================
+                    =            Advance search Modal            =
+                    =============================================-->
+                    <div class="modal fade advancesearch" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                    <div class="modal-dialog modal-lg" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" ng-click="advanceModalClose()" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Advance filter</h4>
+                        </div>
+                          <div class="modal-body">
+
+                            <form class="form-horizontal" name="sendemaildata" ng-submit="sendadvanceData(AdvanceData)" novalidate>
+
+                            <!--=================================
+                            =            Single Data            =
+                            ==================================-->
+                            <div class="form-group ">
+                                <label class="control-label col-sm-2" for="">Client Name</label>
+                                <div class="col-sm-4">
+                                   <input type="text" class="form-control" ng-model="AdvanceData.companyname" disabled>
+                                </div>
+
+                                <label class="control-label col-sm-2" for="">Job Profile</label>
+                                <div class="col-sm-4">
+                                   <input type="text" class="form-control" ng-model="AdvanceData.jobprofile" disabled>
+                                </div>
+                                
+                             </div>
+
+                             <div class="form-group">
+                                <label class="control-label col-sm-2" for="">Branch</label>
+                                <div class="col-sm-4">
+                                   <select name="bran" ng-model="AdvanceData.bBranchId" class="form-control inputEle" ng-options="bran.bBranchId as bran.branchname for bran in AllBranches" ng-change="branchChange(AdvanceData.bBranchId, AllBranches)">
+                                      <option value="">select Branch</option>
+                                    </select> 
+                                </div>
+
+                                <label class="control-label col-sm-2" for="">Courses & Batches</label>
+                                  <div class="col-sm-4" >
+                                  <div ng-dropdown-multiselect="" options="selectByGroupData" selected-model="selectByGroupModel" ng extra-settings="selectByGroupSettings" ng-click="checkcb(selectByGroupModel)"></div>
+                                  </div>
+                             </div>
+
+                              <div class="form-group ">
+                                <label class="control-label col-sm-2" for="">Trainer Feedback</label>
+                                <div class="col-sm-4">
+                                   <!-- <span ng-repeat="traf in TrainerFeedbackCheckboxData" style="margin-left: 20px !important;display: inline-block;width: 100px;max-width: 100px;">
+                                      <label class="checkbox" style="margin-right: 10px;line-height: 21px;">
+                                        <input type="checkbox" checklist-model="user5.name" checklist-value="traf.name" ng-change="checkTrainerFeedback(traf.name, checked)"> {{traf.name}}
+                                      </label>
+                                    </span> -->
+                                    <input type="checkbox" ng-model="tfcheckbox1"  ng-click="TCheck(tfcheckbox1)" ng-disabled="disableEligible"> <label class="checkbox tflabel">Eligible</label>
+                                    &nbsp;&nbsp;&nbsp;
+                                    <input type="checkbox" ng-model="tfcheckbox2"  ng-click="TCheck1(tfcheckbox2)" ng-disabled="disableNotEligible"> <label class="checkbox tflabel">Not-Eligible</label>
+                                </div>
+                                <label class="control-label col-sm-2" for="">Fee Paid</label>
+                                <div class="col-sm-4">
+                                   <!-- <span ng-repeat="feep in FeesPaidCheckboxData" style="margin-left: 20px !important;display: inline-block;width: 100px;max-width: 100px;">
+                                      <label class="checkbox" style="margin-right: 10px;line-height: 21px;">
+                                        <input type="checkbox" checklist-model="user6.name" checklist-value="feep.name" ng-change="checkFeesPaid(feep.name, checked)"> {{feep.name}}
+                                      </label>
+                                    </span> -->
+                                    <input type="checkbox" ng-model="feescheckbox1"  ng-click="FeeCheck(feescheckbox1)" ng-disabled="disableFeesPaid"> <label class="checkbox tflabel">Paid</label>
+                                    &nbsp;&nbsp;&nbsp;
+                                    <input type="checkbox" ng-model="feescheckbox2"  ng-click="FeeCheck1(feescheckbox2)" ng-disabled="disableFeesUnpaid"> <label class="checkbox tflabel">Unpaid</label>
+                                </div>
+                             </div>
+                             <div class="form-group ">
+                                <label class="control-label col-sm-2" for="">Post Dated Cheque Received</label>
+                                <div class="col-sm-4">
+                                   <select ng-model="AdvanceData.postdatedcheque" class="form-control" ng-change="postDatedChequeChange(AdvanceData.postdatedcheque)">
+                                      <option value="">Select Option</option>
+                                      <option value="Yes">Yes</option>
+                                      <option value="No">No</option>
+                                   </select>
+                                </div>
+                                <label class="control-label col-sm-2" for="">Attendance</label>
+                                <div class="col-sm-4">
+                                   <select ng-model="AdvanceData.attendance" class="form-control " >
+                                      <option value="">Select Attendance</option>
+                                      <option value="10">10</option>
+                                      <option value="20">20</option>
+                                      <option value="30">30</option>
+                                      <option value="40">40</option>
+                                      <option value="50">50</option>
+                                      <option value="60">60</option>
+                                      <option value="70">70</option>
+                                      <option value="80">80</option>
+                                      <option value="90">90</option>
+                                      <option value="100">100</option>
+                                   </select>
+                                </div>
+                             </div>
+                           
+                       <div class="form-group ">
+                          <label class="control-label col-sm-2" for="">Status</label>
+                          <div class="col-sm-4">
+                             <!-- <span ng-repeat="plasta in PlacementStatusCheckboxData" style="margin-left: 20px !important;display: inline-block;width: 100px;max-width: 100px;">
+                                <label class="checkbox" style="margin-right: 10px;line-height: 21px;">
+                                  <input type="checkbox" checklist-model="user7.name" checklist-value="plasta.name" ng-change="checkPlacementStatus(plasta.name, checked)"> {{plasta.name}}
+                                </label>
+                              </span> -->
+                              <input type="checkbox" ng-model="placementstatus1"  ng-click="PlacementCheck(placementstatus1)" ng-disabled="disableOpen"> <label class="checkbox tflabel">Open</label>
+                              &nbsp;&nbsp;&nbsp;
+                              <input type="checkbox" ng-model="placementstatus2"  ng-click="PlacementCheck1(placementstatus2)" ng-disabled="disableBlackListed"> <label class="checkbox tflabel">Blacklisted</label>
+                          </div>
+                          <label class="control-label col-sm-2" for="">Experience</label>
+                          <div class="col-sm-4">
+                             <select ng-model="AdvanceData.experience" class="form-control">
+                                <option value="">Select Experience</option>
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                             </select>
+                          </div>
+                       </div>
+                       
+                       <div class="form-group">
+                        <label class="control-label col-sm-2" for="">10<sup>th</sup></label>
+                        <div class="col-sm-4">
+                            <input type="hidden" ng-model="sccId">
+                            <select class="form-control" ng-model="AdvanceData.sscpercentage">
+                              <option value="0">Select Min 10th %</option>
+                              <option value="35">35</option>
+                              <option value="40">40</option>
+                              <option value="45">45</option>
+                              <option value="50">50</option>
+                              <option value="55">55</option>
+                              <option value="60">60</option>
+                              <option value="65">65</option>
+                              <option value="70">70</option>
+                              <option value="75">75</option>
+                              <option value="85">85</option>
+                            </select> 
+                        </div>
+
+                        <label class="control-label col-sm-2" for="">12<sup>th</sup></label>
+                        <div class="col-sm-4">
+                        <input type="hidden" ng-model="hscId">
+                            <select class="form-control inputEle" ng-model="AdvanceData.hscpercentage" >
+                              <option value="0">Select Min 12th %</option>
+                              <option value="35">35</option>
+                              <option value="40">40</option>
+                              <option value="45">45</option>
+                              <option value="50">50</option>
+                              <option value="55">55</option>
+                              <option value="60">60</option>
+                              <option value="65">65</option>
+                              <option value="70">70</option>
+                              <option value="75">75</option>
+                            </select>
+                        </div>
+                          
+                      </div>
+
+                      <div class="form-group">
+
+                          <label class="control-label col-sm-2" for="">Diploma</label>
+                          <div class="col-sm-4">
+                          <input type="hidden" ng-model="diplomaId">
+                              <select class="form-control inputEle" ng-model="AdvanceData.diplomapercentage" >
+                                <option value="0">Select Min Diploma %</option>
+                                <option value="35">35</option>
+                                <option value="40">40</option>
+                                <option value="45">45</option>
+                                <option value="50">50</option>
+                                <option value="55">55</option>
+                                <option value="60">60</option>
+                                <option value="65">65</option>
+                                <option value="70">70</option>
+                                <option value="75">75</option>
+                              </select>                        
+                          </div>
+
+                          <label class="control-label col-sm-2" for="">Graduation</label>
+                          <div class="col-sm-4">
+                          <input type="hidden" ng-model="graduationId">
+                              <select class="form-control inputEle" ng-model="AdvanceData.graduationpercentage" >
+                                <option value="0">Select Min Graduation %</option>
+                                <option value="35">35</option>
+                                <option value="40">40</option>
+                                <option value="45">45</option>
+                                <option value="50">50</option>
+                                <option value="55">55</option>
+                                <option value="60">60</option>
+                                <option value="65">65</option>
+                                <option value="70">70</option>
+                                <option value="75">75</option>
+                              </select>                        
+                          </div>
+                      </div>
+                         
+                      <div class="form-group ">
+                         <label class="control-label col-sm-2" for="">Post Graduation</label>
+                            <div class="col-sm-4">
+                            <input type="hidden" ng-model="postgraduationId">
+                                <select class="form-control inputEle" ng-model="AdvanceData.postgraduationpercentage" >
+                                  <option value="0">Select Min Post Graduation %</option>
+                                  <option value="35">35</option>
+                                  <option value="40">40</option>
+                                  <option value="45">45</option>
+                                  <option value="50">50</option>
+                                  <option value="55">55</option>
+                                  <option value="60">60</option>
+                                  <option value="65">65</option>
+                                  <option value="70">70</option>
+                                  <option value="75">75</option>
+                                </select>                        
+                            </div>
+                            <label class="control-label col-sm-2" for="">Year of Passing</label>
+                            <div class="col-sm-4">
+                               <select ng-model="AdvanceData.yearofpassing" class="form-control ">
+                                  <option value="">Select year</option>
+                                  <option value="1990">1990</option>
+                                  <option value="1991">1991</option>
+                                  <option value="1992">1992</option>
+                                  <option value="1993">1993</option>
+                                  <option value="1994">1994</option>
+                                  <option value="1995">1995</option>
+                                  <option value="1996">1996</option>
+                                  <option value="1997">1997</option>
+                                  <option value="1998">1998</option>
+                                  <option value="1999">1999</option>
+                                  <option value="2000">2000</option>
+                                  <option value="2001">2001</option>
+                                  <option value="2002">2002</option>
+                                  <option value="2003">2003</option>
+                                  <option value="2004">2004</option>
+                                  <option value="2005">2005</option>
+                                  <option value="2006">2006</option>
+                                  <option value="20027">2007</option>
+                                  <option value="2008">2008</option>
+                                  <option value="2009">2009</option>
+                                  <option value="2010">2010</option>
+                                  <option value="2011">2011</option>
+                                  <option value="2012">2012</option>
+                                  <option value="2013">2013</option>
+                                  <option value="2014">2014</option>
+                                  <option value="2015">2015</option>
+                                  <option value="2016">2016</option>
+                                  <option value="2017">2017</option>
+                                  <option value="2018">2018</option>
+                               </select>
+                            </div>
+                         </div>
+                         <!--====  End of Single Data  ====-->
+                         
+                        <div class="clearfix"></div>
+                        <hr>
+                        <!--==================================
+                        =            Technologies            =
+                        ===================================-->
+                        <div class="form-group">
+                          <label class="control-label col-sm-2" for=""></label>
+                          <div class="col-sm-10" style="max-height: 200px; min-height:100px;overflow-y: scroll;">
+                          <h3><span class="label label-primary">Technologies</span></h3>
+                                <div class="clearfix"></div>
+                            <span ng-repeat="sch1 in Technologies_Course" style="margin-left: 20px;display: inline-block;">
+                              <label class="checkbox" style="margin-right: 10px;min-width: 200px;line-height: 21px;">
+                                <input type="checkbox" checklist-model="user2.Technologies_Course" checklist-value="sch1.cTechnologyMasterId" ng-change="checkTechnology
+                                (sch1.cTechnologyMasterId, checked)"> {{sch1.technologyname}}
+                              </label>
+                            </span>              
+                          </div>
+                        </div>
+                        <!--====  End of Technologies  ====-->
+
+                        <div class="clearfix"></div>
+                        <hr>
+                        <!--===============================
+                        =            Documents            =
+                        ================================-->
+                        <div class="form-group">
+                          <label class="control-label col-sm-2" for=""></label>
+                          <div class="col-sm-10" style="max-height: 200px; min-height:100px;overflow-y: scroll;">
+                          <h3><span class="label label-primary">Documents</span></h3>
+                                <div class="clearfix"></div>
+                            <span ng-repeat="doc1 in allDocuments" style="margin-left: 20px;display: inline-block;">
+                              <label class="checkbox" style="margin-right: 10px;min-width: 200px;line-height: 21px;">
+                                <input type="checkbox" checklist-model="user3.documentname" checklist-value="doc1.documentname" ng-change="checkDocument(doc1.documentname, checked)"> {{doc1.name}}
+                              </label>
+                            </span>              
+                          </div>
+                        </div> 
+                        <!--====  End of Documents  ====-->
+
+                        <div class="clearfix"></div>
+                        <hr>
+                        
+                          <!--===================================
+                           =            Qualification            =
+                           ====================================-->
+                            <div class="form-group">
+
+                              <label class="control-label col-sm-2" for=""></label>
+                              <div class="col-sm-10" style="max-height: 400px; min-height:300px;overflow-y: scroll;">
+                                <h3 style="margin-bottom: 20px;"><span class="label label-primary">Qualification, Degree and Degree Specialization</span></h3>
+                                <div class="clearfix"></div>
+                                <ul class="treelist" ng-repeat="tree in QDSData track by $index">
+                                  <li><i ng-click="tree.active = !tree.active" class="fa" ng-class="{'fa-plus-circle' : !tree.active, 'fa-minus-circle' : tree.active,}"></i>&nbsp;&nbsp;
+                                    <input type="checkbox" name="check1" ng-model="AdvanceData.tree['cQualificationmasterId'+'/'+tree.id]"><label>{{tree.name}}</label>
+                                    <ul class="treelist1" ng-repeat="tree1 in tree.children">
+                                      <li ng-show="tree.active">
+                                        <i ng-click="tree1.active = !tree1.active" class="fa" ng-class="{'fa-plus-circle' : !tree1.active, 'fa-minus-circle' : tree1.active,}"></i>&nbsp;&nbsp;
+                                        <input type="checkbox" name="check2" ng-model="AdvanceData.tree['cDegreeId'+'/'+tree1.id]"><label>{{tree1.name}}</label>
+                                        <ul class="treelist2" ng-repeat="tree2 in tree1.children">
+                                          <li ng-show="tree1.active">
+                                          <i class="fa fa-circle"></i>&nbsp;&nbsp;
+                                          <input type="checkbox" name="check3" ng-model="AdvanceData.tree['cDegreespecificationId'+'/'+tree2.id]"><label>{{tree2.name}}</label></li>
+                                        </ul>
+                                      </li>
+                                    </ul>
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
+                           <!--====  End of Qualification  ====-->
+
+                        <div class="clearfix"></div>
+                        <hr>
+
+
+
+                        <div class="form-group">
+                          <div class="col-md-12 text-center">
+                            <button type="submit" class="btn btn-success" onclick="$('.modal').modal('hide')">Search
+                            </button>
+                            <a class="btn btn-primary" ng-click="resetForm()">Reset</a>
+                            <!--  -->
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                      </form>
+                      
+                  </div>
+                </div>
+              </div>
+            </div>
+
+                <!--====  End of Advance search  Modal  ====-->
+
+                <!--====================================
+                =            Admission Form            =
+                =====================================-->
+                
+                <div class="modal fade addenrollment" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+              <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" ng-click="clearModalOnCloseAdmission()" data-dismiss="modal">&times;</button>
+                          <h4 class="modal-title">Admission Form - {{enrollmentData.firstname}}&nbsp;{{enrollmentData.middlename}}&nbsp;{{enrollmentData.lastname}}</h4>
+                      </div>
+                      <div class="modal-body">
+                        <form class="form-horizontal" name="enrollmentDataform" ng-submit="saveEnrollment(enrollmentData)" novalidate>
+                                 <input type="hidden" ng-model="enrollmentData.eEnquiryFormId" name="">
+
+                               <div class="form-group required">
+                               <!-- <label class="control-label col-sm-2" for="">Status</label>
+                                <div class="col-sm-4">
+                                   <label class="radio-inline">
+                                   <input type="radio"  ng-model="new" name="availibility" value="New" ng-click="enableAll()">New
+                                   </label>
+                                   <label class="radio-inline">
+                                   <input type="radio" ng-model="existing"  name="availibility" value="Existing" ng-click="enableAll1()">Existing
+                                   </label>
+                                </div> -->
+
+                                <label class="control-label col-sm-2" for="">Branch</label>
+                                <div class="col-sm-4">
+                                    <select name="bran" ng-model="enrollmentData.bBranchId" class="form-control inputEle" ng-options="bran.bBranchId as bran.branchname for bran in currentRoleBranches1" ng-change="branchChange(enrollmentData.bBranchId, currentRoleBranches1)" ng-required="true">
+                                      <option value="">select Branch</option>
+                                    </select> 
+                                    <div class="clearfix"></div>
+                                   <p class="error" ng-show="enrollmentDataform.bran.$invalid && enrollmentDataform.bran.$touched">Please Select Branch</p> 
+                                </div>
+                               </div>
+
+                               <hr>
+
+                               <div class="form-group required">
+                                
+                              <label class="control-label col-sm-2" for="">Date</label>
+                                <div class="col-sm-4">
+                                   <datepicker date-format="yyyy-MM-dd">
+                                      <input type="text" name="dat" ng-model="enrollmentData.date" placeholder="Enter Date" class="form-control" restrict-to="[0-9]" ng-required="true" />
+                                   </datepicker>
+                                   <div class="clearfix"></div>
+                                   <p class="error" ng-show="enrollmentDataform.dat.$invalid && enrollmentDataform.dat.$touched">Please Enter Date</p> 
+                                </div>
+
+                                <div ng-show="existing" >
+                                  <label class="control-label col-sm-2" for="">Select Student</label>
+                                  <div class="col-sm-4">
+                                      <select ng-model="enrollmentData.eEnquiryFormId" name="stud" class="form-control inputEle" ng-options="stu.eEnquiryFormId as (stu.firstname + ' ' + stu.middlename + ' ' + stu.lastname) for stu in Students" ng-change="OnStudentChange1(enrollmentData.eEnquiryFormId)" ng-required="stureq">
+                                        <!-- <option value="">Select Source Name</option> -->
+                                      </select>
+                                      <div class="clearfix"></div>
+                                      <p class="error" ng-show="enrollmentDataform.stud.$invalid && enrollmentDataform.stud.$touched">Please Select Student</p>
+                                  </div>
+                                </div>
+
+                              </div>
+
+                               <hr>
+
+                              <div class="form-group required" ng-hide="showStaticCourseInfo">
+                                  <input type="hidden" ng-model="enrollmentData.cCourseId">
+                                 <label class="control-label col-sm-2" for="">Course Name</label>
+                                  <label class="control-label col-sm-4" for="" style="text-align: left;"><b>{{enrollmentData.coursename}}</b></label>
+
+                                  <label class="control-label col-sm-2" for="">Total Fee (including discount)</label>
+                                  <label class="control-label col-sm-4" style="text-align: left;"><b>{{enrollmentData.totalfee}}</b></label>
+                               </div>
+
+                               <div ng-hide="showDyanmicCourseInfo">
+                                 <div class="form-group required">
+                                    <label class="control-label col-sm-2" for="">Course</label>
+                                    <div class="col-sm-3">
+                                        <select ng-model="enrollmentData.cCourseId" name="cou" class="form-control inputEle" ng-options="co.cCourseId as co.coursename for co in Course" ng-change="courseChange(enrollmentData.cCourseId)" ng-required="true">
+                                          <option value="">Select Course</option>
+                                        </select> 
+                                        <div class="clearfix"></div>
+                                        <p class="error" ng-show="enrollmentDataform.cou.$invalid && enrollmentDataform.cou.$touched">Please Select Course</p>
+                                    </div>
+                                    <label class="control-label col-sm-2" for="" style="text-align: left;"><b>Course Fee: {{totalFee}}</b></label>
+
+
+                                    <label class="control-label col-sm-2" for="">Apply Discount</label>
+                                    <div class="col-sm-3">
+                                       <label class="radio-inline">
+                                       <input type="radio"  ng-model="Auto" name="Auto" value="One" ng-click="oneClick()">From List
+                                       </label>
+                                       <label class="radio-inline">
+                                       <input type="radio" ng-model="Auto"  name="Auto" value="Two" ng-click="twoClick()">Enter Manually
+                                       </label>
+                                    </div>
+                                 </div>
+
+                                 <div class="form-group">
+
+                                    <label class="control-label col-sm-2" for="">Discount</label>
+                                    <div class="col-sm-3" ng-show="Auto == 'One'">
+                                        <select ng-model="enrollmentData.cDiscountId" class="form-control inputEle" ng-options="co.cDiscountId as co.title for co in Discount" ng-change="discountChange(enrollmentData.cDiscountId)">
+                                          <option value="">Select Discount</option>
+                                        </select> 
+                                    </div>
+
+
+                                    <!-- <label class="control-label col-sm-2" for="">Amount</label> -->
+                                    <div class="col-sm-3" ng-show="Auto == 'Two'">
+                                       <input type="number"  class="form-control inputEle" ng-model="manualamount" placeholder="Enter Amount" ng-blur="manualAmtMinus(manualamount)">
+                                       <!-- <span style="display: inline-block;margin-top: 5px;cursor: pointer;" ng-click="applyAmount(manualamount)">Apply</span> -->
+                                    </div>
+                                    <label class="control-label col-sm-2" style="text-align: left;" for="" ng-hide="manualLabel">
+                                    <b>Discount(%): {{DiscountPercentage}}</b>
+                                    </label>
+                                    <label class="control-label col-sm-3" style="text-align: left;" for="" ng-hide="manualDiscLabel">
+                                    <b>Discount Amount (Rs): {{manualamount}}</b>
+                                    </label>
+                                    <label class="control-label col-sm-2" style="text-align: left;padding: 5px;background-color: #ddd;" for="">
+                                    <b>Total Fee: {{calculatedFee}}</b>
+                                    </label>
+                                    
+                                 </div>
+
+                                  <div class="form-group required">
+                                    <label class="control-label col-sm-2" for="">Batch</label>
+                                    <div class="col-sm-4">
+                                      <select ng-model="enrollmentData.cBatchId" name="bat" class="form-control inputEle" ng-options="btch.cBatchId as btch.batchname for btch in Batch" ng-required="true">
+                                        <option value="">Select Batch</option>
+                                      </select> 
+                                       <div class="clearfix"></div>
+                                     <p class="error" ng-show="enrollmentDataform.bat.$invalid && enrollmentDataform.bat.$touched">Please Select Batch</p>
+                                    </div>
+                                 </div>
+                               </div>
+
+                               <hr>
+
+                               <div class="form-group required">
+                                 <label class="control-label col-sm-2" for="">Candidate Name</label>
+                                  <div class="col-sm-3">
+                                     <input type="text" name="cadina" class="form-control inputEle" ng-model="enrollmentData.firstname" placeholder="Enter First Name" ng-required="true" ng-disabled="disableAllInput">
+                                     <div class="clearfix"></div>
+                                     <p class="error" ng-show="enrollmentDataform.cadina.$invalid && enrollmentDataform.cadina.$touched">Please Enter FirstName</p>
+                                  </div>
+
+                                
+                                  <div class="col-sm-3">
+                                     <input type="text" name="midl" class="form-control inputEle" ng-model="enrollmentData.middlename" placeholder="Enter Middle Name" ng-required="true" ng-disabled="disableAllInput">
+                                     <div class="clearfix"></div>
+                                     <p class="error" ng-show="enrollmentDataform.midl.$invalid && enrollmentDataform.midl.$touched">Please Enter MiddleName</p>
+                                  </div>
+
+                                   <!-- <label class="control-label col-sm-2" for="">Candidate Name</label> -->
+                                  <div class="col-sm-4">
+                                     <input type="text" name="las" class="form-control inputEle" ng-model="enrollmentData.lastname" placeholder="Enter Surname" ng-required="true" ng-disabled="disableAllInput">
+                                     <div class="clearfix"></div>
+                                     <p class="error" ng-show="enrollmentDataform.las.$invalid && enrollmentDataform.las.$touched">Please Enter LastName</p>
+                                  </div>
+                                </div>
+
+                                 <div class="form-group">
+                                   <label class="control-label col-sm-2" for="">College/Company Name</label>
+                                    <div class="col-sm-4">
+                                       <input type="text" name="compname" class="form-control inputEle" ng-model="enrollmentData.collegename" placeholder="Enter College/Company Name" ng-disabled="disableAllInput">
+                                    </div>
+                                    
+                                 </div>
+
+                                 <div class="form-group">
+                                <label class="control-label col-sm-2 mandatory" for="">Email Id</label>
+                                    <div class="col-sm-4">
+                                       <input type="email" name="emai" class="form-control inputEle" ng-model="enrollmentData.email" placeholder="Enter Email Id" ng-required="true" ng-pattern="/^[a-zA-Z]+[a-zA-Z0-9._]+@[a-zA-Z]+\.[a-zA-Z.]{2,5}$/" ng-disabled="disableAllInput">
+                                       <div class="clearfix"></div>
+                                     <p class="error" ng-show="enrollmentDataform.emai.$invalid && enrollmentDataform.emai.$touched">Please Enter Email Id</p>
+                                    </div>
+
+                                    <label class="control-label col-sm-2" for="">Alternate Email Id</label>
+                                    <div class="col-sm-4">
+                                      <input type="email" name="altemail" class="form-control inputEle" ng-model="enrollmentData.alternateemail" placeholder="Enter Email Id" ng-pattern="/^[a-zA-Z]+[a-zA-Z0-9._]+@[a-zA-Z]+\.[a-zA-Z.]{2,5}$/" ng-disabled="disableAllInput">
+                                    </div>
+                                 </div>
+
+                               <div class="form-group required">
+                                <label class="control-label col-sm-2" for="">Address</label>
+                                <div class="col-sm-10">
+                                   <textarea class="form-control inputEle" name="addr" ng-model="enrollmentData.presentaddress" placeholder="Enter Permenant Address" ng-disabled="disableAllInput" ng-required="true" ng-disabled="disableAllInput"> </textarea>
+                                   <div class="clearfix"></div>
+                                    <p class="error" ng-show="enrollmentDataform.addr.$invalid && enrollmentDataform.addr.$touched">Please Enter Address</p>
+                                </div>
+                             </div>
+                             <div class="form-group">
+                                <label class="control-label col-sm-2" for="">Local Area</label>
+                                <div class="col-sm-4">
+                                   <input type="text" name="enquirylocal" class="form-control inputEle" ng-model="enrollmentData.localarea" placeholder="Enter Local Area" ng-disabled="disableAllInput">
+                                </div>
+                                <label class="control-label col-sm-2" for="">Native Place</label>
+                                <div class="col-sm-4">
+                                   <input type="text" name="enquirynative" class="form-control inputEle" ng-model="enrollmentData.nativeplace" placeholder="Enter Native Place" ng-disabled="disableAllInput">
+                                </div>
+                             </div>
+                             <div class="form-group required">
+                                <label class="control-label col-sm-2" for="">Gender</label>
+                                <div class="col-sm-4">
+                                   <label class="radio-inline">
+                                   <input type="radio" name="gender" ng-model="enrollmentData.gender" value="Male" ng-required="true">Male
+                                   </label>
+                                   <label class="radio-inline">
+                                   <input type="radio" name="gender" ng-model="enrollmentData.gender" value="Female" ng-required="true">Female
+                                   </label>
+                                   <label class="radio-inline">
+                                   <input type="radio" name="gender" ng-model="enrollmentData.gender" value="Transgender" ng-required="true">Transgender
+                                   </label>
+                                </div>
+                                <label class="control-label col-sm-2" for="">Marital Status</label>
+                                <div class="col-sm-4">
+                                   <label class="radio-inline">
+                                   <input type="radio" name="mt" ng-model="enrollmentData.maritalstatus" value="Unmarried" ng-required="true">Unmarried
+                                   </label>
+                                   <label class="radio-inline">
+                                   <input type="radio" name="mt" ng-model="enrollmentData.maritalstatus" value="Married" ng-required="true">Married
+                                   </label>
+                                   <label class="radio-inline">
+                                   <input type="radio" name="mt" ng-model="enrollmentData.maritalstatus" value="Divorce" ng-required="true">Divorce
+                                   </label>
+                                </div>
+                             </div>
+                             <div class="form-group">
+                                <label class="control-label col-sm-2" for="">Landline</label>
+                                <div class="col-sm-4">
+                                   <input type="text" class="form-control inputEle" ng-model="enrollmentData.telresource" restrict-to="[0-9]"> 
+                                </div>
+                                <label class="control-label col-sm-2 mandatory" for="">Contact No.</label>
+                                <div class="col-sm-4">
+                                   <input type="number" name="cont" class="form-control inputEle" ng-model="enrollmentData.contactno" placeholder="Enter Contact Number" ng-required="true" ng-required="true" maxlength="10" minlength="10" required ng-disabled="disableAllInput">
+                                   <div class="clearfix"></div>
+                                   <p class="error" ng-show="enrollmentDataform.cont.$invalid && enrollmentDataform.cont.$touched">Please Enter Contact No</p>
+                                </div>
+                                
+                             </div>
+                             <div class="form-group required">
+                                 <label class="control-label col-sm-2" for="">Date Of Birth</label>
+                                  <div class="col-sm-4">
+                                     <datepicker date-format="yyyy-MM-dd" date-max-limit= "{{currentDate}}">
+                                        <input ng-model="enrollmentData.dob" name="dob" placeholder="Enter Birthdate" class="form-control" type="text" restrict-to="[0-9]" ng-disabled="disableAllInput" ng-required="true"/>
+                                     </datepicker>
+                                     <div class="clearfix"></div>
+                                   <p class="error" ng-show="enrollmentDataform.dob.$invalid && enrollmentDataform.dob.$touched">Please Enter Contact No</p>
+                                  </div>
+
+                                 <label class="control-label col-sm-2" for="">Candidate Type</label>
+                                <div class="col-sm-4">
+                                    <select ng-model="enrollmentData.cStatusId" name="candi" class="form-control inputEle" ng-options="enq.cStatusId as enq.statusname for enq in EnquiryStatus" ng-required="true" ng-disabled="disableAllInput">
+                                      <option value="">Select Status</option>
+                                    </select>
+                                    <div class="clearfix"></div>
+                                   <p class="error" ng-show="enrollmentDataform.candi.$invalid && enrollmentDataform.candi.$touched">Please Select Candidate Type</p>
+                                </div> 
+                               </div>
+
+                               <div class="form-group">
+
+                                  <label class="control-label col-sm-2" for="">Hear About Us</label>
+                                  <div class="col-sm-4">
+                                      <select ng-model="enrollmentData.cSourceId" name="hear" class="form-control inputEle" ng-options="enq.cSourceId as enq.sourcename for enq in Source" ng-required="true" ng-change="sourceChange(enrollmentData.cSourceId, Source)" ng-disabled="disableAllInput">
+                                        <option value="">Select Source Name</option>
+                                      </select>
+                                      <div class="clearfix"></div>
+                                      <p class="error" ng-show="enrollmentDataform.hear.$invalid && enrollmentDataform.hear.$touched">Please Select Hear About Us</p>
+                                  </div>
+
+                                  <div ng-show="showStudent">
+                                    <label class="control-label col-sm-2" for="">Select Student</label>
+                                    <div class="col-sm-4">
+                                        <select ng-model="reference" class="form-control inputEle" ng-options="stu.eEnquiryFormId as (stu.firstname + ' ' + stu.middlename + ' ' + stu.lastname) for stu in Students1" ng-change="changeStudent(reference, Students)" >
+                                          <!-- <option value="">Select Source Name</option> -->
+                                        </select>
+                                    </div>
+                                  </div>
+
+                                  <div ng-show="showStaff">
+                                    <label class="control-label col-sm-2" for="">Select Staff</label>
+                                    <div class="col-sm-4">
+                                        <select ng-model="reference1" class="form-control inputEle" ng-options="stf.adUserdetailId as (stf.firstname + ' ' + stf.middlename + ' ' + stf.lastname) for stf in Staff" ng-change="changeStaff(reference1, Staff)">
+                                          <!-- <option value="">Select Source Name</option> -->
+                                        </select>
+                                    </div>
+                                  </div>
+                                  
+                              </div> <!--hear about us form group ends-->
+                              
+                                <div class="form-group">
+                                    <input type="hidden" ng-model="enrollmentData.windowtype" ng-init="enrollmentData.windowtype ='Enrollment'">
+                                 
+                              </div> <!--enquiry form group ends-->
+
+                              <div class="form-group ">
+                                <label class="control-label col-sm-2" for="">Highest Qualification</label>
+                                <div class="col-sm-4">
+                                    <select ng-model="enrollmentData.cDegreeId" name="high" class="form-control inputEle" ng-options="stf.cDegreeId as stf.degreename for stf in HighestQualification">
+                                    </select>
+                                    <!-- <div class="clearfix"></div>
+                                    <p class="error" ng-show="enrollmentDataform.high.$invalid && enrollmentDataform.high.$touched">Please Select Highest Qualification</p> -->
+                                </div>
+
+                               <label class="control-label col-sm-2" for="">Year of Passing</label>
+                                <div class="col-sm-4">
+                                   <input type="number" name="yearofpassing" class="form-control inputEle"  ng-model="enrollmentData.yearofpassing" placeholder="Enter Year of Passing">
+                                   <!-- <div class="clearfix"></div>
+                                    <p class="error" ng-show="enrollmentDataform.yearofpassing.$invalid && enrollmentDataform.yearofpassing.$touched">Please Enter Year of Passing</p> -->
+                                </div>
+                              </div> 
+                             
+                              <div class="form-group ">
+                               <label class="control-label col-sm-2" for="">Description</label>
+                                <div class="col-sm-10">
+                                   <input type="text" class="form-control inputEle"  ng-model="enrollmentData.description" placeholder="Enter Description" ng-disabled="disableAllInput">
+                                </div>   
+                              </div>
+
+                              
+                               <br>
+                               <div class="form-group">
+                                <div class="col-md-12 text-center">
+                                  <button type="submit" ng-disabled="enrollmentDataform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                                  </button>
+                                </div>
+                              </div>
+                              <div class="clearfix"></div>
+
+                        </form>
+                      </div>
+                  </div>
+                </div>
+              </div>
+                
+                <!--====  End of Admission Form  ====-->
+                
+
+                  
+              </div>
+            </div>
+         </div>
+      </div>
+  </div>
+
+
+   
+</div>
+         
+
+       <!--  </div> --> <!-- controller ends -->
+    
+    
+<!-- </div>
+</div> -->
+<!--====  End of Controller  ====-->
+
+
+
+
+
+
+<script src="view/pages/Placement Activity/PlacementCtrl.js"></script>
+

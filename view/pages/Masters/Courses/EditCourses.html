@@ -1,0 +1,131 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+
+
+<div class="page-content" sidebar-directive="state" >
+    <div class="container-fluid">
+        <div class="row no-margin" ng-controller="coursesCtrl as Inst">
+         
+            <div class="col-md-12 no-padding">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Edit Course</h3>
+                    </div>
+                    <div class="panel-body">
+
+
+                        <!-- toaster message -->
+                          <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+                        <!-- toaster message -->
+                        
+                        <!-- form -->
+                        <form class="form-horizontal mb40" name="addCourses" ng-submit="save(coursesData)" novalidate>
+
+                            <div class="button-group">
+                                <a href="#/Courses" class="btn btn-default btn-labeled btn-sm">
+                                    <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back</a>
+                                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</a>
+                            
+                                <button type="submit" class="btn btn-success btn-labeled btn-sm">
+                                <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Update</button>
+                            </div>
+                            <hr>
+
+                            <div class="form-group form-group required">
+                                <input type="hidden" ng-model="coursesData.cCourseId">
+                                <label class="control-label col-md-3" for="">Courses
+                                  </label>
+                                  <div class="col-md-7">
+                                    <input type="text" name="courses" class="form-control inputEle" ng-model="coursesData.coursename" placeholder="Enter Courses Name" ng-required="true">
+                                    <div class="clearfix"></div>
+                                    <p class="error" ng-show="addCourses.courses.$invalid && addCourses.courses.$touched">Please Enter Courses Name</p>
+                                  </div>
+                            </div>
+                            <br>
+
+                        </form>
+                        <!-- form -->
+
+                        <!-- tab starts -->
+                        <div id="exTab2">
+                            <ul class="nav nav-tabs">
+                                
+                                <li ng-class="{active:Inst.isSet(1)}">
+                                    <a ng-click="Inst.setTab(1)">Technologies</a>
+                                </li>
+                                <li ng-class="{active:Inst.isSet(2)}">
+                                    <a ng-click="Inst.setTab(2)">Fee</a>
+                                </li>
+                                <li ng-class="{active:Inst.isSet(3)}">
+                                    <a ng-click="Inst.setTab(3)">Discount</a>
+                                </li>
+                                 <li ng-class="{active:Inst.isSet(4)}">
+                                    <a ng-click="Inst.setTab(4)">Batch</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <!--===========================
+                                =            Tab 1            =
+                                ============================-->
+                                <div class="tab-pane active" ng-show="Inst.isSet(1)">
+
+                                    <div ng-if="Inst.isSet(1)" ng-include="'view/pages/Masters/Courses/TechnologyTab.html'"></div>
+                                     
+                                </div>
+                                <!--====  End of Tab 1  ====-->
+
+                                <!--===========================
+                                =            Tab 2            =
+                                ============================-->
+                                
+                                <div class="tab-pane active" ng-show="Inst.isSet(2)">
+                                     
+                                    <div ng-if="Inst.isSet(2)" ng-include="'view/pages/Masters/Courses/FeeTab.html'"></div>
+
+                                </div>
+                                
+                                <!--====  End of Tab 2  ====-->
+
+                                <!--===========================
+                                =            Tab 3            =
+                                ============================-->
+                                
+                                <div class="tab-pane active" ng-show="Inst.isSet(3)">
+                                     
+                                    <div ng-if="Inst.isSet(3)" ng-include="'view/pages/Masters/Courses/DiscountTab.html'"></div>
+
+                                </div>
+                                
+                                <!--====  End of Tab 3  ====-->
+
+                                 <!--===========================
+                                =            Tab 4            =
+                                ============================-->
+                                
+                                <div class="tab-pane active" ng-show="Inst.isSet(4)">
+                                     
+                                    <div ng-if="Inst.isSet(4)" ng-include="'view/pages/Masters/Courses/Batch.html'"></div>
+
+                                </div>
+                                
+                                <!--====  End of Tab 4  ====-->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- end controller div -->
+    </div>
+
+
+</div>
+
+
+<script src="view/pages/Masters/Courses/CoursesCtrl.js"></script>

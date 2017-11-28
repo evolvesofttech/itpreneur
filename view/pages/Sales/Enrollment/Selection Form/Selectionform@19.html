@@ -1,0 +1,237 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div class="row no-margin" ng-controller="selectionformCtrl">
+  <div class="col-md-12 no-padding">
+    <div class="panel panel-info">
+      <div class="panel-body">
+        
+        <!-- toaster message -->
+        <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+        <!-- toaster message -->
+
+        <div class="button-group">
+          <a data-toggle="modal" data-target=".addselection" class="btn btn-default btn-labeled btn-sm">
+            <i class="fa fa-plus-circle">
+            </i>&nbsp;&nbsp;Add info
+          </a>
+        </div>
+        <table ng-table="usersTable_selection" show-filter="true" class="table table-bordered table-striped text-center">
+          <tbody>
+            <tr ng-repeat="bo in data_selection">
+              <td data-title="'Technologies'" filter="{'inchargeperson': 'text'}" sortable="'inchargeperson'">{{bo.inchargeperson}}
+              </td>
+               <td data-title="'Company Name'" filter="{'companyname': 'text'}" sortable="'companyname'">{{bo.companyname}}
+              </td>
+              <td data-title="'Designation'" filter="{'designation': 'text'}" sortable="'designation'">{{bo.designation}}
+              </td>
+               <td data-title="'CTC'" filter="{'ctc': 'text'}" sortable="'ctc'">{{bo.ctc}}
+              </td>
+               <td data-title="'Date Of Joining'" filter="{'date': 'text'}" sortable="'date'">{{bo.date}}
+              </td>
+              </td>
+               <td data-title="'Status'" filter="{'status': 'text'}" sortable="'status'">{{bo.status}}
+              </td>
+              <td data-title="'Actions'" class="w150">
+                <a data-toggle="modal"  class="btn btn-success btn-xs" data-target=".addselection" ng-click="editselection(bo.eEnquirySelectionDetailsId)" tooltip-placement="top" uib-tooltip="Edit">
+                  <i class="fa fa-pencil-square-o"></i>
+                </a> 
+                <a data-toggle="modal" data-target=".viewselection" class="btn btn-info btn-xs" ng-click="viewselection1(bo.eEnquirySelectionDetailsId, data_selection)" tooltip-placement="top" uib-tooltip="View">
+                  <i class="fa fa-eye">
+                  </i>
+                </a>
+                <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deleteselection1" ng-click="delselection(bo.eEnquirySelectionDetailsId, data_selection)" tooltip-placement="top" uib-tooltip="Delete">
+                  <i class="fa fa-trash">
+                  </i>
+                </a>
+                
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <hr>
+        
+        <!-- start edit modal -->
+        <div class="modal fade addselection" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="clearModalOnCloseContactPerson()" data-dismiss="modal">&times;
+                </button>
+                <h4 class="modal-title">Add selection Form
+                </h4>
+              </div>
+              <div class="modal-body">
+                
+              <form class="form-horizontal" name="studentselection" ng-submit="saveselection(selectionData)" novalidate>
+             <!--  <legend>Office Use</legend> -->
+
+              <input type="hidden" ng-model="eEnquiryFormId">
+              <div class="form-group ">
+                <label class="control-label col-sm-2" for="">Technologies</label>
+                <div class="col-sm-4">
+                <input type="text" name="inchargep" class="form-control inputEle" ng-model="selectionData.inchargeperson" placeholder="Enter Technologies" ng-required="true">
+                <div class="clearfix"></div>
+                <p class="error" ng-show="studentselection.inchargep.$invalid && studentselection.inchargep.$touched">Please Enter Technologies </p> 
+                </div>
+                <label class="control-label col-sm-2" for="">Company Name</label>
+                <div class="col-sm-4">
+                   <input name="desg" type="text" class="form-control inputEle" ng-model="selectionData.companyname" placeholder="Enter Company Name" ng-required="true" >
+                   <div class="clearfix"></div>
+                   <p class="error" ng-show="studentselection.desg.$invalid && studentselection.desg.$touched">Please Enter Company Name</p>
+                </div>
+              </div>
+             
+              <div class="form-group"> 
+                  <label class="control-label col-sm-2" for="">Designation</label>
+                  <div class="col-sm-4">
+                     <input type="text" name="desi" class="form-control inputEle" ng-model="selectionData.designation" placeholder="Enter Designation" ng-required="true">
+                     <div class="clearfix"></div>
+                     <p class="error" ng-show="studentselection.desi.$invalid && studentselection.desi.$touched">Please Enter Designation</p>
+                  </div>
+                  <label class="control-label col-sm-2" for="">CTC</label>
+                  <div class="col-sm-4">
+                     <input type="number" name="ctc1" class="form-control inputEle" ng-model="selectionData.ctc" placeholder="Enter CTC " ng-required="true">
+                     <p class="error" ng-show="studentselection.ctc1.$invalid && studentselection.ctc1.$touched">Please Enter Designation</p>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="">Date Of Joining Status</label>
+                    <div class="col-sm-4">
+                      
+                       <label class="radio-inline">
+                          <input type="radio" name="modeofpayment" ng-model="selectionData.modeofpayment" value="yes" ng-required="true" ng-click="yesChecked()">Yes
+                       </label>
+                       <label class="radio-inline">
+                         <input type="radio" name="modeofpayment" ng-model="selectionData.modeofpayment" value="no" ng-required="true" ng-click="NoChecked()">No
+                         </label>
+                    </div>
+                    <div ng-show="selectionData.modeofpayment=='yes'">
+                        <label class="control-label col-sm-2" for="">Date Of Joining</label>
+                        <div class="col-sm-4">
+                          <datepicker date-format="yyyy-MM-dd">
+                            <input  name=" " ng-model="selectionData.date" placeholder="Enter Date" class="form-control" ng-value="currentDate" type="text"  ng-required="ye"/>
+                          </datepicker>
+                          <p class="error" ng-show="addPaymentin.tras1.$invalid && addPaymentin.tras1.$touched">Enter Trasaction Id</p>
+                        </div>
+                    </div>
+                      <div class="clearfix"></div>
+                </div>
+                                
+               <br>
+
+               <div class="form-group">
+                      <div class="col-md-12 text-center">
+                        <button type="submit" ng-disabled="studentselection.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                        </button>
+                      </div>
+                    </div>
+                    <div class="clearfix"></div>
+              </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end edit modal  -->
+
+
+        <!-- start view modal -->
+        <div class="modal fade viewselection" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="clearModalOnCloseContactPerson()" data-dismiss="modal">&times;
+                </button>
+                <h4 class="modal-title">selection Form
+                </h4>
+              </div>
+              <div class="modal-body">
+                
+                <!-- form -->
+                  <form class="form-horizontal" novalidate>
+                  <div class="form-group ">
+                    <label class="control-label col-sm-2" for="">Technologies:</label>
+                    <label class="control-label col-sm-4" for="" style="text-align: left;"><b>{{viewselectionData.Technologies}}</b></label>
+                  
+                    <label class="control-label col-sm-2" for="">Company Name:</label>
+                    <label class="control-label col-sm-4" for="" style="text-align: left;">{{viewselectionData.companyname}}</label>
+                  </div>
+
+ 
+                  <div class="clearfix"></div>
+                  <hr>
+                  <div class="form-group">
+                    <label class="control-label col-sm-2" for="">Designation:</label>
+                    <label class="control-label col-sm-4" for="" style="text-align: left;">{{viewselectionData.designation}}</label>
+
+                    <label class="control-label col-sm-2" for="">CTC:</label>
+                    <label class="control-label col-sm-4" for="" style="text-align: left;">{{viewselectionData.ctc}}</label>
+                  </div>
+                  <div class="clearfix"></div>
+                  <hr>
+                   <div class="form-group">
+                      <label class="control-label col-md-2" for="">Date Of Joining:</label>
+                      <label class="control-label col-md-4" for="" style="text-align: left;">{{viewselectionData.date}}</label>
+                      <label class="control-label col-md-2" for="">Status:</label>
+                      <label class="control-label col-md-4" for="" style="text-align: left;">{{viewselectionData.status}}</label>
+                    </div>
+
+                     <div class="clearfix"></div>
+                     <hr>
+
+                                       
+                  </form>
+                <!-- form -->
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end view modal -->
+
+        <!-- start delete modal -->
+        <div class="modal fade deleteselection1" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;
+                  </button>
+                  <h4 class="modal-title">Delete clientcp
+                  </h4>
+                </div>
+                <div class="modal-body">
+                  <h4>Are you sure you want to delete 
+                    <strong>{{deleteselectionData.designation}}?
+                    </strong>
+                  </h4>
+                  <br>
+                  <a class="btn btn-danger btn-sm" ng-click="deleteselection(deleteselectionData.eEnquirySelectionDetailsId)" onclick="$('.modal').modal('hide')">
+                    <i class="fa fa-trash">
+                    </i>&nbsp;&nbsp;Delete
+                  </a>
+                  <a class="btn btn-default btn-sm" data-dismiss="modal">
+                    <i class="fa fa-trash">
+                    </i>&nbsp;&nbsp;Cancel
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        <!-- end delete modal -->
+       
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--====  End of Controller  ====-->
+
+ <script src="view/pages/Sales/Enrollment/Selection Form/SelectionformCtrl.js"></script>
+
+
+    
+
+   

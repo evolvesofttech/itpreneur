@@ -1,0 +1,398 @@
+<style>
+  .w20{
+    width:10px;
+    text-align: left;
+  }
+  .teacher-img {
+    display: inline-block;
+    
+    margin-right: 10px;
+    margin-bottom: 0;
+    min-height: 100px;
+    max-height: 100px;
+    width: 1000px;
+    max-width: 100px;
+  }
+</style>
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="TestQuestionCtrl as vm">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">View Test Question
+              <!-- <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{branch.length}}</span></span> -->
+              </h3>
+            </div>
+            <div class="panel-body">
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+              <div class="button-group">
+                <a data-toggle="modal" data-target=".addSingleQuestionModal" ng-click="addSingleQuestionClick()" class="btn btn-default btn-labeled btn-sm">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp;Add 
+                </a>
+                <a ng-click="go_back()" class="btn btn-sm btn-default" ><i class="fa fa-arrow-left"></i>&nbsp;Back</a>
+                <a ng-click="refreshPage()" class="btn btn-default btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+              </div>
+              <table ng-table="testQuestionTable" class="table table-bordered table-sm" show-filter="true">
+                    <tr ng-repeat="tst in testdata">
+                        <td data-title="'Sr. No.'" filter="{'index': 'text'}" sortable="'index'">{{$index + 1}}</td>
+                        <td data-title="'Question Type'" filter="{ questiontype: 'text'}" sortable="'questiontype'">
+                            {{tst.questiontype}}</td>
+                        <td data-title="'Question'" filter="{ question: 'text'}" sortable="'question'"  style="width: 68%">
+                            <h3>Q: {{tst.question}}</h3>
+                            <p style="margin-bottom: .5rem;">Options: 
+                            </p>
+                            <ol type="1">
+                                <li ng-if="tst.text1== null "><img ng-src="data:image/png;charset=utf-8;base64,{{tst.image1}}" class="thumbnail teacher-img"></li>
+                                <li ng-if="tst.image1== null ">{{tst.text1}}</li>
+                                <li ng-if="tst.text2== null "><img ng-src="data:image/png;charset=utf-8;base64,{{tst.image2}}" class="thumbnail teacher-img"></li>
+                                <li ng-if="tst.image2== null ">{{tst.text2}}</li>
+                                <li ng-if="tst.text3== null "><img ng-src="data:image/png;charset=utf-8;base64,{{tst.image3}}" class="thumbnail teacher-img"></li>
+                                <li ng-if="tst.image3== null ">{{tst.text3}}</li>
+                                <li ng-if="tst.text4== null "><img ng-src="data:image/png;charset=utf-8;base64,{{tst.image4}}" class="thumbnail teacher-img"></li>
+                                <li ng-if="tst.image4== null ">{{tst.text4}}</li>
+                                
+                            </ol>
+                            <p>
+                              <span><b>Correct Answer  : &nbsp;{{tst.questionrightanswer}}</b></span>
+                              <span class="pull-right"><b>Marks  : &nbsp;{{tst.marks}}<b></span>
+                            </p>
+
+                        </td>
+                        <td data-title="'Actions'" class="w150 text-center">
+                            <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target=".addSingleQuestionModal" ng-click="editSingleQuestion(tst)" tooltip-placement="top" uib-tooltip="Edit">
+                            <i class="fa fa-pencil-square-o"></i>
+                            </button>
+                            <button type="button" class="btn btn-primary btn-xs" tooltip-placement="top" uib-tooltip="View" ng-click="viewSingleQuestion(tst)" data-toggle="modal" data-target=".viewSingleQuestionModal">
+                                <i class="fa fa-eye"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deleteSingleQuestionModal" ng-click="delSingleQuestion(tst.tQuestionId,testdata)" tooltip-placement="top" uib-tooltip="Delete">
+                            <i class="fa fa-trash"></i>
+                            </button>
+                            
+                            <div class="clearfix"></div>
+                        </td>
+                    </tr>
+                </table>
+                <div class="modal fade addSingleQuestionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title" ng-init="modalHeading = 'Add Single Question'">{{modalHeading}}</h4>
+                      </div>
+                      <div class="modal-body">
+                        <form role="form" name="singleQueFormName" ng-submit="saveSingleQuestion(singleTestQueData)" novalidate>
+                          <input type="hidden" ng-model="singleTestQueData.tQuestionId">
+                            <div class="form-group row">
+                                    <input type="hidden" ng-model="singleTestQueData.tQuestionId">
+                                    <label for="name" class="col-md-2 col-form-label mandatory">Question Type</label>
+                                    <div class="col-md-4">
+                                        <select class="form-control" name="questiontype" ng-model="singleTestQueData.questiontype" ng-change="qTypeChange(singleTestQueData.questiontype)" ng-required="true">
+                                            <option value="">Select Question Type</option>
+                                            <option value="MCQ">MCQ</option>
+                                            <option value="Fill in The Blank">Fill in The Blank</option>
+                                            <option value="Essay">Essay</option>
+                                        </select>
+                                        <div class="clearfix"></div>
+                                        <p class="error" ng-show="singleQueFormName.questiontype.$invalid && singleQueFormName.questiontype.$touched">Please Select Question Type</p>
+                                        
+                                    </div>
+                                </div>
+
+                                <div class="form-group row" ng-if="multipleSelected">
+                                    <label for="name" class="col-md-2 col-form-label mandatory">Question</label>
+                                    <div class="col-md-10">
+                                        <textarea class="form-control" name="question" ng-model="singleTestQueData.question" rows="3" ng-required="true"></textarea>
+                                        <div class="clearfix"></div>
+                                        <p class="error" ng-show="singleQueFormName.question.$invalid && singleQueFormName.question.$touched">Please Enter Question</p>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row" ng-if="essaySelected">
+                                    <label for="name" class="col-md-2 col-form-label mandatory">Question</label>
+                                    <div class="col-md-10">
+                                        <textarea class="form-control" name="question" ng-model="singleTestQueData.question" rows="3" ng-required="true"></textarea>
+                                        <div class="clearfix"></div>
+                                        <p class="error" ng-show="singleQueFormName.question.$invalid && singleQueFormName.question.$touched">Please Enter Question</p>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row" ng-if="multipleSelected">
+                                    <label for="name" class="col-md-2 col-form-label mandatory">Option Type</label>
+                                       <div class="col-md-2">
+                                          <label class="radio-inline">
+                                          <input type="radio" name="option1" ng-model="singleTestQueData1.option1" value="Text" ng-required="true">Text
+                                          </label>
+                                          <label class="radio-inline">
+                                          <input type="radio" name="option1" ng-model="singleTestQueData1.option1" value="Image" ng-required="true">Image
+                                          </label>
+                                       </div>
+                                </div>
+
+                                <!--==============================
+                                =            Option 1            =
+                                ===============================-->
+                                <div class="form-group row" ng-if="multipleSelected">
+                                    <label for="name" class="col-md-2 col-form-label mandatory">Option 1</label>
+                                    <div class="col-md-2" ng-if="singleTestQueData1.option1=='Text'">
+                                       <label class="radio-inline">
+                                          <input type="radio" name="option" ng-model="singleTestQueData.questionrightanswer" value="1" ng-required="true">Right answer
+                                          </label> 
+                                    </div>   
+                                    <div class="col-md-8" ng-if="singleTestQueData1.option1=='Text'">
+                                        <textarea class="form-control" name="text1" ng-model="singleTestQueData.text1" rows="2" ng-required="true" placeholder="Enter Option 1"></textarea>
+                                        <div class="clearfix"></div>
+                                        <p class="error" ng-show="addquestion.text1.$invalid && addquestion.text1.$touched">Please Enter Option 1</p>
+                                    </div>
+                                    <div class="col-md-2" ng-if="singleTestQueData1.option1=='Image'">
+                                       <label class="radio-inline">
+                                          <input type="radio" name="option" ng-model="singleTestQueData.questionrightanswer" value="1" ng-required="true">Right answer
+                                          </label> 
+                                    </div>
+                                    <div class="col-md-8" ng-if="singleTestQueData1.option1=='Image'">
+                                                                               
+                                        <input type="file" class="form-control" ng-model="singleTestQueData.image1" name="file" base-sixty-four-input required accept="image/*">
+                                    </div>
+                                </div>
+                                <!--====  End of Option 1  ====-->
+
+                                <!--==============================
+                                =            Option 2            =
+                                ===============================-->
+                                <div class="form-group row" ng-if="multipleSelected">
+                                    <label for="name" class="col-md-2 col-form-label mandatory">Option 2</label>
+                                    <div class="col-md-2" ng-if="singleTestQueData1.option1=='Text'">
+                                       <label class="radio-inline">
+                                          <input type="radio" name="option" ng-model="singleTestQueData.questionrightanswer" value="2" ng-required="true" >Right answer
+                                          </label> 
+                                    </div>
+                                    <div class="col-md-8" ng-if="singleTestQueData1.option1=='Text'">
+                                        <textarea class="form-control" name="option2" ng-model="singleTestQueData.text2" rows="2" ng-required="true" placeholder="Enter Option 2"></textarea>
+                                        <div class="clearfix"></div>
+                                        <p class="error" ng-show="addquestion.option2.$invalid && addquestion.option2.$touched">Please Enter Option 2</p>
+                                    </div>
+                                    <div class="col-md-2" ng-if="singleTestQueData1.option1=='Image'">
+                                       <label class="radio-inline">
+                                          <input type="radio" name="option" ng-model="singleTestQueData.questionrightanswer" value="2" ng-required="true" >Right answer
+                                          </label> 
+                                    </div>
+                                    <div class="col-md-8" ng-if="singleTestQueData1.option1=='Image'">
+                                        <input type="file" class="form-control" ng-model="singleTestQueData.image2" name="file" base-sixty-four-input required accept="image/*">
+                                    </div>
+                                </div>
+                                <!--====  End of Option 2  ====-->
+
+                                <!--==============================
+                                =            Option 3            =
+                                ===============================-->
+                                <div class="form-group row" ng-if="multipleSelected">
+                                    <label for="name" class="col-md-2 col-form-label mandatory">Option 3</label>
+                                    <div class="col-md-2" ng-if="singleTestQueData1.option1=='Text'">
+                                       <label class="radio-inline">
+                                          <input type="radio" name="option" ng-model="singleTestQueData.questionrightanswer" value="3" ng-required="true" >Right answer
+                                          </label> 
+                                    </div>
+                                    <div class="col-md-8" ng-if="singleTestQueData1.option1=='Text'">
+
+                                        <textarea class="form-control" name="option3" ng-model="singleTestQueData.text3" rows="2" ng-required="true" placeholder="Enter Option 3"></textarea>
+                                        <div class="clearfix"></div>
+                                        <p class="error" ng-show="addquestion.option3.$invalid && addquestion.option3.$touched">Please Enter Option 3</p>
+                                    </div>
+                                    <div class="col-md-2" ng-if="singleTestQueData1.option1=='Image'">
+                                       <label class="radio-inline">
+                                          <input type="radio" name="option" ng-model="singleTestQueData.questionrightanswer" value="3" ng-required="true" >Right answer
+                                          </label> 
+                                    </div>
+                                    <div class="col-md-8" ng-if="singleTestQueData1.option1=='Image'">
+                                        <input type="file" class="form-control" ng-model="singleTestQueData.image3" name="file" base-sixty-four-input required accept="image/*">
+                                    </div>
+                                </div>
+                                <!--====  End of Option 3  ====-->
+
+                                <!--==============================
+                                =            Option 4            =
+                                ===============================-->
+                                <div class="form-group row" ng-if="multipleSelected">
+                                    <label for="name" class="col-md-2 col-form-label mandatory">Option 4</label>
+                                    <div class="col-md-2" ng-if="singleTestQueData1.option1=='Text'">
+                                       <label class="radio-inline">
+                                          <input type="radio" name="option" ng-model="singleTestQueData.questionrightanswer" value="4" ng-required="true" >Right answer
+                                          </label> 
+                                    </div>
+                                    <div class="col-md-8" ng-if="singleTestQueData1.option1=='Text'">
+                                        <textarea class="form-control" name="option4" ng-model="singleTestQueData.text4" rows="2" ng-required="true" placeholder="Enter Option 4"></textarea>
+                                        <div class="clearfix"></div>
+                                        <p class="error" ng-show="addquestion.option4.$invalid && addquestion.option4.$touched">Please Enter Option 4</p>
+                                    </div>
+                                    <div class="col-md-2" ng-if="singleTestQueData1.option1=='Image'">
+                                       <label class="radio-inline">
+                                          <input type="radio" name="option" ng-model="singleTestQueData.questionrightanswer" value="4" ng-required="true" >Right answer
+                                          </label> 
+                                    </div>
+                                    <div class="col-md-8" ng-if="singleTestQueData1.option1=='Image'">
+                                        <input type="file" class="form-control" ng-model="singleTestQueData.image4" name="file" base-sixty-four-input required accept="image/*">
+                                    </div>
+                                </div>
+                                <!--====  End of Option 4  ====-->
+
+                            <div class="form-group row" ng-if="multipleSelected">
+                                <label for="name" class="col-md-2 col-form-label mandatory">Explanation</label>
+                                <div class="col-md-10">
+                                    <textarea class="form-control" name="explanation" ng-model="singleTestQueData.explanation" rows="3" ng-required="true"></textarea>
+                                    <div class="clearfix"></div>
+                                    <p class="error" ng-show="singleQueFormName.explanation.$invalid && singleQueFormName.explanation.$touched">Please Enter Explanation</p>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" ng-if="essaySelected">
+                                <label for="name" class="col-md-2 col-form-label mandatory">Keywords</label>
+                                <div class="col-md-10">
+                                    <tags-input ng-model="singleTestQueData.keyword" name="keywords" ng-required="true"></tags-input>
+                                    <div class="clearfix"></div>
+                                    <small id="fileHelp" class="form-text">
+                                        Enter keyword and press comma (,) button or tab button
+                                    </small>
+                                    <div class="clearfix"></div>
+                                    <p class="error" ng-show="singleQueFormName.keywords.$invalid && singleQueFormName.keywords.$touched">Please Enter Keywords</p>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" ng-if="essaySelected">
+                                <label for="name" class="col-md-2 col-form-label mandatory">Marks</label>
+                                <div class="col-md-10">
+                                    <input class="form-control" type="number" name="marks" ng-model="singleTestQueData.marks" ng-required="true">
+                                    <div class="clearfix"></div>
+                                    <p class="error" ng-show="singleQueFormName.marks.$invalid && singleQueFormName.marks.$touched">Please Enter Marks</p>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" ng-if="multipleSelected">
+                                <label for="name" class="col-md-2 col-form-label mandatory">Marks</label>
+                                <div class="col-md-10">
+                                    <input class="form-control" type="number" name="marks" ng-model="singleTestQueData.marks" ng-required="true">
+                                    <div class="clearfix"></div>
+                                    <p class="error" ng-show="singleQueFormName.marks.$invalid && singleQueFormName.marks.$touched">Please Enter Marks</p>
+                                </div>
+                            </div>
+
+                            <!-- <div class="form-group row">
+                              <label for="name" class="col-md-2 col-form-label">Image</label>
+                              <div class="col-md-10">
+                                <input class="form-control" type="file" name="imagefile" ng-model="singleTestQueData.imagefile">
+                              </div>
+                            </div> -->
+                            <hr>
+
+                            <div class="form-group row text-center">
+                                <button type="submit" class="btn btn-success mx-auto"  onclick="$('.modal').modal('hide')">Save</button>
+                            </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- end add model -->
+
+                <!-- delete modal -->
+                <div class="modal fade deleteSingleQuestionModal"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel1" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h5 class="modal-title" id="exampleModalLabel1">Delete Single Question</h5>
+                      </div>
+                      <div class="modal-body">
+                        Detele following question?&nbsp;<strong>{{deleteSingleQueData.question}}</strong>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" ng-click="deleteSingleQuestion(deleteSingleQueData.tQuestionId)" onclick="$('.modal').modal('hide')">Delete</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- end delete model -->
+
+                <!-- view modal -->
+                <div class="modal fade viewSingleQuestionModal" id="" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel1" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h5 class="modal-title" id="exampleModalLabel1">View Single Question</h5>
+                      </div>
+                      <div class="modal-body">
+                        <form role="form">
+                            <div class="form-group row">
+                              <label for="name" class="control-label col-md-3">Question Type</label>
+                              <label for="name" class="col-md-9">{{viewSingleata.questiontype}}</label>
+                            </div>
+
+                            <div class="form-group row">
+                              <label for="name" class="control-label col-md-3">Question</label>
+                              <label for="name" class="col-md-9">{{viewSingleata.question}}</label>
+                            </div>
+
+                            <div class="form-group row">
+                              <label for="name" class="control-label col-md-3">Option 1</label>
+                              <label for="name" class="col-md-9">{{viewSingleata.text1}}</label>
+                            </div>
+
+                            <div class="form-group row">
+                              <label for="name" class="control-label col-md-3">Option 2</label>
+                              <label for="name" class="col-md-9">{{viewSingleata.text2}}</label>
+                            </div>
+
+                            <div class="form-group row">
+                              <label for="name" class="control-label col-md-3">Option 3</label>
+                              <label for="name" class="col-md-9">{{viewSingleata.text3}}</label>
+                            </div>
+
+                            <div class="form-group row">
+                              <label for="name" class="control-label col-md-3">Option 4</label>
+                              <label for="name" class="col-md-9">{{viewSingleata.text4}}</label>
+                            </div>
+
+                            <div class="form-group row">
+                              <label for="name" class="control-label col-md-3">Correct Answer</label>
+                              <label for="name" class="col-md-9">{{viewSingleata.questionrightanswer}}</label>
+                            </div>
+
+                            <div class="form-group row">
+                              <label for="name" class="control-label col-md-3">Explanation</label>
+                              <label for="name" class="col-md-9">{{viewSingleata.explanation}}</label>
+                            </div>
+
+                            <div class="form-group row">
+                              <label for="name" class="control-label col-md-3">Marks</label>
+                              <label for="name" class="col-md-3">{{viewSingleata.marks}}</label>
+                            </div>
+
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- end view model -->
+                                
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Masters/Topic/Test/TestQuestionCtrl.js"></script>
+

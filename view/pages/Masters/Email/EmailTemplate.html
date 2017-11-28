@@ -1,0 +1,420 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<style type="text/css">
+  .ta-hidden-input {
+    width: 1px;
+    height: 1px;
+    border: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: -10000px;
+    left: -10000px;
+    opacity: 0;
+    overflow: hidden;
+}
+
+/* add generic styling for the editor */
+.ta-root.focussed > .ta-scroll-window.form-control {
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+
+.ta-editor.ta-html, .ta-scroll-window.form-control {
+    min-height: 300px;
+    height: auto;
+    overflow: auto;
+    font-family: inherit;
+    font-size: 100%;
+}
+
+.ta-scroll-window.form-control {
+    position: relative;
+    padding: 0;
+}
+
+.ta-scroll-window > .ta-bind {
+    height: auto;
+    min-height: 300px;
+    padding: 6px 12px;
+}
+
+.ta-editor:focus {
+    user-select: text;
+}
+
+/* add the styling for the awesomness of the resizer */
+.ta-resizer-handle-overlay {
+    z-index: 100;
+    position: absolute;
+    display: none;
+}
+
+.ta-resizer-handle-overlay > .ta-resizer-handle-info {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    border: 1px solid black;
+    background-color: #FFF;
+    padding: 0 4px;
+    opacity: 0.7;
+}
+
+.ta-resizer-handle-overlay > .ta-resizer-handle-background {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    left: 5px;
+    top: 5px;
+    border: 1px solid black;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.ta-resizer-handle-overlay > .ta-resizer-handle-corner {
+    width: 10px;
+    height: 10px;
+    position: absolute;
+}
+
+.ta-resizer-handle-overlay > .ta-resizer-handle-corner-tl{
+    top: 0;
+    left: 0;
+    border-left: 1px solid black;
+    border-top: 1px solid black;
+}
+
+.ta-resizer-handle-overlay > .ta-resizer-handle-corner-tr{
+    top: 0;
+    right: 0;
+    border-right: 1px solid black;
+    border-top: 1px solid black;
+}
+
+.ta-resizer-handle-overlay > .ta-resizer-handle-corner-bl{
+    bottom: 0;
+    left: 0;
+    border-left: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+.ta-resizer-handle-overlay > .ta-resizer-handle-corner-br{
+    bottom: 0;
+    right: 0;
+    border: 1px solid black;
+    cursor: se-resize;
+    background-color: white;
+}
+
+/* copy the popover code from bootstrap so this will work even without it */
+.popover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1060;
+    display: none;
+    max-width: 276px;
+    padding: 1px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.42857143;
+    text-align: left;
+    white-space: normal;
+    background-color: #fff;
+    -webkit-background-clip: padding-box;
+            background-clip: padding-box;
+    border: 1px solid #ccc;
+    border: 1px solid rgba(0, 0, 0, .2);
+    border-radius: 6px;
+    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+}
+.popover.top {
+    margin-top: -10px;
+}
+.popover.bottom {
+    margin-top: 10px;
+}
+.popover-title {
+    padding: 8px 14px;
+    margin: 0;
+    font-size: 14px;
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #ebebeb;
+    border-radius: 5px 5px 0 0;
+}
+.popover-content {
+    padding: 9px 14px;
+}
+.popover > .arrow,
+.popover > .arrow:after {
+    position: absolute;
+    display: block;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+}
+.popover > .arrow {
+    border-width: 11px;
+}
+.popover > .arrow:after {
+    content: "";
+    border-width: 10px;
+}
+.popover.top > .arrow {
+    bottom: -11px;
+    left: 50%;
+    margin-left: -11px;
+    border-top-color: #999;
+    border-top-color: rgba(0, 0, 0, .25);
+    border-bottom-width: 0;
+}
+.popover.top > .arrow:after {
+    bottom: 1px;
+    margin-left: -10px;
+    content: " ";
+    border-top-color: #fff;
+    border-bottom-width: 0;
+}
+.popover.bottom > .arrow {
+    top: -11px;
+    left: 50%;
+    margin-left: -11px;
+    border-top-width: 0;
+    border-bottom-color: #999;
+    border-bottom-color: rgba(0, 0, 0, .25);
+}
+.popover.bottom > .arrow:after {
+    top: 1px;
+    margin-left: -10px;
+    content: " ";
+    border-top-width: 0;
+    border-bottom-color: #fff;
+}
+</style>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="emailTemplateCtrl as vm">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Email Template
+              <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{EmailTemplate.length}}</span></span>
+              </h3>
+            </div>
+            <div class="panel-body">
+            
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+
+              <!--=============================
+              =            Buttons            =
+              ==============================-->
+              <div class="button-group">
+                <a data-toggle="modal" data-target=".addEmailTemplateModal" ng-click="addemail()" class="btn btn-default btn-labeled btn-sm">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp;Add Email Template
+                </a>
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+              </div>
+              <!--====  End of Buttons  ====-->
+
+              <!--===========================
+              =            Table            =
+              ============================-->
+              <table ng-table="usersTable" show-filter="true" class="table table-bordered table-striped text-center">
+                <tbody>
+                  <tr ng-repeat="eml in EmailTemplate">
+                    <td data-title="'Email Template'" filter="{'title': 'text'}" sortable="'title'">{{eml.title}}
+                    </td>
+                    <td data-title="'Actions'">
+                      <button data-toggle="modal" data-target=".addEmailTemplateModal" class="btn btn-success btn-xs" ng-click="editTemplate(eml.eEmailtemplateId, EmailTemplate)" tooltip-placement="top" uib-tooltip="Edit">
+                        <i class="fa fa-pencil-square-o">
+                        </i>
+                      </button> 
+                      <a data-toggle="modal" data-target=".viewEmailTemplateModal" class="btn btn-info btn-xs" ng-click="viewEmailTemplate(eml.eEmailtemplateId, EmailTemplate)" tooltip-placement="top" uib-tooltip="View">
+                        <i class="fa fa-eye">
+                        </i>
+                      </a>
+                      <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deleteEmailTemplateModal" ng-click="delEmailTemplate(eml.eEmailtemplateId, EmailTemplate)" tooltip-placement="top" uib-tooltip="Delete">
+                        <i class="fa fa-trash">
+                        </i>
+                      </a>
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <!--====  End of Table  ====-->
+              <hr>
+              
+              <!--========================================
+              =            Add Template Modal            =
+              =========================================-->
+              <div class="modal fade addEmailTemplateModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title" ng-init="headingMessage = 'Add Email Template'">{{headingMessage}}</h4>
+                    </div>
+                    <div class="modal-body">
+                      <form class="form-horizontal" name="emailtemplateform" ng-submit="saveEmailTemplate(EmailTemplateData, vm.content)" novalidate>
+                      <input type="hidden" ng-model="EmailTemplateData.eEmailtemplateId">
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Template Name
+                          </label>
+                          <div class="col-md-4">
+                            <input type="text" name="title" class="form-control inputEle" ng-model="EmailTemplateData.title" placeholder="Enter Template Name" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="emailtemplateform.title.$invalid && emailtemplateform.title.$touched">Please Enter Template Name</p>
+                          </div>
+                        </div>
+                       
+                        <div class="form-group">
+                          <label class="control-label col-md-2">Tags</label>
+                          <div class="col-md-4">
+                            <!-- <select ng-model="EmailTemplateData.emailtagvalue" name="tagvalue" class="form-control" ng-change="vm.variable=EmailTemplateData.emailtagvalue" ng-required="true">
+                                <option value="jobtitle">Job Title</option>
+                                <option value="nameofcompany">Name of Company</option>
+                                <option value="keyskills">Key Skills</option>
+                                <option value="experience">Experience</option>
+                                <option value="jobtype">Job Type</option>
+                                <option value="jobdescription">Job Description</option>
+                                <option value="marksrequired">Marks Required</option>
+                                <option value="educationqualification">Education Qualification</option>
+                                <option value="joblocation">Job Location</option>
+                                <option value="salaryrange">Salary Range</option>
+                                <option value="termsandconditions">Terms and Conditions</option>
+                                <option value="technologies">Technologies</option>
+                                <option value="round">Round</option>
+                                <option value="roundlocation">Round Location</option>
+                                <option value="interviewdate">Interview Date</option>
+                                <option value="roundinterviewdescription">Round Interview Desription</option>
+                            </select> -->
+                            <select ng-model="TagsModel" name="tags" class="form-control inputEle" ng-options="tag.emailtagvalue as tag.emailtagname for tag in EmailTags" ng-change="vm.variable=TagsModel">
+                              <option value="">select Tag</option>
+                            </select>
+                            
+                            
+                          </div>
+                          </div>
+
+                          <div class="form-group">
+                            <label class="control-label col-md-2">Editor</label>
+                            <div class="col-md-10">
+                              <text-angular ng-click="vm.getCursorPosition()" id="editor1" name="editor1" ng-model="vm.content">
+                            </div>
+                          </div>
+                        
+
+                        <div class="clearfix"></div>
+                        <br>
+
+                        <div class="form-group">
+                          <div class="col-md-12 text-center">
+                            <button type="submit" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                            </button>
+                            <!-- ng-disabled="emailtemplateform.$invalid" -->
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                      </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!--====  End of Add Template Modal  ====-->
+
+
+              <!--=========================================
+              =            View Email Template            =
+              ==========================================-->
+              <div class="modal fade viewEmailTemplateModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">View Email Template
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label class="control-label col-md-2" for="">Template Name:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewEmailTemplateData.title}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <hr>
+                      <div class="form-group">
+                        <label class="control-label col-md-2" for="">Template Body:
+                        </label>
+                        <label class="control-label col-md-10" style="padding: 5px;background-color: #eee;" for="" ng-bind-html="viewEmailTemplateData.text">
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <br>
+                       
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!--====  End of View Email Template  ====-->
+
+              <!--===========================================
+              =            Delete Email Template            =
+              ============================================-->
+              <div class="modal fade deleteEmailTemplateModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Delete Email Template
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Are you sure you want to delete 
+                          <strong>{{deleteEmailData.title}}?
+                          </strong>
+                        </h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="deleteEmailTemplate(deleteEmailData.eEmailtemplateId)" onclick="$('.modal').modal('hide')">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Delete
+                        </a>
+                        <a class="btn btn-default btn-sm" data-dismiss="modal">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Cancel
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!--====  End of Delete Email Template  ====-->
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Masters/Email/EmailTemplateCtrl.js"></script>
+

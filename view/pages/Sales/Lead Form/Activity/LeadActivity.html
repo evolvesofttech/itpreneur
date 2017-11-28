@@ -1,0 +1,219 @@
+<!--================================
+=            Controller            =
+=================================-->
+  <div class="row no-margin" ng-controller="leadinfoCtrl">
+    <div class="col-md-12 no-padding">
+      <div class="panel panel-info">
+       
+        <div class="panel-body">
+
+          <!-- toaster message -->
+          <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+          <!-- toaster message -->
+          
+          <div class="button-group">
+            <a data-toggle="modal" data-target=".addenquiryactivities" class="btn btn-default btn-labeled btn-sm"  ng-click="AddHideActivityStatus();">
+              <i class="fa fa-plus-circle">
+              </i>&nbsp;&nbsp;Add Activity
+            </a> 
+          </div>
+          
+          <table ng-table="usersTable_enquiryactivities" show-filter="true" class="table table-bordered table-striped text-center">
+            <tbody>
+              <tr ng-repeat="bo in data_enquiryactivities">
+                <td data-title="'Activity Type'" filter="{'activitytype': 'text'}" sortable="'activitytype'">{{bo.activitytype}}
+                </td>
+                 <td data-title="'Description'" filter="{'description': 'text'}" sortable="'description'">{{bo.description}}
+                </td>
+                <td data-title="'Plan'" filter="{'followupdate': 'text'}" sortable="'followupdate'">{{bo.followupdate | date}}
+                </td>
+                 <td data-title="'Activity Date'" filter="{'activitydate': 'text'}" sortable="'activitydate'">{{bo.activitydate | date}}
+                </td>
+                 
+                 <td data-title="'Activity Status'" filter="{'activitystatus': 'text'}" sortable="'activitystatus'">  
+                 <span style="font-size: 12px;" class="label" ng-class="{'label-primary' : bo.activitystatus=='Pending','label-success' : bo.activitystatus=='Close'}">{{bo.activitystatus}}</span>
+                </td>
+                <td data-title="'Actions'" class="w150">
+                  <a data-toggle="modal" data-target=".addenquiryactivities" class="btn btn-success btn-xs" ng-click="editLeadActivity(bo.acActivityId)" tooltip-placement="top" uib-tooltip="Edit">
+                    <i class="fa fa-pencil-square-o">
+                    </i>
+                  </a> 
+
+                  <a ng-click="viewLeadActivity(bo.acActivityId, data_enquiryactivities)" data-toggle="modal" data-target=".viewleadinfo" class="btn btn-info btn-xs" tooltip-placement="top" uib-tooltip="View" ><i class="fa fa-eye"></i>
+                  </a>
+
+                  <a class="btn btn-primary btn-xs" data-toggle="modal" data-target=".addenquiryactivities" tooltip-placement="top" uib-tooltip="Add Activity" ng-click="AddHideActivityStatus();">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <hr>
+        
+          <!--==================================
+          =            Add Activity            =
+          ===================================-->
+          <div class="modal fade addenquiryactivities" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+              <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" ng-click="clearModalOnCloseActivity()" data-dismiss="modal">&times;
+                    </button>
+                     <h4 class="modal-title" ng-init="headingMessage ='Add Activity'">{{headingMessage}}</h4>
+                  </div>
+                  <div class="modal-body">
+                    <form class="form-horizontal" name="enquiryactivitiesform" ng-submit="saveActivities(leadactivitiesData)" novalidate >
+                    <input type="hidden" ng-model="leadactivitiesData.eLeadinformationId">
+                     <div class="form-group ">
+                     <label class="control-label col-sm-2" for="">Student</label>
+                        <div class="col-sm-4">
+                            <input type="text" ng-model="LeadFullName" class="form-control" disabled>
+                        </div>                                      
+                        <label class="control-label col-md-2" for="">Activity</label>
+                        <div class="col-md-4" >
+                            <select ng-model="leadactivitiesData.activitytype" name="activit" class="form-control inputEle" ng-required="true"> 
+                              <option>Email</option>
+                              <option>Call</option>
+                              <option>Message</option>
+                              <option>Visit</option>
+                            </select>
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="enquiryactivitiesform.activit.$invalid && enquiryactivitiesform.activit.$touched">Please Select Activity</p>
+                        </div> 
+                      </div> 
+                      <input type="hidden" ng-model="leadactivitiesData.eEnquiryFormId">
+                      <div class="form-group ">
+                         <label class="control-label col-md-2" for="">Description</label>
+                          <div class="col-md-10">
+                             <textarea class="form-control inputEle"  ng-model="leadactivitiesData.description" placeholder="Enter Description"></textarea>
+                          </div>   
+                      </div>
+
+                      <div class="form-group">
+
+                        <label class="control-label col-md-2 mandatory" for="">Plan Date</label>
+                        <div class="col-md-4">
+                         <datepicker date-format="yyyy-MM-dd">
+                            <input name="pland" ng-model="leadactivitiesData.followupdate" placeholder="Enter Date" class="form-control" type="text" restrict-to="[0-9]"/  ng-required="true">
+                         </datepicker>
+                         <div class="clearfix"></div>
+                          <p class="error" ng-show="enquiryactivitiesform.pland.$invalid && enquiryactivitiesform.pland.$touched">Please Enter Plan Date </p> 
+                        </div>
+
+                        <label class="control-label col-md-2" for="">Activity Date</label>
+                        <div class="col-md-4">
+                         <datepicker date-format="yyyy-MM-dd">
+                            <input name="acti" ng-model="leadactivitiesData.activitydate" placeholder="Enter Date" class="form-control" type="text" restrict-to="[0-9]"/>
+                         </datepicker>
+                        <!--  <div class="clearfix"></div>
+                          <p class="error" ng-show="enquiryactivitiesform.acti.$invalid && enquiryactivitiesform.acti.$touched">Please Enter Activity Date </p> -->
+                        </div>
+                        
+                     </div>
+
+                     <div class="form-group ">                                
+                        <label class="control-label col-md-2" for="">Activity Status</label>
+                        <div class="col-md-4" >
+                            <select name="actistatus" ng-model="leadactivitiesData.activitystatus" ng-init="leadactivitiesData.activitystatus = 'Pending'" class="form-control inputEle"  ng-required="true"> 
+                              <option>Pending</option>
+                              <option>Close</option>
+                            </select>
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="enquiryactivitiesform.actistatus.$invalid && enquiryactivitiesform.actistatus.$touched">Please Select Activity Status </p>
+                        </div> 
+
+                        <label class="control-label col-md-2" for="">Activity Against</label>
+                          <div class="col-md-4" >
+                              <select name="against" ng-model="leadactivitiesData.activityagainst" ng-init="leadactivitiesData.activityagainst = 'Lead'" class="form-control inputEle" disabled> 
+                                <option value="Lead">Lead</option>
+                                <option value="Enquiry">Enquiry</option>
+                                <option value="Application">Application</option>
+                                <option value="Admission">Admission</option>
+                              </select>
+                              <div class="clearfix"></div>
+                            <p class="error" ng-show="enquiryactivitiesform.against.$invalid && enquiryactivitiesform.against.$touched">Please Select Activity Against </p>
+                          </div>
+                      </div> 
+                      <input type="hidden" value="{{leadactivitiesData.activitystatus}}">
+                     
+                     <br>
+                      <div class="form-group">
+                        <div class="col-md-12 text-center">
+                          <button type="submit" ng-disabled="enquiryactivitiesform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                          </button>
+                        </div>
+                      </div>
+                      <div class="clearfix"></div>
+                     </form>
+                     </div>
+                  </div>
+                </div>
+              </div>
+          <!--====  End of Add Activity  ====-->
+
+           <!--===================================
+          =            View Activity            =
+          ====================================-->
+        <div class="modal fade viewleadinfo" tabindex="-1" role="dialog" aria-labelledby="  mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                  </button>
+                  <h4 class="modal-title">View Activity
+                  </h4>
+                </div>
+                <div class="modal-body">
+                 <div class="form-group ">
+                 <label class="control-label col-sm-2" for="">Student</label>
+                 <label class="control-label col-sm-4" style="text-align: left;" for="">{{LeadFullName}}</label>
+                                                         
+                    <label class="control-label col-md-2" for="">Activity</label>
+                    <label class="control-label col-sm-4" style="text-align: left;" for="">{{viewActivityData.activitytype}}</label>
+                  </div> 
+
+                   <div class="clearfix"></div>
+                  <hr>
+
+                  <div class="form-group ">
+                     <label class="control-label col-md-2" for="">Description</label>
+                     <label class="control-label col-sm-10" style="text-align: left;" for="">{{viewActivityData.description}}</label>  
+                  </div>
+                   <div class="clearfix"></div>
+                  <hr>
+
+                  <div class="form-group ">
+                    
+                    <label class="control-label col-md-2" for="">Plan Date</label>
+                    <label class="control-label col-sm-4" style="text-align: left;" for="">{{viewActivityData.followupdate | date}}</label>
+
+                     <label class="control-label col-md-2" for="">Activity Date</label>
+                     <label class="control-label col-sm-4" style="text-align: left;" for="">{{viewActivityData.activitydate | date}}</label>
+
+                 </div>
+                  <div class="clearfix"></div>
+                  <hr>
+
+                 <div class="form-group ">                                
+                    <label class="control-label col-md-2" for="">Activity Status</label>
+                    <label class="control-label col-sm-4" style="text-align: left;" for="">{{viewActivityData.activitystatus}}</label>
+
+                    <label class="control-label col-md-2" for="">Activity Against</label>
+                    <label class="control-label col-sm-4" style="text-align: left;" for="">{{viewActivityData.activityagainst}}</label>
+                  </div>
+                   <div class="clearfix"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+       <!-- End View Activity  ====-->
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!--====  End of Controller  ====-->
+
+ <!-- <script src="view/pages/Sales/Lead Form/LeadinformationCtrl.js"></script> -->
+ <script src="view/pages/Sales/Lead Form/LeadinformationCtrl.js"></script>

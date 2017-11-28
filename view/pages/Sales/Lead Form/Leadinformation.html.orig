@@ -1,0 +1,306 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state" >
+    <div class="container-fluid">
+
+    <div class="row no-margin" ng-controller="leadinfoCtrl as Inst">
+    <div class="col-md-12 no-padding">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Lead Information
+                <span class="pull-right"><small>Total: </small><span class="badge">{{leadinfo.length}}</span></span>
+                </h3>
+            </div>
+            <div class="panel-body">
+            
+                <!-- toaster message -->
+                <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+                <!-- toaster message -->
+
+                <div class="button-group">
+                    <a data-toggle="modal" data-target=".addleadinfo" class="btn btn-default btn-labeled btn-sm" ng-click="addEnquiryClick()">
+                        <i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Add Lead Info</a>
+                    <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                        <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</a>
+                </div>
+                <table ng-table="usersTable_leadinfo" show-filter="true" class="table table-bordered table-striped text-center">
+                    <tbody>
+                        <tr ng-repeat="ins in data_leadinfo" ng-hide="ins.eLeadinformationId == '0'">
+                        <td data-title="'Name'" filter="{ 'firstname': 'text' }">{{ins.lastname}}&nbsp;&nbsp;{{ins.firstname}}&nbsp;&nbsp;{{ins.middlename}}</td>
+                        <td data-title="'Email Id'" filter="{ 'emailid': 'text' }">{{ins.emailid}}</td>
+                          <td data-title="'Contact No'" filter="{ 'contactno': 'text' }">{{ins.contactno}}</td>
+                          <td data-title="'Location'" filter="{ 'location': 'text' }">{{ins.location}}</td>
+                          <td data-title="'Source Of Lead.'" filter="{'sourcename': 'text' }">{{ins.sourcename}}</td>
+                          <td data-title="'Lead Type'" filter="{'leadtype': 'text' }">{{ins.leadtype}}</td>
+                          <td data-title="'Assigned To'" filter="{'leadtype': 'text' }">{{ins.lastnameuser}}&nbsp;&nbsp;{{ins.firstnameuser}}&nbsp;&nbsp;{{ins.middlenameuser}}</td>
+                          <td data-title="'Actions'" class="w150">
+                              <a href="#/Editleadinformation/{{ins.eLeadinformationId}}" class="btn btn-success btn-xs" tooltip-placement="top" uib-tooltip="Edit"><i class="fa fa-pencil-square-o"></i>
+                              </a>
+
+                              <a ng-click="viewleadinfo(ins.eLeadinformationId, data_leadinfo)" data-toggle="modal" data-target=".viewleadinfo" class="btn btn-info btn-xs" tooltip-placement="top" uib-tooltip="View"><i class="fa fa-eye"></i>
+                              </a>
+
+                              <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deleteleadinfo1" ng-click="delleadinfo(ins.eLeadinformationId, data_leadinfo)" tooltip-placement="top" uib-tooltip="Delete"><i class="fa fa-trash"></i>
+                              </a>
+
+                              <button class="btn btn-primary btn-xs" data-toggle="modal" data-target=".movelead" ng-click="moveLead(ins.eLeadinformationId, data_leadinfo)" tooltip-placement="top" uib-tooltip="Move To Enquiry">
+                              Enquiry
+                              </button>
+                          </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <hr>
+                <div class="modal fade addleadinfo" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content" sc_school_id>
+                            <div class="modal-header">
+                                <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Add Lead Information</h4>
+                            </div>
+                            <div class="modal-body">
+                              <form class="form-horizontal" name="leadinfoDataform" ng-submit="saveleadinfo(leadinfoData)" novalidate>
+                                       <input type="hidden" ng-model="leadinfoData.eLeadinformationId" name="">
+
+                                     <div class="form-group required">
+                                     <label class="control-label col-sm-2" for="">First Name</label>
+                                      <div class="col-sm-4">
+                                         <input type="text"  class="form-control inputEle" ng-model="leadinfoData.firstname" placeholder="Enter First Name" ng-required="true">
+                                      </div>
+
+                                      <label class="control-label col-sm-2" for="">Middle Name</label>
+                                      <div class="col-sm-4">
+                                          <input type="text"  class="form-control inputEle" ng-model="leadinfoData.middlename" placeholder="Enter Middle Name" ng-required="true">
+                                      </div>
+                                     </div>
+
+                                     
+                                     <div class="form-group required">
+                                      
+                                    <label class="control-label col-sm-2" for="">Last Name</label>
+                                      <div class="col-sm-4">
+                                         <input type="text"  class="form-control inputEle" ng-model="leadinfoData.lastname" placeholder="Enter Last Name" ng-required="true">
+                                      </div>
+
+                                      <label class="control-label col-sm-2" for="">Email Id</label>
+                                          <div class="col-sm-4">
+                                             <input type="email" class="form-control inputEle" ng-model="leadinfoData.emailid" placeholder="Enter Email Id" ng-required="true"  ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" >
+                                          </div>
+
+                                    </div>
+
+                                    <div class="form-group required">
+                                        <label class="control-label col-sm-2" for="">Contact No.</label>
+                                        <div class="col-sm-4">
+                                           <input type="number" class="form-control inputEle" ng-model="leadinfoData.contactno" placeholder="Enter Contact Number" ng-required="true" ng-required="true" maxlength="10" minlength="10" required>
+                                          
+                                        </div>
+                                        <label class="control-label col-sm-2" for="">Location</label>
+                                        <div class="col-sm-4">
+                                           <input type="text" class="form-control inputEle"  ng-model="leadinfoData.location" placeholder="Enter Location" ng-required="true">
+                                        </div>
+                                     </div>
+                                   
+                                    <div class="form-group required">
+                                        
+                                        <label class="control-label col-sm-2" for="">Source Of Lead</label>
+                                        <div class="col-sm-4">
+                                           <select ng-model="leadinfoData.cSourceId" class="form-control inputEle" ng-options="so.cSourceId as so.sourcename for so in Aboutus"  ng-required="true">
+                                              <option value="">Select Source</option>
+                                            </select> 
+                                        </div> 
+
+                                        <label class="control-label col-sm-2" for="">Lead Type</label>
+                                        <div class="col-sm-4">
+                                            <select ng-model="leadinfoData.leadtype " class="form-control "  ng-required="true">
+                                              <option value="Hot">Hot</option>
+                                              <option value="Cold">Cold</option>
+                                               <option value="Warm">Warm</option>
+                                            </select>
+                                        </div> 
+                                    </div>
+
+                                    <div class="form-group required">
+                                        
+                                        <label class="control-label col-sm-2" for="">Assign Lead</label>
+                                        <div class="col-sm-4">
+                                           <select ng-model="leadinfoData.adUserdetailId" class="form-control inputEle" ng-options="so.adUserdetailId as (so.lastname + ' ' + so.middlename + ' ' + so.firstname) for so in UserDetails"  ng-required="true">
+                                              <option value="">Select Lead</option>
+                                            </select> 
+                                        </div>
+                                         <label class="control-label col-sm-2" for="">Branch</label>
+                                         <div class="col-sm-4">
+                                            <select ng-model="leadinfoData.bBranchId" name="enquirybranch" class="form-control inputEle" ng-options="bran.bBranchId as bran.branchname for bran in Branch" ng-required="true">
+                                              <option value="">select Branch</option>
+                                            </select> 
+                                        </div> 
+
+                                    </div>
+
+
+                                    
+                                     <br>
+                                     <div class="form-group">
+                                      <div class="col-md-12 text-center">
+                                        <button type="submit" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                                        </button>
+                                      </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+
+                              </form>
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="modal fade viewleadinfo" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                                    <h4 class="modal-title">View Lead Information</h4>
+                                </div>
+                                <div class="modal-body">
+                                   
+                                    <input type="hidden" ng-model="viewleadinfoData.eLeadinformationId">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2" for="">First Name: </label>
+                                        <div class="col-md-4">
+                                            {{viewleadinfoData.firstname}}
+                                        </div>
+
+                                         <label class="control-label col-md-2" for="">Middle Name: </label>
+                                        <div class="col-md-4">
+                                            {{viewleadinfoData.middlename}}
+                                        </div>
+                                    </div>
+
+                                    <div class="clearfix"></div>
+                                    <hr>
+ 
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2" for="">Last Name: </label>
+                                        <div class="col-md-4">
+                                            {{viewleadinfoData.lastname}}
+                                        </div>
+
+                                         <label class="control-label col-md-2" for="">Email Id: </label>
+                                        <div class="col-md-4">
+                                            {{viewleadinfoData.emailid}}
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2" for="">Contact No:
+                                        </label>
+                                        <div class="col-md-4">
+                                            {{viewleadinfoData.contactno}}
+                                        </div>
+                                        <label class="control-label col-md-2" for="">Location:
+                                         </label>
+                                        <div class="col-md-4">
+                                            {{viewleadinfoData.location}}
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                   
+                                    <hr>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2" for="">Lead Type: </label>
+                                        <div class="col-md-4">
+                                            {{viewleadinfoData.leadtype}}
+                                        </div>
+
+                                        <label class="control-label col-md-2" for="">Assigned To: </label>
+                                        <div class="col-md-4">
+                                            {{viewleadinfoData.lastnameuser}}&nbsp;&nbsp;{{viewleadinfoData.firstnameuser}}&nbsp;&nbsp;{{viewleadinfoData.middlenameuser}}&nbsp;&nbsp;
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <br>
+                                    
+                                    <!-- </form> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                </div>
+            </div>
+          <!--============================================
+          =            Delete Enrollment Modal            =
+          =============================================-->
+          <div class="modal fade deleteleadinfo1" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Delete Lead Information</h4>
+                  </div>
+                  <div class="modal-body">
+                      <h4>Are you sure you want to delete <strong>{{deleteleadinfoData.firstname}}</strong></h4>
+                      <br>
+                      <a class="btn btn-danger btn-sm" ng-click="deleteleadinfo(deleteleadinfoData.eLeadinformationId)" onclick="$('.modal').modal('hide')"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a>
+
+                      <a class="btn btn-default btn-sm" data-dismiss="modal"><i class="fa fa-trash"></i>&nbsp;&nbsp;Cancel</a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <!--====  End of Delete Enrollment Modal  ====-->
+
+
+           <!--============================================
+        =            Move Lead Modal            =
+        =============================================-->
+        <div class="modal fade movelead" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Move Lead</h4>
+                </div>
+                <div class="modal-body">
+                    <h4>Are you sure you want to move following Lead to Enquiry? </h4><br>
+                     <p class="lead">
+                     Form No. : {{moveleadData.enquiryformno}} <br>
+                     Name : {{moveleadData.lastname}}&nbsp;{{moveleadData.firstname}}&nbsp;{{moveleadData.middlename}} <br>
+                     Date : {{moveleadData.date}}
+
+
+                     </p class="lead">
+                    <br>
+                    <a class="btn btn-success btn-sm" ng-click="moveEnquiry(moveleadData.eLeadinformationId, moveleadData.windowtype, moveleadData.statusenquiry)" onclick="$('.modal').modal('hide')"><i class="fa fa-icon-move"></i>Move</a>
+
+                    <a class="btn btn-default btn-sm" data-dismiss="modal"><i class="fa icon-remove-sign"></i>Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--====  End of Move enquiry Modal  ====-->
+
+
+        </div>
+            
+
+        </div> <!-- controller ends -->
+    
+    
+</div>
+</div>
+<!--====  End of Controller  ====-->
+
+
+
+
+
+
+<script src="view/pages/Sales/Lead Form/LeadinformationCtrl.js"></script>
+

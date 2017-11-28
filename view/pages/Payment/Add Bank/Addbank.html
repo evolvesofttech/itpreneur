@@ -1,0 +1,195 @@
+<!--================================
+=            Controller            =
+=================================-->
+
+
+
+  <div class="row no-margin" ng-controller="PaymentreconCtrl">
+    <div class="col-md-12 no-padding">
+      <div class="panel panel-info">
+       
+        <div class="panel-body">
+
+          <!-- toaster message -->
+          <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+          <!-- toaster message -->
+          
+          <div class="button-group">
+            <a data-toggle="modal" data-target=".addbank" class="btn btn-default btn-labeled btn-sm">
+              <i class="fa fa-plus-circle">
+              </i>&nbsp;&nbsp;Add Bank
+            </a> 
+          </div>
+          
+          <table ng-table="usersTable" show-filter="true" class="table table-bordered table-striped text-center">
+            <tbody>
+              <tr ng-repeat="bo in data">
+                <td data-title="'Bank Name'" filter="{'bankname': 'text'}" sortable="'bankname'">{{bo.bankname}}
+                </td>
+                <!-- <td data-title="'Date'" filter="{'date': 'text'}" sortable="'date'">{{bo.date}}
+                </td> -->
+                 <td data-title="'Bank Opening'" filter="{'bankopening': 'text'}" sortable="'bankopening'">{{bo.bankopening}}
+                </td>
+                 <td data-title="'Bank Closing'" filter="{'bankclosing': 'text'}" sortable="'bankclosing'">{{bo.bankclosing}}
+                </td>
+                <td data-title="'Actions'">
+                    <a data-toggle="modal" data-target=".addbank" class="btn btn-success btn-xs" ng-click="editbank(bo.pBankbalancedetailsId)" tooltip-placement="top" uib-tooltip="Edit">
+                        <i class="fa fa-pencil-square-o">
+                        </i>
+                      </a> 
+                    <a data-toggle="modal" data-target=".viewbank" class="btn btn-info btn-xs" ng-click="viewbank(bo.pBankbalancedetailsId, data)" tooltip-placement="top" uib-tooltip="View">
+                      <i class="fa fa-eye">
+                      </i>
+                    </a>
+                    <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletebank" ng-click="delbank(bo.pBankbalancedetailsId, data)" tooltip-placement="top" uib-tooltip="Delete">
+                      <i class="fa fa-trash">
+                      </i>
+                    </a>
+                    
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <hr>
+          
+
+          <!--==================================
+          =            Add bank            =
+          ===================================-->
+          <div class="modal fade addbank" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" ng-click="clearModalOnCloseBank()" data-dismiss="modal">&times;
+                    </button>
+                    <h4 class="modal-title">Add Bank
+                    </h4>
+                  </div>
+                  <div class="modal-body">
+                    <form class="form-horizontal" name="addbankform" ng-submit="savebank(bankData)" novalidate >
+                    <!-- <div class="form-group">
+                     <label class="control-label col-sm-3 for="">Date</label>
+                      <div class="col-sm-6">
+                        <datepicker date-format="yyyy-MM-dd" >
+                          <input name="date" ng-model="bankData.date" restrict-to="[0-9]" placeholder="Enter Date" class="form-control" type="text" ng-required="true" />
+                       </datepicker>
+                      </div>
+                    </div> -->
+                     <div class="form-group ">
+                     <label class="control-label col-sm-3 for="">Bank Name</label>
+                        <div class="col-sm-6">
+                            <select ng-model="bankData.cBankdetailId" class="form-control inputEle" ng-options="bk.cBankdetailId as bk.bankname for bk in Bank" ng-change="BankClick(bankData.cBankdetailId)" ng-required="true">
+                                <option value="">Select Bank Name</option>
+                            </select> 
+                        </div>
+                      </div> 
+                      <div class="form-group ">                                     
+                        <label class="control-label  col-md-3" for="">Bank Opening</label>
+                        <div class="col-md-6" >
+                             <input ng-model="bankData.bankopening" placeholder="Enter Bank Opening" class="form-control" type="number" disabled />
+                        </div> 
+                      </div> 
+                     
+                      <div class="form-group ">
+                         <label class="control-label col-md-3" for="">Bank Closing</label>
+                          <div class="col-md-6">
+                            <input ng-model="bankData.bankclosing" placeholder="Enter Bank Closing" class="form-control" type="number" ng-required="true" name="bankc"/>
+							<div class="clearfix"></div>
+                            <p class="error" ng-show="addbankform.bankc.$invalid && addbankform.bankc.$touched">Enter Bank Closing</p>
+                          </div>   
+                      </div>
+
+                      
+                     <br>
+                      <div class="form-group">
+                        <div class="col-md-12 text-center">
+                          <button type="submit"  class="btn btn-success" ng-disabled="addbankform.$invalid" onclick="$('.modal').modal('hide')">Save
+                          </button>
+                        </div>
+                      </div>
+                      <div class="clearfix"></div>
+                     </form>
+                  </div>
+                </div>
+              </div>
+
+          </div>
+          <!--====  End of Add bank  ====-->
+          <!-- start view modal -->
+              <div class="modal fade viewbank" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog " role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">Bank
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label class="control-label col-md-3" for="">Bank Name:</label>
+                        <div class="col-md-6">
+                            {{viewbankData.bankname}}
+                        </div>
+                      </div>
+                       <div class="clearfix"></div> 
+                      <hr>
+                      <div class="form-group">
+                        <label class="control-label col-md-3" for="">Bank Opening:</label>
+                        <div class="col-md-6">
+                            {{viewbankData.bankopening}}
+                        </div>
+                      </div>
+                      <div class="clearfix"></div> 
+                      <hr>
+                      <div class="form-group">
+                          <label class="control-label col-md-3" for="">Bank Closing:</label>
+                          <div class="col-md-6">
+                              {{viewbankData.bankclosing}}
+                          </div>
+                          
+                      </div>
+                      <div class="clearfix"></div> 
+                               
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end view modal -->
+           <!-- start delete modal -->
+              <div class="modal fade deletebank" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Delete  
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Are you sure you want to delete 
+                          <strong>{{deletebankData.bankname}}?
+                          </strong>
+                        </h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="delete(deletebankData.pBankbalancedetailsId)" onclick="$('.modal').modal('hide')">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Delete
+                        </a>
+                        <a class="btn btn-default btn-sm" data-dismiss="modal">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Cancel
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!-- end delete modal -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!--====  End of Controller  ====-->
+
+ <script src="view/pages/Payment/PaymentreconciliationCtrl.js"></script>

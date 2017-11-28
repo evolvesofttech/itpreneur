@@ -1,0 +1,748 @@
+<!--================================
+=            Controller            =
+=================================-->
+<style type="text/css">
+  .assignspan {
+    position: relative;
+    top: 6px;
+    font-weight: bold;
+  }
+  input[type="checkbox"] {
+    cursor: pointer;
+  }
+  .w40 {
+    width: 40px;
+  }
+</style>
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state" >
+<div class="container-fluid">
+
+<div class="row no-margin" ng-controller="leadinfoCtrl as Inst">
+<div class="col-md-12 no-padding">
+  <div class="panel panel-info">
+      <div class="panel-heading">
+          <h3 class="panel-title">Lead Information
+          <span class="pull-right"><small>Total: </small><span class="badge">{{leadinfo.length}}</span></span>
+          </h3>
+      </div>
+      <div class="panel-body">
+      
+          <!-- toaster message -->
+          <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+          <!-- toaster message -->
+
+          <div class="button-group">
+              <a data-toggle="modal" data-target=".addleadinfo" class="btn btn-default btn-labeled btn-sm" ng-click="addLeadInfoClick()">
+                  <i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Add Lead Info</a>
+
+              <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</a>
+
+                  <button data-toggle="modal" data-target=".assignmodal" ng-click="assignButtonClick()" class="btn btn-primary btn-labeled btn-sm" ng-disabled="St_name.length > 0 ? false : true">
+                        <i class="fa fa-user"></i>&nbsp;&nbsp;Assign</button>
+
+              <button class="btn btn-default btn-labeled btn-sm" ng-click="checkAll()" ng-show="data_leadinfo"><i class="fa fa-check-circle"></i>&nbsp;&nbsp;Select All</button>
+
+                <button class="btn btn-default btn-labeled btn-sm" ng-click="uncheckAll()" ng-show="data_leadinfo"><i class="fa fa-times-circle"></i>&nbsp;&nbsp;Deselect All</button>
+
+              <button ng-click="exportAction('excel','Lead Forms')" class="btn btn-default btn-labeled btn-sm pull-right" ng-disabled="data_leadinfo.length > 0 ? false : true">
+                  <i class="fa fa-file-excel-o"></i>&nbsp;&nbsp;Export to Excel</button>
+
+              <button type="button" data-toggle="modal" data-target=".emailModal" class="btn btn-default btn-labeled btn-sm" ng-click="emailClickFunction(InterviewScheduleData.clClientId, InterviewScheduleData.clClientjobprofileId)" ng-disabled="St_name.length > 0 ? false : true">
+              <i class="fa fa-envelope"></i>&nbsp;&nbsp; Send Email</button>
+          </div>
+          <table ng-table="usersTable_leadinfo" id="exportable" show-filter="true" class="table table-bordered table-striped text-center export-table">
+              <tbody>
+                  <tr ng-repeat="ins in data_leadinfo" ng-hide="ins.eLeadinformationId == '0'">
+                  <td data-title="''" class="w40">
+                    <input type="checkbox" checklist-model="user11.eLeadinformationId" checklist-value="ins.eLeadinformationId" ng-change="checkEnq(ins.eLeadinformationId, checked, ins.email, (ins.firstname + ' ' + ins.middlename + ' ' + ins.lastname))">
+                  </td>
+                  <td data-title="'Name'" filter="{ 'firstname': 'text' }">{{ins.firstname}}&nbsp;{{ins.middlename}}&nbsp;{{ins.lastname}}</td>
+                  <td data-title="'Email Id'" filter="{ 'email': 'text' }">{{ins.email}}</td>
+                    <td data-title="'Contact No'" filter="{ 'contactno': 'text' }">{{ins.contactno}}</td>
+                    <td data-title="'Location'" filter="{ 'location': 'text' }">{{ins.location}}</td>
+                    <td data-title="'Source Of Lead.'" filter="{'sourceofleadname': 'text' }">{{ins.sourceofleadname}}</td>
+                    <td data-title="'Lead Type'" filter="{'leadtype': 'text' }">{{ins.leadtype}}</td>
+                    <td data-title="'Assigned To'" filter="{'firstnameuser': 'text' }">{{ins.firstnameuser}}&nbsp;{{ins.middlenameuser}}&nbsp;{{ins.lastnameuser}}</td>
+                    <td data-title="'Actions'" class="w150">
+                        <a href="#/Editleadinformation/{{ins.eLeadinformationId}}" class="btn btn-success btn-xs" tooltip-placement="top" uib-tooltip="Edit"><i class="fa fa-pencil-square-o"></i>
+                        </a>
+
+                        <a ng-click="viewleadinfo(ins.eLeadinformationId, data_leadinfo)" data-toggle="modal" data-target=".viewleadinfo" class="btn btn-info btn-xs" tooltip-placement="top" uib-tooltip="View"><i class="fa fa-eye"></i>
+                        </a>
+
+                        <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deleteleadinfo1" ng-click="delleadinfo(ins.eLeadinformationId, data_leadinfo)" tooltip-placement="top" uib-tooltip="Delete"><i class="fa fa-trash"></i>
+                        </a>
+
+                        <button class="btn btn-primary btn-xs" data-toggle="modal" data-target=".addenquiry" ng-click="addEnquiryFromLead(ins.eLeadinformationId, data_leadinfo)" ng-disabled="ins.status=='Completed'" tooltip-placement="top" uib-tooltip="Move To Enquiry">
+                        Enquiry
+                        </button>
+                    </td>
+                  </tr>
+              </tbody>
+          </table>
+          <div class="clearfix"></div>
+          <hr>
+
+          <!--===================================
+          =            Add Lead Info            =
+          ====================================-->
+          <div class="modal fade addleadinfo" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+              <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content" sc_school_id>
+                      <div class="modal-header">
+                          <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                          <h4 class="modal-title">Add Lead Information</h4>
+                      </div>
+                      <div class="modal-body">
+                        <form class="form-horizontal" name="leadinfoDataform" ng-submit="saveleadinfo(leadinfoData)" novalidate>
+                                 <input type="hidden" ng-model="leadinfoData.eLeadinformationId" name="">
+
+                               <div class="form-group required">
+                               <label class="control-label col-sm-2" for="">First Name</label>
+                                <div class="col-sm-4">
+                                   <input type="text" name="fname" class="form-control inputEle" ng-model="leadinfoData.firstname" placeholder="Enter First Name" ng-required="true">
+                                   <div class="clearfix"></div>
+                                    <p class="error" ng-show="leadinfoDataform.fname.$invalid && leadinfoDataform.fname.$touched">Please Enter First Name</p>
+                                </div>
+
+                                <label class="control-label col-sm-2" for="">Middle Name</label>
+                                <div class="col-sm-4">
+                                    <input type="text" name="mname" class="form-control inputEle" ng-model="leadinfoData.middlename" placeholder="Enter Middle Name" ng-required="true">
+                                    <div class="clearfix"></div>
+                                    <p class="error" ng-show="leadinfoDataform.mname.$invalid && leadinfoDataform.mname.$touched">Please Enter Middle Name</p>
+                                </div>
+                               </div>
+
+                               
+                               <div class="form-group required">
+                                
+                              <label class="control-label col-sm-2" for="">Last Name</label>
+                                <div class="col-sm-4">
+                                   <input type="text" name="lname" class="form-control inputEle" ng-model="leadinfoData.lastname" placeholder="Enter Last Name" ng-required="true">
+                                   <div class="clearfix"></div>
+                                   <p class="error" ng-show="leadinfoDataform.lname.$invalid && leadinfoDataform.lname.$touched">Please Enter Last Name</p>
+                                </div>
+
+                                <label class="control-label col-sm-2" for="">Email Id</label>
+                                    <div class="col-sm-4">
+                                       <input type="email" name="mail" class="form-control inputEle" ng-model="leadinfoData.email" placeholder="Enter Email Id" ng-required="true"  ng-pattern="/^[a-zA-Z]+[a-zA-Z0-9._]+@[a-zA-Z]+\.[a-zA-Z.]{2,5}$/" >
+                                       <div class="clearfix"></div>
+                                        <p class="error" ng-show="leadinfoDataform.mail.$invalid && leadinfoDataform.mail.$touched">Please Enter Mail Id</p>
+                                    </div>
+
+                              </div>
+
+                              <div class="form-group">
+                                  <label class="control-label col-sm-2 mandatory" for="">Contact No.</label>
+                                  <div class="col-sm-4">
+                                     <input type="text" name="contact" class="form-control inputEle" ng-model="leadinfoData.contactno" placeholder="Enter Contact Number" ng-required="true" maxlength="10" minlength="10" restrict-to="[0-9]">
+                                     <div class="clearfix"></div>
+                                     <p class="error" ng-show="leadinfoDataform.contact.$invalid && leadinfoDataform.contact.$touched">Please Enter Contact No</p>
+                                    
+                                  </div>
+                                  <label class="control-label col-sm-2" for="">Location</label>
+                                  <div class="col-sm-4">
+                                    <input type="text" name="loc" class="form-control inputEle"  ng-model="leadinfoData.location" placeholder="Enter Location">
+                                  </div>
+                               </div>
+                             
+                              <div class="form-group">  
+                                <label class="control-label col-sm-2 mandatory" for="">Source Of Lead</label>
+                                <div class="col-sm-4">
+                                   <select name="source" ng-model="leadinfoData.cSourceofLeadId" class="form-control inputEle" ng-options="ls.cSourceofLeadId as ls.sourceofleadname for ls in Leadsource"  ng-required="true" ng-change="otherChange(leadinfoData.cSourceofLeadId, Leadsource)">
+                                      <option value="">Select Source</option>
+                                    </select> 
+                                    <div class="clearfix"></div>
+                                    <p class="error" ng-show="leadinfoDataform.source.$invalid && leadinfoDataform.source.$touched">Please Select Source</p>
+                                </div> 
+
+                                <div ng-show="showOther">
+                                <label class="control-label col-sm-2" for="">Description</label>
+                                  <div class="col-sm-4">
+                                    <input type="text" name="other" class="form-control inputEle" ng-model="leadinfoData.other" placeholder="Enter Other Source">
+                                  </div>
+                                </div>     
+                              </div>
+
+                              <div class="form-group required">
+                                <label class="control-label col-sm-2" for="">Lead Type</label>
+                                  <div class="col-sm-4">
+                                      <select name="type" ng-model="leadinfoData.leadtype " class="form-control "  ng-required="true">
+                                        <option value="Hot">Hot</option>
+                                        <option value="Cold">Cold</option>
+                                         <option value="Warm">Warm</option>
+                                      </select>
+                                      <div class="clearfix"></div>
+                                    <p class="error" ng-show="leadinfoDataform.type.$invalid && leadinfoDataform.type.$touched">Please Select Lead Type</p>
+                                  </div>
+                              </div>
+
+                              <div class="form-group required">
+                                   <label class="control-label col-sm-2" for="">Branch</label>
+                                   <div class="col-sm-4">
+                                      <select name="branch" ng-model="leadinfoData.bBranchId" name="enquirybranch" class="form-control inputEle" ng-options="bran.bBranchId as bran.branchname for bran in currentRoleBranches1" ng-required="true" ng-change="branchChangeForUser(leadinfoData.bBranchId)">
+                                        <option value="">Select Branch</option>
+                                      </select>
+                                      <div class="clearfix"></div>
+                                    <p class="error" ng-show="leadinfoDataform.branch.$invalid && leadinfoDataform.branch.$touched">Please Select Branch</p> 
+                                  </div>
+
+                                  <label class="control-label col-sm-2" for="">Assign Lead</label>
+                                  <div class="col-sm-4">
+                                     <select name="assign" ng-model="leadinfoData.assignuser" class="form-control inputEle" ng-options="so.adUserId as (so.lastname + ' ' + so.firstname + ' ' + so.middlename) for so in UserDetails" ng-change="leadChange(leadinfoData.assignuser, UserDetails)">
+                                        <option value="">Select Lead</option>
+                                      </select>
+                                      <!-- <div class="clearfix"></div>
+                                  <p class="error" ng-show="leadinfoDataform.assign.$invalid && leadinfoDataform.assign.$touched">Please Select Assign From</p>  -->
+                                  </div> 
+
+                              </div>
+                               <br>
+                               <div class="form-group">
+                                <div class="col-md-12 text-center">
+                                  <button type="submit" class="btn btn-success" ng-disabled="leadinfoDataform.$invalid" onclick="$('.modal').modal('hide')">Save
+                                  </button>
+                                </div>
+                              </div>
+                              <div class="clearfix"></div>
+
+                        </form>
+                      </div>
+                  </div>
+                </div>
+              </div>
+              <!--====  End of Add Lead Info  ====-->
+
+              <!--=================================
+              =            Email Modal            =
+              ==================================-->
+              <div class="modal fade emailModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal">&times;</button>
+                          <h4 class="modal-title">Lead - Send Email</h4>
+                      </div>
+                      <div class="modal-body">
+                          
+                          <form class="form-horizontal" name="sendemaildataform" ng-submit="saveEmailData(sendEmailData, Inst.content)" novalidate>
+                          <!-- <form class="form-horizontal" name="sendemaildataform" ng-submit="saveEmailDataPreview(sendEmailData, vm.content)" novalidate> -->
+                            <div class="form-group">
+                              <label class="control-label col-md-3" for="">Email:</label>
+                              <div class="col-md-9">
+                                <span class="studentlist" ng-repeat="nam in studentNameArray2">[ {{nam.email}} ]&nbsp;&nbsp;</span>
+                              </div>
+                              
+                            </div>
+
+                            <div class="form-group required">
+                                <label class="control-label col-md-3" for="">Template:</label>
+                                <div class="col-md-5">
+                                  <select ng-model="sendEmailData.eEmailtemplateId" name="emailtemplate" class="form-control inputEle" ng-options="eml.eEmailtemplateId as eml.title for eml in EmailTemplate"  ng-change="emailTemplateChange(sendEmailData.eEmailtemplateId, EmailTemplate)" ng-required="true">
+                                    <option value="">Select Email Template</option>
+                                 </select>
+                                </div>
+                              </div>
+                            
+                              <div class="form-group">
+                                <label class="control-label col-md-3" for="">Template Body
+                                </label>
+                                <div class="col-md-9">
+                                    Dear<span ng-repeat="std in studentnames">&nbsp;{{std.name}},</span>
+                                    <div class="clearfix"></div>
+                                    <text-angular ng-click="Inst.getCursorPosition()" id="editor1" name="editor1" ng-model="Inst.content">
+                                </div>
+                              </div>
+                              <div class="clearfix"></div>
+                              <br>
+                              <div class="form-group">
+                                <div class="col-md-12 text-center">
+                                  <!-- <a class="btn btn-primary" ng-click="previewClicked(sendEmailData, templateData)">Save
+                                  </a> -->
+                                  <button class="btn btn-primary" type="submit" onclick="$('.modal').modal('hide')">Send</button>
+                                  <!-- <button class="btn btn-primary" >Preview &amp; Send</button> -->
+                                  <!-- onclick="$('.modal').modal('hide')" -->
+                                </div>
+                              </div>
+                              <div class="clearfix"></div>
+                              <br>
+                            </form>
+
+                      </div>
+                    </div>
+                </div>
+              </div>
+              <!--====  End of Email Modal  ====-->
+
+              <!--=================================
+              =            Add Enquiry            =
+              ==================================-->
+              <div class="modal fade addenquiry" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+              <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content" sc_school_id>
+                      <div class="modal-header">
+                          <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                          <h4 class="modal-title">Add Enquiry</h4>
+                      </div>
+                      <div class="modal-body">
+                        <form class="form-horizontal" name="leadtoenquiryform" ng-submit="saveEnquiry(enquiryData)" novalidate>
+                              <input type="hidden" ng-model="enquiryData.eLeadinformationId">
+                               <div class="form-group required">
+                                
+                                  <label class="control-label col-sm-2" for="">Branch</label>
+                                  <div class="col-sm-4" ng-if="fullAccess">
+                                      <select ng-model="enquiryData.bBranchId" name="leadbranch" class="form-control inputEle" ng-options="bran.bBranchId as bran.branchname for bran in Branch"  ng-change="branchChange(enquiryData.bBranchId, Branch)" ng-required="true">
+                                        <option value="">select Branch</option>
+                                      </select> 
+                                       <div class="clearfix"></div>
+                                    <p class="error" ng-show="leadtoenquiryform.leadbranch.$invalid && leadtoenquiryform.leadbranch.$touched">Please Select Branch</p> 
+                                  </div> 
+                                   <div class="col-sm-4" ng-if="!fullAccess">
+                                      <select ng-model="enquiryData.bBranchId" name="leadbranch" class="form-control inputEle" ng-options="bran.bBranchId as bran.branchname for bran in currentRoleBranches1"  ng-change="branchChange(enquiryData.bBranchId, currentRoleBranches1)" ng-required="true">
+                                        <option value="">select Branch</option>
+                                      </select> 
+                                       <div class="clearfix"></div>
+                                    <p class="error" ng-show="leadtoenquiryform.leadbranch.$invalid && leadtoenquiryform.leadbranch.$touched">Please Select Branch</p> 
+                                  </div> 
+
+                                   <label class="control-label col-sm-2" for="">Date</label>
+                                  <div class="col-sm-4">
+                                     <datepicker date-format="yyyy-MM-dd" >
+                                        <input type="text" ng-model="enquiryData.date" placeholder="Enter Date" name="dobd" ng-required="true" class="form-control" />
+                                     </datepicker>
+                                      <div class="clearfix"></div>
+                                    <p class="error" ng-show="leadtoenquiryform.dobd.$invalid && leadtoenquiryform.dobd.$touched">Please Select Date</p> 
+                                  </div>
+                               </div>
+
+                               <div class="form-group required">
+                                 <label class="control-label col-sm-2" for="">Candidate Name</label>
+                                  <div class="col-sm-3">
+                                     <input type="text"  class="form-control inputEle" ng-model="enquiryData.firstname" name="fnm" placeholder="Enter First Name" ng-required="true">
+                                      <div class="clearfix"></div>
+                                    <p class="error" ng-show="leadtoenquiryform.fnm.$invalid && leadtoenquiryform.fnm.$touched">Please Enter First Name</p> 
+                                  </div>
+
+                                
+                                  <div class="col-sm-3">
+                                     <input type="text"  class="form-control inputEle" ng-model="enquiryData.middlename" name="mnm" placeholder="Enter Middle Name" ng-required="true">
+                                      <div class="clearfix"></div>
+                                    <p class="error" ng-show="leadtoenquiryform.mnm.$invalid && leadtoenquiryform.mnm.$touched">Please Enter Middle Name</p> 
+                                  </div>
+
+                                  <div class="col-sm-4">
+                                     <input type="text"  class="form-control inputEle" ng-model="enquiryData.lastname" name="lnm" placeholder="Enter Surname" ng-required="true">
+                                      <div class="clearfix"></div>
+                                    <p class="error" ng-show="leadtoenquiryform.lnm.$invalid && leadtoenquiryform.lnm.$touched">Please Enter Surname</p> 
+                                  </div>
+                                </div>
+
+                                 <div class="form-group">
+                                   <label class="control-label col-sm-2" for="">College/Company Name</label>
+                                  <div class="col-sm-4">
+                                     <input type="text" class="form-control inputEle" ng-model="enquiryData.collegename" placeholder="Enter College/Company Name">
+                                  </div>
+                                   
+                               </div>
+
+                               <div class="form-group">
+                                  <label class="control-label col-sm-2 mandatory" for="">Email Id</label>
+                                   <div class="col-sm-4">
+                                     <input type="email" class="form-control inputEle" ng-model="enquiryData.email" name="mailid" placeholder="Enter Email Id" ng-required="true" ng-pattern="/^[a-zA-Z]+[a-zA-Z0-9._]+@[a-zA-Z]+\.[a-zA-Z.]{2,5}$/">
+                                      <div class="clearfix"></div>
+                                    <p class="error" ng-show="leadtoenquiryform.mailid.$invalid && leadtoenquiryform.mailid.$touched">Please Enter Email Id</p> 
+                                  </div>
+
+                                <label class="control-label col-sm-2" for="">Alternate Email Id</label>
+                                   <div class="col-sm-4">
+                                     <input type="email" class="form-control inputEle" ng-model="enquiryData.alternateemail" placeholder="Enter Alternate Email Id" ng-pattern="/^[a-zA-Z]+[a-zA-Z0-9._]+@[a-zA-Z]+\.[a-zA-Z.]{2,5}$/">
+                                  </div>
+                               </div>
+
+
+                               <div class="form-group required">
+                                <label class="control-label col-sm-2" for="">Address</label>
+                                <div class="col-sm-10">
+                                   <textarea class="form-control inputEle" name="addr" ng-model="enquiryData.presentaddress" placeholder="Enter Permenant Address" ng-required="true"> </textarea>
+                                    <div class="clearfix"></div>
+                                    <p class="error" ng-show="leadtoenquiryform.addr.$invalid && leadtoenquiryform.addr.$touched">Please Enter Permenant Address</p> 
+                                </div>
+                             </div>
+                             <div class="form-group">
+                                <label class="control-label col-sm-2" for="">Local Area</label>
+                                <div class="col-sm-4">
+                                   <input type="text" name="enquirylocal" class="form-control inputEle" ng-model="enquiryData.localarea" placeholder="Enter Local Area">
+                                </div>
+                                <label class="control-label col-sm-2" for="">Native Place</label>
+                                <div class="col-sm-4">
+                                   <input type="text" name="enquirynative" class="form-control inputEle" ng-model="enquiryData.nativeplace" placeholder="Enter Native Place">
+                                </div>
+                             </div>
+                             <div class="form-group required">
+                                <label class="control-label col-sm-2" for="">Gender</label>
+                                <div class="col-sm-4">
+                                   <label class="radio-inline">
+                                   <input type="radio" name="gender" ng-model="enquiryData.gender" value="Male" ng-required="true">Male
+                                   </label>
+                                   <label class="radio-inline">
+                                   <input type="radio" name="gender" ng-model="enquiryData.gender" value="Female" ng-required="true">Female
+                                   </label>
+                                   <label class="radio-inline">
+                                   <input type="radio" name="gender" ng-model="enquiryData.gender" value="Transgender" ng-required="true">Transgender
+                                   </label>
+                                </div>
+                                <label class="control-label col-sm-2" for="">Marital Status</label>
+                                <div class="col-sm-4">
+                                   <label class="radio-inline">
+                                   <input type="radio" name="mt" ng-model="enquiryData.maritalstatus" value="Unmarried" ng-required="true">Unmarried
+                                   </label>
+                                   <label class="radio-inline">
+                                   <input type="radio" name="mt" ng-model="enquiryData.maritalstatus" value="Married" ng-required="true">Married
+                                   </label>
+                                   <label class="radio-inline">
+                                   <input type="radio" name="mt" ng-model="enquiryData.maritalstatus" value="Divorce" ng-required="true">Divorce
+                                   </label>
+                                </div>
+                             </div>
+                             <div class="form-group">
+                                <label class="control-label col-sm-2" for="">Landline</label>
+                                <div class="col-sm-4">
+                                   <input type="text" class="form-control inputEle" ng-model="enquiryData.telresource" placeholder="Enter Landline Number" restrict-to="[0-9]"> 
+                                </div>
+                                <label class="control-label col-sm-2 mandatory" for="">Contact No.</label>
+                                <div class="col-sm-4">
+                                   <input type="number" class="form-control inputEle" name="cont" ng-model="enquiryData.contactno" placeholder="Enter Contact Number" ng-required="true" maxlength="10" minlength="10" restrict-to="[0-9]">
+                                   <div class="clearfix"></div>
+                                    <p class="error" ng-show="leadtoenquiryform.cont.$invalid && leadtoenquiryform.cont.$touched">Please Enter Contact Number</p> 
+                                </div>
+                                
+                             </div>
+                             <div class="form-group required">
+                                 <label class="control-label col-sm-2" for="">Date Of Birth</label>
+                                  <div class="col-sm-4">
+                                     <datepicker date-format="yyyy-MM-dd" date-max-limit= "{{currentDate}}">
+                                      <input ng-model="enquiryData.dob" placeholder="Enter Birthdate" class="form-control" type="text" ng-required="true" name="dobb" />
+                                     </datepicker>
+                                      <div class="clearfix"></div>
+                                    <p class="error" ng-show="leadtoenquiryform.dobb.$invalid && leadtoenquiryform.dobb.$touched">Please Enter Birthdate</p> 
+                                  </div>
+
+                                 <label class="control-label col-sm-2" for="">Candidate Type</label>
+                                <div class="col-sm-4">
+                                    <select ng-model="enquiryData.cStatusId" class="form-control inputEle" name="cantype" ng-options="enq.cStatusId as enq.statusname for enq in EnquiryStatus" ng-required="true">
+                                      <option value="">Select Candidate Type</option>
+                                    </select>
+                                     <div class="clearfix"></div>
+                                  <p class="error" ng-show="leadtoenquiryform.cantype.$invalid && leadtoenquiryform.cantype.$touched">Please Select Candidate Type</p> 
+                                </div> 
+                               </div>
+
+                               <div class="form-group">
+                                  <label class="control-label col-sm-2 mandatory" for="">Hear About Us</label>
+                                  <div class="col-sm-4">
+                                      <select ng-model="enquiryData.cSourceId" name="sorcenm" class="form-control inputEle" ng-options="enq.cSourceId as enq.sourcename for enq in Source" ng-required="true" ng-change="sourceChange(enquiryData.cSourceId, Source)">
+                                        <option value="">Select Source Name</option>
+                                      </select>
+                                       <div class="clearfix"></div>
+                                    <p class="error" ng-show="leadtoenquiryform.sorcenm.$invalid && leadtoenquiryform.sorcenm.$touched">Please Select Source Name</p> 
+                                  </div>
+
+                                  <div ng-show="showStudent">
+                                    <label class="control-label col-sm-2" for="">Select Student</label>
+                                    <div class="col-sm-4">
+                                        <select ng-model="reference" class="form-control inputEle" ng-options="stu.eEnquiryFormId as (stu.firstname + ' ' + stu.middlename + ' ' + stu.lastname) for stu in Students"  ng-change="changeStudent(reference, Students)">
+                                          <!-- <option value="">Select Source Name</option> -->
+                                        </select>
+                                    </div>
+                                  </div>
+
+                                  <div ng-show="showStaff">
+                                    <label class="control-label col-sm-2" for="">Select Staff</label>
+                                    <div class="col-sm-4">
+                                        <select ng-model="enquiryData.adUserdetailId" class="form-control inputEle" ng-options="stf.adUserdetailId as (stf.firstname + ' ' + stf.middlename + ' ' + stf.lastname) for stf in Staff" ng-change="changeStaff(reference1, Staff)">
+                                          <!-- <option value="">Select Source Name</option> -->
+                                        </select>
+                                    </div>
+                                  </div>
+                                  
+                              </div> <!--hear about us form group ends-->
+                              
+                              <div class="form-group ">
+                                <input type="hidden" ng-model="enquiryData.windowtype" ng-init="enquiryData.windowtype ='Enquiry'">
+                              </div> <!--enquiry form group ends-->
+
+                              <div class="form-group">
+                                <label class="control-label col-sm-2" for="">Highest Qualification</label>
+                                  <div class="col-sm-4">
+                                    <select ng-model="enquiryData.cDegreeId" name="hq" class="form-control inputEle" ng-options="stf.cDegreeId as stf.degreename for stf in HighestQualification">
+                                      </select>
+                                      <!-- <div class="clearfix"></div>
+                                  <p class="error" ng-show="leadtoenquiryform.hq.$invalid && leadtoenquiryform.hq.$touched">Please Select Highest Qualification</p> -->
+                                  </div>
+
+                                 <label class="control-label col-md-2" for="">Year of Passing</label>
+                                <div class="col-md-4">
+                                   <input type="number" name="yearofpassingname" class="form-control inputEle" ng-model="enquiryData.yearofpassing" placeholder="Enter Year of Passing" ng-required="true">
+                                    <div class="clearfix"></div>
+                                    <p class="error" ng-show="leadtoenquiryform.yearofpassingname.$invalid && leadtoenquiryform.yearofpassingname.$touched">Please Enter Year of Passingh</p> 
+                                </div>
+                              </div>
+                             
+                              <div class="form-group ">
+                               <label class="control-label col-sm-2" for="">Description</label>
+                                <div class="col-sm-10"> 
+                                  <textarea class="form-control inputEle"  ng-model="enquiryData.description" placeholder="Enter Description" rows="3"></textarea>
+                                </div>   
+                              </div>
+
+                              <div class="form-group">
+                                <label class="control-label col-sm-2" for="">Assign To</label>
+                                <div class="col-sm-4">
+                                    <select ng-model="enquiryData.assignto" class="form-control inputEle" ng-options="stf.adUserId as (stf.firstname + ' ' + stf.middlename + ' ' + stf.lastname) for stf in Staff">
+                                    </select>
+                                </div>
+                              </div>
+
+                               <br>
+                               <div class="form-group">
+                                 <div class="col-md-12 text-center">
+                                  <button type="submit" ng-disabled="leadtoenquiryform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                                  </button>
+                                </div>
+                              </div>
+                              <div class="clearfix"></div>
+
+                        </form>
+                      </div>
+                  </div>
+                </div>
+              </div>
+              <!--====  End of Add Enquiry  ====-->
+              
+
+              <div class="modal fade viewleadinfo" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog modal-lg" role="document">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                              <h4 class="modal-title">View Lead Information</h4>
+                          </div>
+                          <div class="modal-body">
+                             
+                              <input type="hidden" ng-model="viewleadinfoData.eLeadinformationId">
+                              <div class="form-group">
+                                  <label class="control-label col-md-2" for="">First Name: </label>
+                                  <div class="col-md-4">
+                                      {{viewleadinfoData.firstname}}
+                                  </div>
+
+                                   <label class="control-label col-md-2" for="">Middle Name: </label>
+                                  <div class="col-md-4">
+                                      {{viewleadinfoData.middlename}}
+                                  </div>
+                              </div>
+
+                              <div class="clearfix"></div>
+                              <hr>
+
+                              <div class="form-group">
+                                  <label class="control-label col-md-2" for="">Last Name: </label>
+                                  <div class="col-md-4">
+                                      {{viewleadinfoData.lastname}}
+                                  </div>
+
+                                   <label class="control-label col-md-2" for="">Email Id: </label>
+                                  <div class="col-md-4">
+                                      {{viewleadinfoData.email}}
+                                  </div>
+                              </div>
+                              <div class="clearfix"></div>
+                              <hr>
+                              <div class="form-group">
+                                  <label class="control-label col-md-2" for="">Contact No:
+                                  </label>
+                                  <div class="col-md-4">
+                                      {{viewleadinfoData.contactno}}
+                                  </div>
+                                  <label class="control-label col-md-2" for="">Location:
+                                   </label>
+                                  <div class="col-md-4">
+                                      {{viewleadinfoData.location}}
+                                  </div>
+                              </div>
+                              <div class="clearfix"></div>
+                              <hr>
+
+                              <div class="form-group">
+                                  <label class="control-label col-md-2" for="">Source of Lead:
+                                  </label>
+                                  <div class="col-md-4">
+                                      {{viewleadinfoData.sourceofleadname}}
+                                  </div>
+                                  <label ng-show="showOtherview" class="control-label col-md-2" for="">Description:
+                                   </label>
+                                  <div ng-show="showOtherview" class="col-md-4">
+                                      {{viewleadinfoData.other}}
+                                  </div>
+                              </div>
+                               <div class="clearfix"></div>
+                              <hr>
+
+
+                              <div class="form-group">
+                                  <label class="control-label col-md-2" for="">Lead Type: </label>
+                                  <div class="col-md-4">
+                                      {{viewleadinfoData.leadtype}}
+                                  </div>
+
+                                  <label class="control-label col-md-2" for="">Assigned To: </label>
+                                  <div class="col-md-4">
+                                      {{viewleadinfoData.lastnameuser}}&nbsp;&nbsp;{{viewleadinfoData.firstnameuser}}&nbsp;&nbsp;{{viewleadinfoData.middlenameuser}}&nbsp;&nbsp;
+                                  </div>
+                              </div>
+                              <div class="clearfix"></div>
+                              <br>
+                              
+                              <!-- </form> -->
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+          </div>
+
+          </div>
+      </div>
+    <!--============================================
+    =            Delete Enrollment Modal            =
+    =============================================-->
+    <div class="modal fade deleteleadinfo1" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Delete Lead Information</h4>
+            </div>
+            <div class="modal-body">
+                <h4>Are you sure you want to delete <strong>{{deleteleadinfoData.firstname}}</strong></h4>
+                <br>
+                <a class="btn btn-danger btn-sm" ng-click="deleteleadinfo(deleteleadinfoData.eLeadinformationId)" onclick="$('.modal').modal('hide')"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a>
+
+                <a class="btn btn-default btn-sm" data-dismiss="modal"><i class="fa fa-trash"></i>&nbsp;&nbsp;Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--====  End of Delete Enrollment Modal  ====-->
+
+
+     <!--============================================
+  =            Move Lead Modal            =
+  =============================================-->
+  <div class="modal fade movelead" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">Move Lead</h4>
+          </div>
+          <div class="modal-body">
+              <h4>Are you sure you want to move following Lead to Enquiry? </h4><br>
+               <p class="lead">
+               Form No. : {{moveleadData.enquiryformno}} <br>
+               Name : {{moveleadData.lastname}}&nbsp;{{moveleadData.firstname}}&nbsp;{{moveleadData.middlename}} <br>
+               Date : {{moveleadData.date}}
+
+
+               </p class="lead">
+              <br>
+              <a class="btn btn-success btn-sm" ng-click="moveLead(moveleadData.eLeadinformationId, moveleadData.status)" onclick="$('.modal').modal('hide')"><i class="fa fa-icon-move"></i>Move</a>
+
+              <a class="btn btn-default btn-sm" data-dismiss="modal"><i class="fa icon-remove-sign"></i>Cancel</a>
+              </div>
+          </div>
+      </div>
+  </div>
+  <!--====  End of Move enquiry Modal  ====-->
+
+  <!--===============================
+  =            Assign To            =
+  ================================-->
+  <div class="modal fade assignmodal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">Assign Lead</h4>
+          </div>
+          <div class="modal-body">
+              <form class="form-horizontal" name="assignform" ng-submit="assignSubmit(assignData)" novalidate>
+                <div class="form-group">
+                  <label class="control-label col-md-3">Lead Students</label>
+                  <div class="col-md-9">
+                    <span class="assignspan" ng-repeat="std in studentnames">[ {{std.name}} ]&nbsp;&nbsp;&nbsp;</span>
+                  </div>
+                  
+                </div>
+                <div class="clearfix"></div>
+                <br>
+
+                <div class="form-group">
+                  <label class="control-label col-md-3" for="">Branch</label>
+                   <div class="col-md-6">
+                      <select name="branch" ng-model="assignData.bBranchId" name="enquirybranch" class="form-control" ng-options="bran.bBranchId as bran.branchname for bran in currentRoleBranches1" ng-required="true" ng-change="branchChangeForUser1(assignData.bBranchId)">
+                        <option value="">Select Branch</option>
+                      </select>
+                      <div class="clearfix"></div>
+                    <p class="error" ng-show="leadinfoDataform.branch.$invalid && leadinfoDataform.branch.$touched">Please Select Branch</p> 
+                  </div>
+                </div>
+                <div class="clearfix"></div><br>
+                      
+                <div class="form-group">
+                  <label class="control-label col-md-3">Assign to User</label>
+                  <div class="col-md-6">
+                    <select ng-model="assignData.assignuser" class="form-control inputEle" ng-options="stf.adUserId as (stf.firstname + ' ' + stf.middlename + ' ' + stf.lastname) for stf in Staff11" ng-required="true" ng-disabled="disableAssign">
+                  </select>
+                  </div>
+                  
+                </div>
+                <div class="clearfix"></div>
+                <hr>
+                <div class="form-group">
+                    <div class="col-md-12 text-center">
+                      <button type="submit" ng-disabled="assignform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Assign
+                      </button>
+                       <!-- onclick="$('.modal').modal('hide')" -->
+                    </div>
+                  </div>
+                  <div class="clearfix"></div>
+                  <br>
+              </form>
+          </div>
+      </div>
+    </div>
+  </div>
+  <!--====  End of Assign To  ====-->
+
+
+  </div>
+      
+
+  </div> <!-- controller ends -->
+
+
+</div>
+</div>
+<!--====  End of Controller  ====-->
+
+
+
+
+
+
+<script src="view/pages/Sales/Lead Form/LeadinformationCtrl.js"></script>
+

@@ -1,0 +1,170 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="departmentCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Department
+              <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{department.length}}</span></span>
+              </h3>
+            </div>
+            <div class="panel-body">
+              
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+              
+              <div class="button-group">
+                <a data-toggle="modal" data-target=".adddepartment" ng-click="adddepartment()" class="btn btn-default btn-labeled btn-sm">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp;Add Department
+                </a>
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+              </div>
+              <table ng-table="usersTable" show-filter="true" class="table table-bordered table-striped text-center">
+                <tbody>
+                  <tr ng-repeat="bo in data">
+                    <td data-title="'Department'" filter="{'departmentname': 'text'}" sortable="'departmentname'">{{bo.departmentname}}
+                    </td>
+                    <td data-title="'Description'" filter="{'description': 'text'}" sortable="'description'">{{bo.description}}
+                    </td>
+                    <td data-title="'Actions'">
+                      <a data-toggle="modal" data-target=".adddepartment" class="btn btn-success btn-xs" ng-click="editDepartment(bo.cDepartmentId)" tooltip-placement="top" uib-tooltip="Edit">
+                        <i class="fa fa-pencil-square-o">
+                        </i>
+                      </a> 
+                      <a data-toggle="modal" data-target=".viewdepartment" class="btn btn-info btn-xs" ng-click="viewDepartment(bo.cDepartmentId, data)" tooltip-placement="top" uib-tooltip="View">
+                        <i class="fa fa-eye">
+                        </i>
+                      </a>
+                      <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletedepartment" ng-click="delDepartment(bo.cDepartmentId, data)" tooltip-placement="top" uib-tooltip="Delete">
+                        <i class="fa fa-trash">
+                        </i>
+                      </a>
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <hr>
+              <!-- start edit modal -->
+              <div class="modal fade adddepartment" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title" ng-init="headingMessage='Add Department'">{{headingMessage}}</h4>
+                    </div>
+                    <div class="modal-body">
+                      <form class="form-horizontal" name="departmentform" ng-submit="save(departmentData)" novalidate>
+                        <div class="form-group required">
+                          <label class="control-label col-md-3" for="">Department
+                          </label>
+                          <div class="col-md-7">
+                            <input type="text" name="department" class="form-control inputEle" ng-model="departmentData.departmentname" placeholder="Enter Department Name" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="departmentform.department.$invalid && departmentform.department.$touched">Please Enter Department</p>
+                          </div>
+                          </div>
+                          <div class="form-group ">
+                          <label class="control-label col-md-3" for="">Description
+                          </label>
+                          <div class="col-md-7">
+                            <input type="text" name="departmentname" class="form-control inputEle" ng-model="departmentData.description" placeholder="Enter Description" > 
+                          </div> 
+                        </div>
+                         <br>
+                        <div class="form-group">
+                         <div class="col-md-12 text-center">
+                            <button type="submit" ng-disabled="departmentform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                            </button>
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end edit modal  -->
+              <!-- start view modal -->
+              <div class="modal fade viewdepartment" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">View Department
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">Department:
+                        </label>
+                        <label class="control-label col-md-6" for="">{{viewdepartmentData.departmentname}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <hr>
+                      <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">Description:
+                        </label>
+                        <label class="control-label col-md-6" for="">{{viewdepartmentData.description}}
+                        </label>
+                      </div>
+                       <div class="clearfix"></div>
+                       
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end view modal -->
+              <!-- start delete modal -->
+              <div class="modal fade deletedepartment" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Delete Department
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Are you sure you want to delete 
+                          <strong>{{deletedepartmentData.departmentname}}?
+                          </strong>
+                        </h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="delete(deletedepartmentData.cDepartmentId)" onclick="$('.modal').modal('hide')">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Delete
+                        </a>
+                        <a class="btn btn-default btn-sm" data-dismiss="modal">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Cancel
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!-- end delete modal -->
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Masters/Department/DepartmentCtrl.js"></script>
+

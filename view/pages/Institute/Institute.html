@@ -1,0 +1,254 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+
+        <div class="row no-margin" ng-controller="instituteCtrl as Inst">
+        <div class="col-md-12 no-padding">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Institute
+                    <span class="pull-right"><small>Total: </small><span class="badge">{{institute.length}}</span></span>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                
+                    <!-- toaster message -->
+                      <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+                      <!-- toaster message -->
+
+                    <div class="button-group">
+                        <a data-toggle="modal" data-target=".addinstitute" class="btn btn-default btn-labeled btn-sm" ng-click="addInstituteClick()">
+                            <i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Add Institute</a>
+                        <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                            <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</a>
+                    </div>
+                    <table ng-table="usersTable" show-filter="true" class="table table-bordered table-striped text-center">
+                        <tbody>
+                            <tr ng-repeat="ins in data"> 
+                            <!-- ng-hide="ins.inInstituteId == '0'" -->
+                                <td data-title="'Name'" filter="{ 'institutename': 'text' }">{{ins.institutename}}</td>
+                                <td data-title="'Username'" filter="{ 'username': 'text' }">{{ins.username}}</td>
+                                <td data-title="'Contact No.'" filter="{ 'contactno': 'text' }">{{ins.contactno}}</td>
+                                <td data-title="'Email'" filter="{ 'emailid': 'text' }">{{ins.emailid}}</td>
+                                <td data-title="'Actions'" class="w150">
+                                    <a href="#/editinstitute/{{ins.inInstituteId}}" class="btn btn-success btn-xs" tooltip-placement="top" uib-tooltip="Edit"><i class="fa fa-pencil-square-o"></i>
+                                    </a>
+
+                                    <a ng-click="viewInstitute(ins.inInstituteId, data)" data-toggle="modal" data-target=".viewinstitute" class="btn btn-info btn-xs" tooltip-placement="top" uib-tooltip="View"><i class="fa fa-eye"></i>
+                                    </a>
+
+                                    <button class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deleteInstitute" ng-click="delInstitute(ins.inInstituteId, data)" tooltip-placement="top" uib-tooltip="Delete" ng-disabled="ins.institutename == 'Admin'"><i class="fa fa-trash"></i>
+                                    </button>
+
+                                    <!-- <a class="btn btn-danger btn-xs" disabled><i class="fa fa-trash"></i>
+                                    </a> -->
+
+                                    <a class="btn btn-primary btn-xs" disabled>
+                                      <i class="fa fa-plus">
+                                      </i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <hr>
+                    <div class="modal fade addinstitute" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content" sc_school_id>
+                                <div class="modal-header">
+                                    <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                                    <h4 class="modal-title">Add Institute</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form class="form-horizontal" name="addinst" ng-submit="saveInstitute(addinstitute)" novalidate>
+                                        <input type="hidden" ng-model="addinstitute.adRoleId">
+                                        <div class="form-group form-group required">
+                                            <label class="control-label col-md-3" for="">Institute Name</label>
+                                            <div class="col-md-8">
+                                                <input type="text" name="institutename" class="form-control inputEle" ng-model="addinstitute.institutename" placeholder="Enter Institute Name" ng-required="true">
+                                                <div class="clearfix"></div>
+                                                  <p class="error" ng-show="addinst.institutename.$invalid && addinst.institutename.$touched">Please Enter Institute Name</p>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-md-3" for="">Description</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control inputEle" ng-model="addinstitute.description" placeholder="Enter Institute Description">
+                                            </div>
+                                        </div>
+                                        <!-- <div class="form-group form-group required">
+                                            <label class="control-label col-md-3" for="">Account Type</label>
+                                            <div class="col-md-8">
+                                                <select ng-model="addinstitute.adRoleId" name="accounttype" 
+                                                   class="form-control inputEle" ng-options="atype.adRoleId as atype.accountName for atype in Roles" ng-change="roleSelect(addinstitute.adRoleId, Roles)" ng-required="true">
+                                                   <option value="">Select Account Type</option>
+                                                </select>
+                                                <div class="clearfix"></div>
+                                                  <p class="error" ng-show="addinst.accounttype.$invalid && addinst.accounttype.$touched">Select Account Type</p>
+                                            </div>
+                                        </div> -->
+                                        
+                                        <!-- <input type="hidden" class="form-control inputEle" ng-model="addinstitute.conAccounttypeId" disabled> -->
+
+                                        <div class="form-group form-group required">
+                                            <label class="control-label col-md-3" for="">Email</label>
+                                            <div class="col-md-8">
+                                                <input type="email" name="eId" class="form-control inputEle" ng-model="addinstitute.emailid" ng-required="true" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/">
+                                                <div class="clearfix"></div>
+                                                  <p class="error" ng-show="addinst.eId.$invalid && addinst.eId.$touched">Please Enter Valid Email Id</p>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-md-3" for="">Website</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control inputEle" ng-model="addinstitute.website">
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group required">
+                                            <label class="control-label col-md-3" for="">Contact Number</label>
+                                            <div class="col-md-8">
+                                                <input type="Number" name="contactnumber" class="form-control inputEle" ng-model="addinstitute.contactno" ng-required="true" maxlength="10" minlength="10" restrict-to="[0-9]" required>
+                                                <div class="clearfix"></div>
+                                                  <p class="error" ng-show="addinst.contactnumber.$error.required">Please Enter Valid Contact Number</p>
+                                                   <p class="error" ng-show="addinst.contactnumber.$error.maxlength">Please Enter 10 digits Number</p>
+                                                   <p class="error" ng-show="addinst.contactnumber.$error.minlength">Too Short Number !!!</p>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group required">
+                                            <label class="control-label col-md-3" for="">User Name</label>
+                                            <div class="col-md-8">
+                                                <input type="text" name="un" class="form-control inputEle" ng-model="addinstitute.username" ng-required="true">
+                                                <div class="clearfix"></div>
+                                                  <p class="error" ng-show="addinst.un.$invalid && addinst.un.$touched">Please Enter User Name</p>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group required">
+                                            <label class="control-label col-md-3" for="">Password</label>
+                                            <div class="col-md-8">
+                                                <input type="password" name="pass" class="form-control inputEle" ng-model="addinstitute.password" ng-required="true" maxlength="20" minlength="8" ng-pattern="/^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$/">
+                                                <div class="clearfix"></div>
+                                                  <p class="error" ng-show="addinst.pass.$error.required">Please Enter Password</p>
+                                                  <p class="error" ng-show="addinst.pass.$error.minlength">
+                                                   Password should be atleast 8 characters long
+                                                   and should contain one number,one character and one special
+                                                   character</p>
+                                                  <p class="error" ng-show="addinst.pass.$error.maxlength"> Password Too Long !</p>
+                                            </div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                        <hr>
+                                        <div class="form-group">
+                                            <div class="col-md-12 text-center">
+                                                <button type="submit" ng-disabled="addinst.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Create Account</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade viewinstitute" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                                    <h4 class="modal-title">View Institute</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <!-- <form class="form-horizontal" ng-submit="save(addinstitute)" novalidate> -->
+                                    <input type="hidden" ng-model="instituteData.inInstituteId">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-3" for="">Institute Name</label>
+                                        <div class="col-md-8">
+                                            {{instituteData.institutename}}
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-3" for="">Description</label>
+                                        <div class="col-md-8">
+                                            {{instituteData.description}}
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-3" for="">Email</label>
+                                        <div class="col-md-8">
+                                            {{instituteData.emailid}}
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-3" for="">Website</label>
+                                        <div class="col-md-8">
+                                            {{instituteData.website}}
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-3" for="">Contact Number</label>
+                                        <div class="col-md-8">
+                                            {{instituteData.contactno}}
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-3" for="">Username</label>
+                                        <div class="col-md-8">
+                                            {{instituteData.username}}
+                                        </div>
+                                    </div>
+
+
+                                    <div class="clearfix"></div>
+                                    <br>
+                                    <!-- </form> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+            
+        <!--============================================
+        =            Delete Institute Modal            =
+        =============================================-->
+        <div class="modal fade deleteInstitute" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Delete Institute</h4>
+                </div>
+                <div class="modal-body">
+                    <h4>Are you sure you want to delete <strong>{{deleteinstituteData.institutename}}?</strong></h4>
+                    <br>
+                    <a class="btn btn-danger btn-sm" ng-click="deleteInstitute(deleteinstituteData.inInstituteId)" onclick="$('.modal').modal('hide')"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a>
+
+                    <a class="btn btn-default btn-sm" data-dismiss="modal"><i class="fa fa-trash"></i>&nbsp;&nbsp;Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--====  End of Delete Institute Modal  ====-->
+
+        </div> <!-- controller ends -->
+    
+    
+</div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Institute/InstituteCtrl.js"></script>

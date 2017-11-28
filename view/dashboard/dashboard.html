@@ -1,0 +1,198 @@
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<style type="text/css">
+    /*.pieChart svg {
+        height: 450px !important;
+    }*/
+    #chartdiv {
+    width: 100%;
+    height: 270px;
+    }
+
+    #chartdiv1 {
+    width       : 100%;
+    height      : 270px;
+    font-size   : 11px;
+}             
+
+    .amcharts-chart-div>a{
+        display: none !important;
+    }                     
+    body {
+        background: #eee;
+    }
+    .calendar table {
+        margin: 0 auto;
+    }
+    .calender {
+        padding: 10px 0;
+    }
+    .calendar .btn-group-sm>.btn, .btn-sm {
+        padding: 5px 10px;
+        font-size: 15px;
+        line-height: 1.5;
+        border-radius: 0;
+        margin: 4px 0;
+    }
+    .top-list ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .top-list ul li {
+        /*padding: 10px;*/
+        height: 36px;
+        border-bottom: 1px solid #ddd;
+    }
+    .top-list ul li .top-list-number {
+        display: inline-block;
+        height: 35px;
+        width: 35px;
+        text-align: center;
+        line-height: 35px;
+        background: grey;
+        color: #fff;
+        font-size: 18px;
+        margin-right: 10px;
+    }
+    .points-list {
+        width: 100px !important;
+    }
+    .teacher-span {
+        line-height: 0;
+        display: inline-block;
+        position: relative;
+        font-weight: bold;
+    }
+    .table{
+        margin-bottom: 0;
+        background-color: #fff;
+    }
+    .table th{
+        text-align: center;
+    }
+    .card-header{
+        color: white;
+        background-color: #54A6F8;
+    }
+    .card12{
+        border: 1px solid #D4CFCF;
+        height: 320px;
+        background: #fff;
+        margin-bottom: 20px;
+        box-shadow: 2px 3px 3px #ddd;
+    }
+    .card1 {
+        border: 1px solid #D4CFCF;
+        height: 320px;
+        margin-bottom: 20px;
+        background: #fff;
+        box-shadow: 2px 3px 3px #ddd;
+    }
+</style>
+<script src="view/dashboard/dashboardCtrl.js"></script>
+
+<!--================================
+=            Controller            =
+=================================-->
+<div class="page-content" sidebar-directive="state" ng-controller="dashboardCtrl">
+    <!-- <span class="refreshbtn" ng-click="refreshDashboard()"><i class="fa fa-refresh"></i></span> -->
+    <!-- toaster message -->
+   <toaster-container toaster-options="{'time-out': 7000}"></toaster-container>
+   <!-- toaster message -->
+
+    <div class="container-fluid">
+        <div class="row no-margin">
+            <br>
+            <div class="col-md-12" style="margin-bottom: 20px;" ng-if="role != 'Admin'">
+            <!-- ng-hide="role == 'Admin' || role == 'ITP Admin'" -->
+                <span ng-repeat="bra in currentRoleBranches1" class="pull-right" style="margin-left: 10px;"><button class="btn btn-xs" ng-class="{'btn-success':bra.bBranchId == selID}" ng-click="branchChangeFunction(bra.bBranchId, bra.branchname)">{{bra.branchname}}</button>
+                </span>
+                <!-- ng-disabled="bra.bBranchId == selID" -->
+                <b class="pull-right" style="line-height: 23px;">Active Branch:</b>
+            </div>
+            <div class="col-md-12" style="margin-bottom: 20px;" ng-if="role == 'Admin'">
+            <!-- ng-hide="role == 'Admin' || role == 'ITP Admin'" -->
+                <span ng-repeat="bra in currentRoleBranches1" class="pull-right" style="margin-left: 10px;"><button class="btn btn-xs" ng-class="{'btn-success':bra.bBranchId == selID}" ng-click="branchChangeFunctionAdmin(bra.bBranchId, bra.branchname)">{{bra.branchname}}</button>
+                </span>
+                <!-- ng-disabled="bra.bBranchId == selID" -->
+                <b class="pull-right" style="line-height: 23px;">Active Branch:</b>
+            </div>
+            <div class="clearfix"></div>
+            
+            <!--==================================
+            =            Funnel Chart            =
+            ===================================-->
+            <div class="col-md-6 col-sm-6" ng-if="funnelReport">
+                <div ng-include="'view/dashboard/widgets/funnelreport.html'"></div>
+            </div>
+            <!--====  End of Funnel Chart  ====-->
+
+            <!--===================================
+            =            Payment Chart            =
+            ====================================-->
+            <div class="col-md-6 col-sm-6" ng-if="collectionRevenueDue">
+                <div ng-include="'view/dashboard/widgets/collectiondue.html'"></div>
+            </div>
+            <!--====  End of Payment Chart  ====-->
+        
+            <!--=====================================
+            =            Lead Conversion            =
+            ======================================-->
+            <div class="col-md-6 col-sm-6" ng-if="leadConversion">
+                <div ng-include="'view/dashboard/widgets/leadconversion.html'"></div>
+            </div>
+            <!--====  End of Lead Conversion  ====-->
+
+            <!--=====================================
+            =            Payment Collections           =
+            ======================================-->
+            <div class="col-md-6 col-sm-6" ng-if="paymentCollections">
+                <div ng-include="'view/dashboard/widgets/paymentcollections.html'"></div>
+            </div>
+            <!--====  End of   Payment Collections  ====-->
+            
+
+            <!--=====================================
+            =            Activity Report           =
+            ======================================-->
+            <div class="col-md-6 col-sm-6" ng-if="salesActivity">
+                <div ng-include="'view/dashboard/widgets/salesactivity.html'"></div>
+            </div>
+            <!--====  End of   Activity Report  ====-->
+
+            <!--========================================
+            =            Placement Activity            =
+            =========================================-->
+            <div class="col-md-6 col-sm-6" ng-if="clientActivity">
+                <div ng-include="'view/dashboard/widgets/clientactivity.html'"></div>
+            </div>
+            <!--====  End of Placement Activity  ====-->
+
+            <!--=====================================
+            =            Total Leads           =
+            ======================================-->
+            <div class="col-md-6 col-sm-6" ng-if="totalLeads">
+                <div ng-include="'view/dashboard/widgets/totalleads.html'"></div>
+            </div>
+            <!--====  End of   Total Leads  ====-->
+
+            <div class="col-md-12" ng-if="!funnelReport && !collectionRevenueDue && !leadConversion && !paymentCollections && !paymentCollections && !salesActivity && !clientActivity && !totalLeads">
+                <div class="well">
+                    <h3>Widgets not available. Contact administration for widgets.</h3>
+                </div>
+            </div>
+            
+        </div> <!--row 1 ends-->
+
+        <div class="clearfix"></div>
+        <br><br>
+
+    </div> <!-- Container ends -->
+
+</div> <!-- page content ends -->
+
+<!--====  End of Controller  ====-->
+
+
+      

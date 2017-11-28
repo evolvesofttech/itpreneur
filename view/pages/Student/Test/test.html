@@ -1,0 +1,192 @@
+<style>
+  .panel-footer {
+    background-color: transparent;
+  }
+</style>
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="testCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Test
+              </h3>
+            </div>
+            <div class="panel-body">
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+              <div class="button-group">
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+              </div>
+               <div class="col-md-6" ng-repeat="tst in testData" style="margin-top: 20px;">
+                <!-- panel -->
+                <div class="panel panel-info">
+                  <!-- Default panel contents -->
+                  <div class="panel-heading">Test Name : {{ tst.title }}</div>
+                  <div class="panel-body">
+                    <p>Description:{{ tst.description }}</p>
+                  </div><!-- panel-body -->
+
+                  <!-- List group -->
+                  <ul class="list-group">
+                      <li class="list-group-item">Branch : {{tst.branchName}}</li>
+                      <li class="list-group-item">Course : {{tst.coursename}}</li>
+                      <li class="list-group-item">Technology/Subject : {{tst.technologyname}}</li>
+                      <li class="list-group-item">Topic : {{tst.topicname}}</li>
+                      <li class="list-group-item">
+                          <div class="row">
+                              <div class="col-md-4">
+                                <span tooltip-placement="top" uib-tooltip="Total Questions"><i class="fa fa-question-circle-o darkcyan"></i>&nbsp;&nbsp;TotalQuestion : {{tst.totalquestions}}</span>
+                              </div>
+                              <div class="col-md-4 text-center">
+                                  <span tooltip-placement="top" uib-tooltip="Total Minutes"><i class="fa fa-clock-o darkcyan"></i>&nbsp;&nbsp;Test Time : {{tst.time}} Min</span>
+                              </div>
+                              <div class="col-md-4">
+                                  <span class="pull-right" tooltip-placement="top" uib-tooltip="Right Answer %"><i class="fa fa-trophy darkcyan"></i>&nbsp;&nbsp;Passing : {{tst.passingpercentage}}%</span>
+                              </div>
+                              
+                          </div>
+                      </li>
+                      <li class="list-group-item">
+                          
+                          <span class="pull-left" tooltip-placement="top" uib-tooltip="Passing Percentage"><i class="fa fa-check darkcyan"></i>&nbsp;&nbsp;Right Answer %: {{tst.rightanswer}}</span>
+                                  <span class="pull-right" tooltip-placement="top" uib-tooltip="Wrong Answer %"><i class="fa fa-times-circle-o darkcyan"></i>&nbsp;&nbsp;Wrong Answer %: {{tst.wronganswer}}</span>
+                          <div class="clearfix"></div>
+                      </li>
+                  </ul><!-- list-group -->
+                  <div class="panel-footer">
+                    <a href="#/Instruction/{{tst.tTestId}}" class="btn btn-success btn-md pull-right" style="margin-left: 5px;" tooltip-placement="top" uib-tooltip="Test">
+                      Star Test
+                      </a>
+                      <div class="clearfix"></div>
+                  </div><!-- panel-footer -->
+
+                </div>
+                <!-- panel -->
+            </div><!-- col-md-6 ends -->
+            <div class="clearfix"></div>
+              
+              
+              <!-- start view modal -->
+              <div class="modal fade viewtest" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog " role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">View Test
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <form role="form">
+                          <div class="form-group row">
+                              <label for="name" class="control-label col-md-offset-3 col-md-3">Test Title</label>
+                              <label for="name" class="col-md-3">{{viewTestData.title}}</label>
+                          </div>
+
+                          <div class="form-group row">
+                              <label for="name" class="control-label col-md-offset-3 col-md-3">Branch</label>
+                              <label for="name" class="col-md-3">{{viewTestData.branchName}}</label>
+                          </div>
+
+                          <div class="form-group row">
+                              <label for="name" class="control-label col-md-offset-3 col-md-3">course</label>
+                              <label for="name" class="col-md-3">{{viewTestData.coursename}}</label>
+                          </div>
+
+                          <div class="form-group row">
+                              <label for="name" class="control-label col-md-offset-3 col-md-3">Batch</label>
+                              <label for="name" class="col-md-3">{{viewTestData.batchname}}</label>
+                          </div>
+
+                          <div class="form-group row">
+                              <label for="name" class="control-label col-md-offset-3 col-md-3">Technology</label>
+                              <label for="name" class="col-md-3">{{viewTestData.technologyname}}</label>
+                          </div>
+
+                          <div class="form-group row">
+                              <label for="name" class="control-label col-md-offset-3 col-md-3">Time (In Minutes)</label>
+                              <label for="name" class="col-md-3">{{viewTestData.time}}</label>
+                          </div>
+
+                          <div class="form-group row">
+                              <label for="name" class="control-label col-md-offset-3 col-md-3">Total Questions</label>
+                              <label for="name" class="col-md-3">{{viewTestData.totalquestions}}</label>
+                          </div>
+
+                          <div class="form-group row">
+                              <label for="name" class="control-label col-md-offset-3 col-md-3">Passing Percentage</label>
+                              <label for="name" class="col-md-3">{{viewTestData.passingpercentage}}</label>
+                          </div>
+
+                          <div class="form-group row">
+                              <label for="name" class="control-label col-md-offset-3 col-md-3">Right Answer Percentage</label>
+                              <label for="name" class="col-md-3">{{viewTestData.rightanswer}}</label>
+                          </div>
+
+                          <div class="form-group row">
+                              <label for="name" class="control-label col-md-offset-3 col-md-3">Wrong Answer Percentage</label>
+                              <label for="name" class="col-md-3">{{viewTestData.wronganswer}}</label>
+                          </div>
+
+                          <div class="form-group row">
+                              <label for="name" class="control-label col-md-offset-3 col-md-3">Description</label>
+                              <label for="name" class="col-md-3">{{viewTestData.description}}</label>
+                          </div>
+                      </form>
+                  </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end view modal -->
+              <!-- start delete modal -->
+              <div class="modal fade deletetest" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Delete Test
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Are you sure you want to delete Test
+                          <strong>{{deletetestData.title}}?
+                          </strong>
+                        </h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="delete(deletetestData.tTestId)" onclick="$('.modal').modal('hide')">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Delete
+                        </a>
+                        <a class="btn btn-default btn-sm" data-dismiss="modal">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Cancel
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!-- end delete modal -->
+
+              <!-- Import Data -->
+              
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Student/Test/testCtrl.js"></script>
+

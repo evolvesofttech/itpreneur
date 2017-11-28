@@ -1,0 +1,148 @@
+<div ng-controller="personaldataCtrl">
+
+<form class="form-horizontal" name="personalDataform" ng-submit="save(personalData)" novalidate>
+
+      <!-- toaster message -->
+      <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+      <!-- toaster message -->
+
+       <legend>Personal Details</legend>
+
+       <div class="form-group required">
+          <label class="control-label col-sm-2" for="">Branch</label>
+          <div class="col-sm-4">
+              <select ng-model="personalData.bBranchId" name="enquirybranch" class="form-control inputEle" ng-options="bran.bBranchId as bran.branchname for bran in Branch" ng-required="true">
+                <option value="">select Branch</option>
+              </select> 
+          </div>
+
+           <label class="control-label col-sm-2" for="">Date</label>
+        <div class="col-sm-4">
+           <datepicker date-format="yyyy-MM-dd" date-max-limit="{{currentDate}}">
+              <input ng-model="personalData.date" placeholder="Enter Date" class="form-control" restrict-to="[0-9]" type="text"/>
+           </datepicker>
+        </div>
+       </div>
+
+       <div class="form-group required">
+         <label class="control-label col-sm-2" for="">Candidate Name</label>
+          <div class="col-sm-3">
+             <input type="text"  class="form-control inputEle" ng-model="personalData.firstname" placeholder="Enter First Name" ng-required="true" ng-required="true">
+          </div>
+
+         <!--  <label class="control-label col-sm-2" for="">Candidate Name</label> -->
+          <div class="col-sm-3">
+             <input type="text"  class="form-control inputEle" ng-model="personalData.middlename" placeholder="Enter Middle Name" ng-required="true" ng-required="true">
+          </div>
+
+           <!-- <label class="control-label col-sm-2" for="">Candidate Name</label> -->
+          <div class="col-sm-3">
+             <input type="text"  class="form-control inputEle" ng-model="personalData.lastname" placeholder="Enter Surname" ng-required="true" ng-required="true">
+          </div>
+        </div>
+
+         <div class="form-group required">
+           <label class="control-label col-sm-2" for="">College/Company Name</label>
+          <div class="col-sm-10">
+             <input type="text" name="compname" class="form-control inputEle" ng-model="personalData.collegename" placeholder="Enter College/Company Name" ng-required="true">
+          </div>
+       </div>
+
+
+       <div class="form-group required">
+        <label class="control-label col-sm-2" for="">Address</label>
+        <div class="col-sm-10">
+           <textarea class="form-control inputEle" name="addr" ng-model="personalData.presentaddress" placeholder="Enter Permenant Address" ng-required="true"> </textarea>
+           
+        </div>
+     </div>
+     <div class="form-group required">
+        <label class="control-label col-sm-2" for="">Local Area</label>
+        <div class="col-sm-4">
+           <input type="text" name="enquirylocal" class="form-control inputEle" ng-model="personalData.localarea" placeholder="Enter Local Area" ng-required="true">
+        </div>
+        <label class="control-label col-sm-2" for="">Native Place</label>
+        <div class="col-sm-4">
+           <input type="text" name="enquirynative" class="form-control inputEle" ng-model="personalData.nativeplace" placeholder="Enter Native Place" ng-required="true">
+        </div>
+     </div>
+     <div class="form-group required">
+        <label class="control-label col-sm-2" for="">Gender</label>
+        <div class="col-sm-4">
+           <label class="radio-inline">
+           <input type="radio" name="gender" ng-model="personalData.gender" value="Male" ng-required="true">Male
+           </label>
+           <label class="radio-inline">
+           <input type="radio" name="gender" ng-model="personalData.gender" value="Female" ng-required="true">Female
+           </label>
+           <label class="radio-inline">
+           <input type="radio" name="gender" ng-model="personalData.gender" value="Transgender" ng-required="true">Transgender
+           </label>
+        </div>
+        <label class="control-label col-sm-2" for="">Marital Status</label>
+        <div class="col-sm-4">
+           <label class="radio-inline">
+           <input type="radio" name="mt" ng-model="personalData.maritalstatus" value="Unmarried" ng-required="true">Unmarried
+           </label>
+           <label class="radio-inline">
+           <input type="radio" name="mt" ng-model="personalData.maritalstatus" value="Married" ng-required="true">Married
+           </label>
+           <label class="radio-inline">
+           <input type="radio" name="mt" ng-model="personalData.maritalstatus" value="Divorce" ng-required="true">Divorce
+           </label>
+        </div>
+     </div>
+     <div class="form-group form-group required">
+        <label class="control-label col-sm-2" for="">Landline</label>
+        <div class="col-sm-4">
+           <input type="number" class="form-control inputEle" ng-model="personalData.contactlandline" placeholder="Enter Landline Number" ng-required="true" ng-required="true" maxlength="10" minlength="10" required> 
+        </div>
+        <label class="control-label col-sm-2" for="">Contact No.</label>
+        <div class="col-sm-4">
+           <input type="number" name="contactteacher" class="form-control inputEle" ng-model="personalData.contactno" placeholder="Enter Contact Number" ng-required="true" ng-required="true" maxlength="10" minlength="10" required>
+           <div class="clearfix"></div>
+        </div>
+        
+     </div>
+     <div class="form-group required">
+        <label class="control-label col-sm-2" for="">Alternate No.</label>
+        <div class="col-sm-4">
+           <input type="number" class="form-control inputEle" ng-model="personalData.contactaltno" placeholder="Enter Alternate Contact Number" ng-required="true" ng-required="true" maxlength="10" minlength="10" required> 
+        </div>
+
+        <label class="control-label col-sm-2" for="">Email Id</label>
+        <div class="col-sm-4">
+           <input type="email" name="emailId" class="form-control inputEle" ng-model="personalData.email" placeholder="Enter Email Id" ng-required="true" ng-required="true" ng-required="true" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/">
+        </div>  
+       </div>
+
+       <div class="form-group ">
+        <label class="control-label col-sm-2" for="">Date Of Birth</label>
+        <div class="col-sm-4">
+           <datepicker date-format="yyyy-MM-dd" date-max-limit="{{currentDate}}">
+              <input ng-model="personalData.dob" placeholder="Enter Birthdate" class="form-control" restrict-to="[0-9]" type="text"/>
+           </datepicker>
+        </div>
+      
+
+        <label class="control-label col-sm-2" for="">Status</label>
+        <div class="col-sm-4">
+            <select ng-model="personalData.cStatusId" name="enquirystatus" class="form-control inputEle" ng-options="enq.cStatusId as enq.statusname for enq in EnquiryStatus" ng-required="true">
+              <option value="">Select Enquiry Status</option>
+            </select>
+        </div>
+        </div>
+       <br>
+       <div class="form-group">
+        <div class="col-md-offset-4 col-md-3">
+          <button type="submit" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+          </button>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+
+</form>
+</div>
+    
+
+    <script src="view/pages/Sales/Enquiry/PersonaldetailsCtrl.js"></script>

@@ -1,0 +1,493 @@
+<!--================================
+=            Controller            =
+=================================-->
+<style type="text/css">
+  .multiselect-parent {
+    width: 100%;
+  }
+  .multiselect-parent .btn-default {
+    width: 100%;
+    text-align: left;
+  }
+  .dropdown-menu-form {
+    width: 100%;
+  }
+.parent {
+  padding: 5px 0;
+}
+
+.cell-input,
+.cell-name,
+.indent {
+  display: inline-block;
+}
+
+.ck-nested .parent > .cell-name {
+  cursor: pointer;
+}
+
+.ck-nested .parent > .cell-name > .indent {
+  margin-right: 5px;
+}
+
+.indent:before {
+  font-family: "monospace";
+  margin-right: 5px;
+  content: " * ";
+  display: inline-block;
+}
+
+div.parent > .indent:before {
+  content: " > ";
+  -moz-transition: -moz-transform 0.3s;
+  -o-transition: -o-transform 0.3s;
+  -webkit-transition: -webkit-transform 0.3s;
+  transition: transform 0.3s;
+}
+
+.ck-nested .children {
+  display: none;
+}
+
+.ck-nested .opened > div:parent > .indent:before {
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+
+.ck-nested .opened > .children {
+  display: table-row;
+}
+
+</style>
+<div class="row no-margin" ng-controller="jobCtrl as Jobs">
+  <div class="col-md-12 no-padding">
+    <div class="panel panel-info">
+      <div class="panel-body">
+        
+        <!-- toaster message -->
+        <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+        <!-- toaster message -->
+
+        <div class="button-group">
+          <a data-toggle="modal" data-target=".addJob" class="btn btn-default btn-labeled btn-sm">
+            <i class="fa fa-plus-circle">
+            </i>&nbsp;&nbsp;Specify Job
+          </a>
+          <!-- <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+            <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+          </a> -->
+        </div>
+        <table ng-table="usersTable_Job" show-filter="true" class="table table-bordered table-striped text-center">
+          <tbody>
+            <tr ng-repeat="jb in data_Job">
+              <td data-title="'Job Profile'" filter="{'type': 'text'}" sortable="'type'">{{jb.jobprofile}}
+              </td>
+               <td data-title="'Exprience'" filter="{'experience': 'text'}" sortable="'created'">{{jb.experience}}
+              </td>
+              <td data-title="'From Date'" filter="{'fromdate': 'text'}" sortable="'fromdate'">{{jb.fromdate}}
+              </td>
+              <td data-title="'To Date'" filter="{'todate': 'text'}" sortable="'todate'">{{jb.todate}}
+              </td>
+              <td data-title="'Status'">
+                <select class="form-control inputEle" ng-model="model1" ng-change="changeJobStatus(jb.clClientjobprofileId, model1)" ng-init="model1 = jb.jobstatus" ng-disabled="jb.jobstatus == 'Close'">
+                  <option value="Open">Open</option>
+                  <option value="Hold">Hold</option>
+                  <option value="Close">Close</option>
+                </select>
+              </td>
+               
+              <td data-title="'Actions'" class="w150">
+                <a href="#/Editjobprofile/{{jb.clClientjobprofileId}}" class="btn btn-success btn-xs" tooltip-placement="top" uib-tooltip="Edit"><i class="fa fa-pencil-square-o"></i>
+                          </a>
+                <a data-toggle="modal" data-target=".viewJob" class="btn btn-info btn-xs" ng-click="viewJob(jb.clClientjobprofileId, data_Job)" tooltip-placement="top" uib-tooltip="View">
+                  <i class="fa fa-eye">
+                  </i>
+                </a>
+                <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deleteJob" ng-click="delJob(jb.clClientjobprofileId, data_Job)" tooltip-placement="top" uib-tooltip="Delete">
+                  <i class="fa fa-trash">
+                  </i>
+                </a>
+                
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <hr>
+        
+        <!-- start edit modal -->
+        <div class="modal fade addJob" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="clearModalOnCloseSchedule()" data-dismiss="modal">&times;
+                </button>
+                <h4 class="modal-title">Add Job Profile
+                </h4>
+              </div>
+              <div class="modal-body">
+              <form class="form-horizontal" name="jobDataform" ng-submit="saveJob(jobData, jobData1)" novalidate>
+
+              <div class="form-group ">
+                <label class="control-label col-sm-2 mandatory" for="">Job Profile</label>
+                <div class="col-sm-4">
+                <input type="text" class="form-control inputEle" name="profile" ng-model="jobData.jobprofile" placeholder="Enter Job Profile" ng-required="true"  > 
+                <div class="clearfix"></div>
+                <p class="error" ng-show="jobDataform.profile.$invalid && jobDataform.profile.$touched">Enter Job Profile</p> 
+                </div>
+                <label class="control-label col-sm-2" for="">Key Skills</label>
+                <div class="col-sm-4">
+                   <input type="text" class="form-control inputEle" ng-model="jobData.keyskills" placeholder="Enter Skills" >
+                </div>
+              </div>
+             
+              <div class="form-group">
+                
+                <label class="control-label col-sm-2 mandatory" for="">Exprience</label>
+                <div class="col-sm-4">
+                   <select class="form-control inputEle" name="exp" ng-required="true" ng-model="jobData.experience" >
+                  <option value="0" >0</option>
+                  <option value="1" >1</option>
+                  <option value="2" >2</option>
+                  <option value="3" >3</option>
+                  <option value="4" >4</option>
+                  <option value="5" >5</option>
+                  <option value="more 5" >More Than 5 years</option>
+                </select> 
+                <div class="clearfix"></div>
+                <p class="error" ng-show="jobDataform.exp.$invalid && jobDataform.exp.$touched">Select Exprience</p> 
+                </div>
+
+                <label class="control-label col-sm-2" for="">Job Type</label>
+                  <div class="col-sm-4">
+                      <input type="text" class="form-control inputEle" ng-model="jobData.jobtype" placeholder="Enter Job Type" >
+                  </div>
+
+              </div>
+
+               <div class="form-group">
+                <label class="control-label col-sm-2" for="">Job Description</label>
+                  <div class="col-sm-10">
+                      <textarea class="form-control inputEle" ng-model="jobData.jobdescription" placeholder="Enter Description" > </textarea>      
+                  </div>   
+              </div>
+              
+              <div class="form-group">
+
+                  <label class="control-label col-sm-2" for="">Job Location</label>
+                  <div class="col-sm-4">
+                      <input type="text" class="form-control inputEle" ng-model="jobData.joblocation" placeholder="Enter Comment" >
+                  </div>      
+              </div>
+
+              <div class="form-group required">
+                <label class="control-label col-sm-2" for="">Valid From</label>
+                  <div class="col-sm-4">
+                    <datepicker date-format="yyyy-MM-dd" date-min-limit="{{currentDate1}}">
+                        <input ng-model="jobData.fromdate" name="validfrom" restrict-to="[0-9]" placeholder="Enter Date" class="form-control" ng-required="true" type="text" ng-change="fromDateChange(jobData.fromdate)" />
+                     </datepicker>
+                     <div class="clearfix"></div>
+                      <p class="error" ng-show="jobDataform.validfrom.$invalid && jobDataform.validfrom.$touched">Enter Valid From</p>    
+                  </div>  
+
+                  <label class="control-label col-sm-2" for="">Valid To</label>
+                    <div class="col-sm-4">
+                       <datepicker date-format="yyyy-MM-dd" date-min-limit="{{minDateValidation}}">
+                          <input ng-model="jobData.todate" name="validto" restrict-to="[0-9]" placeholder="Enter Date" class="form-control" ng-disabled="disableValidTo" ng-required="true" type="text"/>
+                       </datepicker>
+                       <div class="clearfix"></div>
+                      <p class="error" ng-show="jobDataform.validto.$invalid && jobDataform.validto.$touched">Enter Valid To</p>    
+                    </div>
+              </div>
+
+              <div class="form-group required">
+                <label class="control-label col-sm-2" for="">Salary From</label>
+                    <div class="col-sm-2">
+                        <select class="form-control inputEle" name="salfrom" ng-required="true" ng-model="jobData.minsalarylakh" ng-change="salaryFromChange(jobData.minsalarylakh)">
+                          <option value="1" >1</option>
+                          <option value="2" >2</option>
+                          <option value="3" >3</option>
+                          <option value="4" >4</option>
+                          <option value="5" >5</option>
+                          <option value="6" >6</option>
+                          <option value="7" >7</option>
+                          <option value="8" >8</option>
+                          <option value="9" >9</option>
+                          <option value="10" >10</option>
+                          <option value="11" >11</option>
+                          <option value="12" >12</option>
+                          <option value="13" >13</option>
+                          <option value="14" >14</option> 
+                          <option value="15" >15</option>
+                          <option value="16" >16</option>
+                          <option value="17" >17</option>
+                          <option value="18" >18</option>
+                          <option value="19" >19</option>
+                          <option value="20" >20</option> 
+                        </select>
+                        <div class="clearfix"></div>
+                      <p class="error" ng-show="jobDataform.salfrom.$invalid && jobDataform.salfrom.$touched">Select Salary From</p>    
+                    </div>
+                    <div class="col-sm-2">
+                        <select class="form-control inputEle" ng-required="true" ng-model="jobData.minsalarythousand" ng-init="jobData.minsalarythousand = '10'">
+                          <option value="10" >10</option>
+                          <option value="20" >20</option>
+                          <option value="30" >30</option>
+                          <option value="40" >40</option>
+                          <option value="50" >50</option>
+                          <option value="60" >60</option>
+                          <option value="70" >70</option>
+                          <option value="80" >80</option>
+                          <option value="90" >90</option>
+                        </select>
+                    </div>
+                     <label class="control-label col-sm-2" for="">to</label>
+                    <div class="col-sm-2">
+                        <select class="form-control inputEle" name="salto" ng-required="true" ng-model="jobData.maxsalarylakh" ng-options="to for to in SalaryTo" ng-disabled="disableSalaryFrom">
+                        </select>
+                        <div class="clearfix"></div>
+                      <p class="error" ng-show="jobDataform.salto.$invalid && jobDataform.salto.$touched">Select Salary to</p>    
+                    </div>
+                    <div class="col-sm-2" >
+                        <select class="form-control inputEle" ng-required="true" ng-model="jobData.maxsalarythousand" ng-disabled="disableSalaryFrom" ng-init="jobData.maxsalarythousand = '10'">
+                          <option value="10" >10</option>
+                          <option value="20" >20</option>
+                          <option value="30" >30</option>
+                          <option value="40" >40</option>
+                          <option value="50" >50</option>
+                          <option value="60" >60</option>
+                          <option value="70" >70</option>
+                          <option value="80" >80</option>
+                          <option value="90" >90</option>
+                        </select>
+                    </div>
+              </div>
+
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="">Year of Passing</label>
+                  <div class="col-sm-4">
+                      <input type="number" class="form-control inputEle" name="yearofpassing" ng-model="jobData.yearofpassing" placeholder="Enter Year of Passing">
+                      <div class="clearfix"></div>
+                      <p class="error" ng-show="jobDataform.yearofpassing.$invalid && jobDataform.yearofpassing.$touched">Please Enter Year of Passing</p>
+                  </div> 
+              </div>
+              
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="">Terms &amp; Conditions</label>
+                  <div class="col-sm-10">
+                      <textarea class="form-control inputEle" name="addr" ng-model="jobData.termscondition" placeholder="Enter Terms & Conditions" > </textarea>                 
+                  </div>
+              </div>
+
+            
+                  <div class="wrapper">
+                    <div class="ck-nested">
+                      <div ng-class="{opened: item.opened}" ng-include="&#39;table_tree.html&#39;" ng-repeat="item in QDSData"></div>
+                    </div>
+                    <script id="table_tree.html" type="text/ng-template">
+                      <div ng-class="{parent: item.children}" ng-init="parentScope = $parent.$parent; initCheckbox(item, parentScope.item)">
+                        <div class="indent" style="padding-left: {{15*level}}px" ng-click="item.opened = !item.opened"></div>
+                        <div class="cell-input ui checkbox" ng-click="item.selected = !item.selected; toggleCheckbox(item, parentScope)">
+                          <input ng-change="toggleCheckbox(item, parentScope)" ng-model="item.selected" type="checkbox" />
+                          <label></label>
+                        </div>
+                        <div class="cell-name" ng-click="item.opened = !item.opened">
+                          {{item.name}} <span ng-if="item.children.length">({{(item.children | selected).length}} / {{item.children.length}})</span>
+                        </div>
+                      </div>
+                      <div class="children" ng-if="item.children &amp;&amp; item.children.length &gt; 0">
+                        <div ng-class="{opened: item.opened}" ng-include="&#39;table_tree.html&#39;" ng-init="level = level + 1" ng-repeat="item in item.children"></div>
+                      </div>
+                    </script>
+                  </div>
+                <div class="clearfix"></div>
+
+              <hr>
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="">Technologies (Compulsory)</label>
+                <div class="col-md-9" style="padding-left:30px;">
+                  <span ng-repeat="sch1 in Technologies_Course" style="margin-left: 10px;display: inline-block;">
+                    <label class="checkbox" style="margin-right: 10px;min-width: 150px;line-height: 21px;">
+                      <input type="checkbox" checklist-model="user.cTechnologyMasterId" checklist-value="sch1.cTechnologyMasterId" ng-change="check(sch1.cTechnologyMasterId, checked)"> {{sch1.technologyname}}
+                    </label>
+                  </span>
+                </div>
+              </div>
+              <hr>
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="">Technologies (Optional)</label>
+                <div class="col-md-9" style="padding-left:30px;">
+                  <span ng-repeat="sch2 in Technologies_Course" style="margin-left: 10px;display: inline-block;">
+                    <label class="checkbox" style="margin-right: 10px;min-width: 150px;line-height: 21px;">
+                      <input type="checkbox" checklist-model="user2.cTechnologyMasterId" checklist-value="sch2.cTechnologyMasterId" ng-change="checkOptional(sch2.cTechnologyMasterId, checked)"> {{sch2.technologyname}}
+                    </label>
+                  </span>
+                </div>
+              </div>
+              <div class="clearfix"></div>
+               <hr>
+
+               <br>
+               <div class="form-group">
+                      <div class="col-md-offset-4 col-md-4 text-center">
+                        <button type="submit" ng-disabled="jobDataform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                        </button>
+                        <!-- || !disableFormCheckbox --> 
+                        <!-- ng-disabled="jobDataform.$invalid" -->
+                      </div>
+                    </div>
+                    <div class="clearfix"></div>
+              </form>
+               <div class="clearfix"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end edit modal  -->
+
+
+        <!-- start view modal -->
+        <div class="modal fade viewJob" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="clearModalOnCloseSchedule()" data-dismiss="modal">&times;
+                </button>
+                <h4 class="modal-title">View Job Profile
+                </h4>
+              </div>
+              <div class="modal-body">
+                
+                <!-- form -->
+                  <form class="form-horizontal" novalidate>
+
+                  <div class="form-group ">
+                    <label class="control-label col-sm-2" for="">Job Profile</label>
+                    <label class="control-label col-sm-4" for="" style="text-align: left;">{{viewJobData.jobprofile}}</label>
+
+                    <label class="control-label col-sm-2" for="">Key Skills</label>
+                    <label class="control-label col-sm-4" for="" style="text-align: left;">{{viewJobData.keyskills}}</label>
+                  </div>
+                  <hr>
+                  <div class="form-group">
+                    
+                    <label class="control-label col-sm-2" for="">Exprience</label>
+                    <label class="control-label col-sm-4" for="" style="text-align: left;">{{viewJobData.experience}}</label>
+                    
+
+                    <label class="control-label col-sm-2" for="">Job Type</label>
+                    <label class="control-label col-sm-4" for="" style="text-align: left;">{{viewJobData.jobtype}}</label>
+
+                  </div>
+                  <hr>
+                  <div class="form-group">
+                    <label class="control-label col-sm-2" for="">Job Description</label>
+                      <label class="control-label col-sm-10" for="" style="text-align: left;">{{viewJobData.jobdescription}}</label>  
+                  </div>
+                  <hr>
+                  <div class="form-group">
+                    <label class="control-label col-sm-2" for="">10 th</label>
+                    <label class="control-label col-sm-4" for="" style="text-align: left;">{{viewJobData.ssc}}</label>
+
+                    <label class="control-label col-sm-2" for="">12 th</label>
+                    <label class="control-label col-sm-4" for="" style="text-align: left;">{{viewJobData.hsc}}</label>
+                      
+                  </div>
+                  <hr>
+                  <div class="form-group">
+                    <label class="control-label col-sm-2" for="">Diploma</label>
+                    <label class="control-label col-sm-4" for="" style="text-align: left;">{{viewJobData.diploma}}</label>
+
+                     <label class="control-label col-sm-2" for="">Graduation</label>
+                     <label class="control-label col-sm-4" for="" style="text-align: left;">{{viewJobData.graduation}}</label>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="control-label col-sm-2" for="">Post Graduation</label>
+                    <label class="control-label col-sm-4" for="" style="text-align: left;">{{viewJobData.postgraduation}}</label>
+
+                      <label class="control-label col-sm-2" for="">Job Location</label>
+                      <label class="control-label col-sm-4" for="" style="text-align: left;">{{viewJobData.joblocation}}</label>
+                  </div>
+                  <hr>
+                  <div class="form-group">
+                    <label class="control-label col-sm-2" for="">Valid From</label>
+                    <label class="control-label col-sm-4" for="" style="text-align: left;">{{viewJobData.fromdate}}</label>  
+
+                      <label class="control-label col-sm-2" for="">Valid To</label>
+                      <label class="control-label col-sm-4" for="" style="text-align: left;">{{viewJobData.todate}}</label>
+                  </div>
+                  <hr>
+                  <div class="form-group">
+                    <label class="control-label col-sm-2" for="">Salary From</label>
+                    <label class="control-label col-sm-2" for="" style="text-align: left;">{{viewJobData.minsalarylakh}} Lakh</label>
+                    <label class="control-label col-sm-2" for="" style="text-align: left;">{{viewJobData.minsalarythousand}} Thousand</label>
+
+                     <label class="control-label col-sm-2" for="">To</label>
+                     <label class="control-label col-sm-2" for="" style="text-align: left;">{{viewJobData.maxsalarylakh}} Lakh</label>
+                     <label class="control-label col-sm-2" for="" style="text-align: left;">{{viewJobData.maxsalarythousand}} Thousand</label>
+
+                  </div>
+                  <hr>
+                  
+                  <div class="form-group">
+                    <label class="control-label col-sm-2" for="">Terms &amp; Conditions</label>
+                    <label class="control-label col-sm-10" for="" style="text-align: left;">{{viewJobData.termscondition}}</label>
+                  </div>
+                  <div class="clearfix"></div>
+                  <hr>
+                  
+                  <div class="form-group" style="padding-left: 40px;">
+                    <span><b>Technologies: </b></span><span ng-repeat="tech in viewTech">[ {{tech.technologyname}} ]&nbsp;&nbsp;</span>
+                  </div>
+                  <div class="clearfix"></div>
+                  <br>
+
+                  </form>
+                <!-- form -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end view modal -->
+
+        <!-- start delete modal -->
+        <div class="modal fade deleteJob" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;
+                  </button>
+                  <h4 class="modal-title">Delete Job
+                  </h4>
+                </div>
+                <div class="modal-body">
+                  <h4>Are you sure you want to delete 
+                    <strong>{{deleteJobData.jobprofile}}?
+                    </strong>
+                  </h4>
+                  <br>
+                  <a class="btn btn-danger btn-sm" ng-click="deleteJob(deleteJobData.clClientjobprofileId)" onclick="$('.modal').modal('hide')">
+                    <i class="fa fa-trash">
+                    </i>&nbsp;&nbsp;Delete
+                  </a>
+                  <a class="btn btn-default btn-sm" data-dismiss="modal">
+                    <i class="fa fa-trash">
+                    </i>&nbsp;&nbsp;Cancel
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        <!-- end delete modal -->
+       
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--====  End of Controller  ====-->
+
+ <script src="view/pages/Client/JobSpecification/JobSpecificationCtrl.js"></script>

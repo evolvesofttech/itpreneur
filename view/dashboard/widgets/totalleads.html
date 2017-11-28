@@ -1,0 +1,16 @@
+<div class="card1">
+    <div class="card-header">
+       Total Leads
+       <i class="fa fa-refresh pull-right" ng-click="refreshPage()" style="cursor: pointer;"></i> 
+    </div>
+    <table ng-table="usersTable_lead" show-filter="true" class="table table-bordered table-striped text-center">
+    <tbody>
+        <tr ng-repeat="bo in data_lead">
+            <td data-title="'Name '" filter="{'firstname': 'text'}" sortable="'firstname'">{{bo.firstname}}&nbsp;{{bo.middlename}}&nbsp;{{bo.lastname}}
+            </td>
+            <td data-title="'Lead Count'" filter="{'Leadcount': 'text'}" sortable="'Leadcount'">{{bo.Leadcount}}
+            </td>
+        </tr>
+    </tbody>
+    </table>
+</div>

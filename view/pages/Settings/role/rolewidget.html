@@ -1,0 +1,173 @@
+<!--================================
+=            Controller            =
+=================================-->
+  <div class="row no-margin" ng-controller="roleWidgetCtrl">
+    <div class="col-md-12 no-padding">
+      <div class="panel panel-info">
+       
+        <div class="panel-body">
+
+           <!-- toaster message -->
+           <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+           <!-- toaster message -->
+
+          <div class="button-group">
+            <a data-toggle="modal" data-target=".addroleWidget" class="btn btn-default btn-labeled btn-sm">
+              <i class="fa fa-plus-circle">
+              </i>&nbsp;&nbsp;Assign Widget
+            </a>
+          </div>
+
+          <!--===========================
+          =            Table            =
+          ============================-->
+          <table ng-table="usersTable_roleWidget" show-filter="true" class="table table-bordered table-striped text-center">
+              <tbody>
+                  <tr ng-repeat="rw in data_roleWidget">
+                      <td data-title="'Role'" filter="{ 'roleName': 'text' }">{{rw.roleName}}</td>
+                      <td data-title="'Widget'" filter="{ 'Widgetname': 'text' }">{{rw.name}}</td>
+                      <td data-title="'Actions'" class="w150">
+                          <button data-toggle="modal" data-target=".addroleWidget" ng-click="editroleWidget(rw.adRolewidgetId)" class="btn btn-success btn-xs" tooltip-placement="top" uib-tooltip="Edit"><i class="fa fa-pencil-square-o"></i></button>
+
+                          <a ng-click="viewRoleWidget(rw.adRolewidgetId, data_roleWidget)" data-toggle="modal" data-target=".viewroleWidget" class="btn btn-info btn-xs" tooltip-placement="top" uib-tooltip="View"><i class="fa fa-eye"></i>
+                          </a>
+
+                          <button class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deleteroleWidget" ng-click="delRoleWidget(rw.adRolewidgetId, data_roleWidget)" tooltip-placement="top" uib-tooltip="Delete"><i class="fa fa-trash"></i>
+                          </button>
+
+                          <a class="btn btn-primary btn-xs" disabled>
+                            <i class="fa fa-plus">
+                            </i>
+                          </a>
+                      </td>
+                  </tr>
+              </tbody>
+            </table>
+          <!--====  End of Table  ====-->
+          <hr>
+
+          <!--===========================================
+          =            Add Role Window Modal            =
+          ============================================-->
+          <div class="modal fade addroleWidget" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button"  class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Assign Widget to Role</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal login-form" name="roleWidgetform" ng-submit="saveRoleWidget(roleWidgetData)">
+                                <!-- <input type="hidden" ng-model="roleWidgetData.adWindowaccessId"> -->
+                                <div class="form-group form-group required">
+                                    <label class="control-label col-md-3" for="">Role</label>
+                                    <div class="col-md-7">
+                                        <input type="text" ng-model="currentRoleName" class="form-control" disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group required">
+                                    <label class="control-label col-md-3" for="">Widget</label>
+                                    <div class="col-md-7">
+                                        <select ng-model="roleWidgetData.adWidgetId" name="enquiryWidget" class="form-control inputEle" ng-options="bran.adWidgetId as bran.name for bran in Widget" ng-required="true">
+                                              <option value="">Select Widget</option>
+                                            </select>
+                                        <div class="clearfix"></div>
+                                        <p class="error" ng-show="roleWidgetform.Widgetname.$invalid && roleWidgetform.Widgetname.$touched">Please Select Widget</p>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="form-group">
+                                    <div class="col-md-12 text-center">
+                                        <button type="submit" ng-disabled="roleWidgetform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Assign Widget</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="clearfix"></div>
+                        
+                    </div>
+                    </div>
+                </div>
+            </div>
+          <!--====  End of Add Role Window Modal  ====-->
+
+          <!--================================
+          =            View Modal            =
+          =================================-->
+          <div class="modal fade viewroleWidget" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" ng-click="clearModalOnCloseWidget()" data-dismiss="modal">&times;
+                  </button>
+                  <h4 class="modal-title">View Widget
+                  </h4>
+                </div>
+                <div class="modal-body">
+                  <div class="form-group">
+                    <label class="control-label col-md-offset-3 col-md-3" for="">RoleName:
+                    </label>
+                    <label class="control-label col-md-6" for="">{{viewWidgetData.roleName}}
+                    </label>
+                  </div>
+                
+                <div class="clearfix"></div>
+                <hr>
+                
+                  <div class="form-group">
+                    <label class="control-label col-md-offset-3 col-md-3" for="">Widget:
+                    </label>
+                    <label class="control-label col-md-6" for="">{{viewWidgetData.name}}
+                    </label>
+                  </div>
+                  <div class="clearfix"></div>
+                                 
+
+                
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--====  End of View Modal  ====-->
+          
+          <!--========================================
+            =            Delete Role Window            =
+            =========================================-->
+            <div class="modal fade deleteroleWidget" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;
+                    </button>
+                    <h4 class="modal-title">Delete Widget
+                    </h4>
+                  </div>
+                  <div class="modal-body">
+                    <h4>Are you sure you want to delete 
+                      <strong>{{deleteroleWidgetData.name}} ?
+                      </strong>
+                    </h4>
+                    <br>
+                    <a class="btn btn-danger btn-sm" ng-click="deleteRoleWidget(deleteroleWidgetData.adRolewidgetId)" onclick="$('.modal').modal('hide')">
+                      <i class="fa fa-trash">
+                      </i>&nbsp;&nbsp;Delete
+                    </a>
+                    <a class="btn btn-default btn-sm" data-dismiss="modal">
+                      <i class="fa fa-trash">
+                      </i>&nbsp;&nbsp;Cancel
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+             <!--====  End of Delete Role Window  ====-->
+         
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- </div> -->
+
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Settings/role/rolewidgetCtrl.js"></script>

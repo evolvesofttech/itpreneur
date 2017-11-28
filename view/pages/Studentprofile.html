@@ -1,0 +1,147 @@
+<!--================================
+=            Controller            =
+=================================-->
+<!-- <div class="page-content" sidebar-directive="state">
+    <div class="container-fluid"> -->
+      <div class="row no-margin" ng-controller="studentprofileCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Student Profile</h3>
+            </div>
+            <div class="panel-body">
+            
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+			 <form class="form-horizontal" name="addDesignation" ng-submit="save(studentprofileData)" novalidate>
+              <div class="form-group ">
+              	<label class="col-md-2">Technologies Known</label>
+              	<div class="col-md-9">
+              	 <textarea class="form-control inputEle"  ng-model="studentprofileData.technologiesknown" placeholder="Enter Description" ng-required="true"></textarea>
+              	</div>
+              </div>
+              <div class="form-group">
+              	<label class="col-md-2">Certification Details</label>
+              	<div class="col-md-9">
+              	 <textarea class="form-control inputEle"  ng-model="studentprofileData.certificationdetails" placeholder="Enter Description" ng-required="true"></textarea>
+              	</div>
+              </div>
+              <div class="form-group">
+              	<label class="col-md-2">Mention Experience if Any</label>
+              	<div class="col-md-9">
+              	 <textarea class="form-control inputEle"  ng-model="studentprofileData.experience" placeholder="e.g. 1 (Enter 0 for fresher)" restrict-to="[0-9]" ng-required="true"></textarea>
+              	</div>
+              </div>
+              <div class="form-group">
+              	<label class="col-md-2">Hobbies and Interest</label>
+              	<div class="col-md-9">
+              	 <textarea class="form-control inputEle"  ng-model="studentprofileData.hobbiesandinterest" placeholder="Enter Description" ng-required="true"></textarea>
+              	</div>
+              </div>
+              	<br>
+              	<br>
+              	<br>
+              	<br>
+              	<button class="btn btn-primary center-block" ng-click="save()">Save</button>
+             </form>
+            </div>           
+
+              <!-- start view modal -->
+              <div class="modal fade viewsource" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">Source
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">Source:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewsourceData.sourcename}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                       <!-- <br> -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end view modal -->
+              
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  <!-- </div>
+</div> -->
+<!--====  End of Controller  ====-->
+
+<script>
+angular.module('theGuru')
+   .controller('studentprofileCtrl', function($scope,$location,$routeParams,$http,CRUD_SERVICE,baseUrlSrvc,$filter,$route,hideHeader,$sessionStorage, toaster, $timeout, $window) {
+
+	$scope.OperType = $routeParams.ID;
+	$window.document.title = "ITPreneur - Student Profile";
+
+  function ClearModels() {
+    $scope.studentprofileData = {};
+  }
+
+  $scope.save = function(data) {
+
+         data.eEnquiryFormId = $scope.OperType;
+         data.createdby = $scope.OperType;
+         data.updatedby = $scope.OperType;
+
+
+            var FormData = {
+                formdata: data,
+                url: baseUrlSrvc.baseUrl + 'addUpdateEnquiryProfile'
+            };
+
+            var promisePut = CRUD_SERVICE.put($routeParams.ID, FormData);
+            promisePut.then(function (pl) {
+               var promiseData = pl.data;
+               //console.log("promiseData",promiseData);
+               
+                $timeout(function() {
+                    $scope.$apply(function () {
+                    //$route.reload();
+                    //GetAllRecords(urlList);
+                    });
+                },100);
+
+                if (promiseData.code == 1) {
+                  toaster.success({title: "Success", body:$scope.toasterAddedSuccess,tapToDismiss: true,showCloseButton: true});
+                    
+                } else {
+                    toaster.error({title: "Error", body:$scope.toasterAddedDuplicate,tapToDismiss: true,showCloseButton: true});
+                }
+               
+                ClearModels();
+            }, function (err) {
+                //console.log("Some Error Occured." + err);
+
+                //console.log("err.data",err.data);
+                
+               $timeout(function() {
+                    $scope.$apply(function () {
+                    //$route.reload();
+                    //GetAllRecords(urlList);
+                    });
+                },100);
+                 
+                toaster.error({title: "Error", body:$scope.toasterAddedError,tapToDismiss: true,showCloseButton: true});
+                  
+                ClearModels();
+            });
+  }
+
+});
+</script>
+

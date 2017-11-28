@@ -1,0 +1,249 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div class="row no-margin" ng-controller="officeuseCtrl">
+  <div class="col-md-12 no-padding">
+    <div class="panel panel-info">
+      <div class="panel-body">
+        
+        <!-- toaster message -->
+        <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+        <!-- toaster message -->
+
+        <div class="button-group">
+          <a data-toggle="modal" data-target=".addofficeuse" class="btn btn-default btn-labeled btn-sm">
+            <i class="fa fa-plus-circle">
+            </i>&nbsp;&nbsp;Current Status
+          </a>
+          <!-- <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+            <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+          </a> -->
+        </div>
+        <table ng-table="usersTable_officeuse" show-filter="true" class="table table-bordered table-striped text-center">
+          <tbody>
+            <tr ng-repeat="bo in data_officeuse">
+              <td data-title="'Status'" filter="{'type': 'text'}" sortable="'type'">{{bo.type}}
+              </td>
+               <td data-title="'Added Date'" filter="{'created': 'text'}" sortable="'created'">{{bo.created | date:'medium'}}
+              </td>
+              <td data-title="'Admission Date'" filter="{'admissiondate': 'text'}" sortable="'admissiondate'">{{bo.admissiondate | date}}
+              </td>
+               <td data-title="'Batch'" filter="{'batchname': 'text'}" sortable="'batchname'">{{bo.batchname}}
+              </td>
+              <td data-title="'Actions'">
+                <a class="btn btn-success btn-xs" disabled>
+                  <i class="fa fa-pencil-square-o">
+                  </i>
+                </a> 
+                <a data-toggle="modal" data-target=".viewOfficeuse" class="btn btn-info btn-xs" ng-click="viewOfficeuse(bo.aOfficeUseId, data_officeuse)" tooltip-placement="top" uib-tooltip="View">
+                  <i class="fa fa-eye">
+                  </i>
+                </a>
+                <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deleteofficeuse" ng-click="delOfficeuse(bo.aOfficeUseId, data_officeuse)" tooltip-placement="top" uib-tooltip="Delete">
+                  <i class="fa fa-trash">
+                  </i>
+                </a>
+                
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <hr>
+        
+        <!-- start edit modal -->
+        <div class="modal fade addofficeuse" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                </button>
+                <h4 class="modal-title">Add Technologies
+                </h4>
+              </div>
+              <div class="modal-body">
+                
+              <form class="form-horizontal" name="officeDataform" ng-submit="saveOfficeuse(officeData)" novalidate>
+              <legend>Office Use</legend>
+
+              <input type="hidden" ng-model="eEnquiryFormId">
+              <div class="form-group ">
+                <label class="control-label col-sm-2" for=""><b>Status</b></label>
+                <div class="col-sm-10">
+                <select class="form-control inputEle" ng-model="officeData.type" >
+                  <option value="Enrolling" >Enrolling</option>
+                  <option value="Interested" >Interested</option>
+                  <option value="Not Interested"  >Not Interested</option>
+                  <option value="Later" >Later</option>
+                </select> 
+                </div>
+              </div>
+             
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="">Comment</label>
+                <div class="col-sm-10">
+                   <input type="text" class="form-control inputEle" ng-model="officeData.comments" placeholder="Enter Comment" ng-required="true" ng-required="true" data-parsley-group="step4">
+                </div>
+              </div>
+
+              <input type="hidden" ng-model="officeData.cBatchId" name="">
+
+               <div class="form-group">
+                <label class="control-label col-sm-2" for="">Admission Date</label>
+                  <div class="col-sm-4">
+                     <datepicker date-format="yyyy-MM-dd">
+                        <input ng-model="officeData.admissiondate" placeholder="Enter Date" class="form-control" restrict-to="[0-9]" type="text"/>
+                     </datepicker>
+                  </div>
+                  <label class="control-label col-sm-2" for="">Batch</label>
+                  <div class="col-sm-4">
+                      <select ng-model="officeData.cBatchId" class="form-control inputEle" ng-options="bran.cBatchId as bran.batchname for bran in Batch" ng-change="OnBatchChange(officeData.cBatchId)" ng-required="true">
+                        <option value="">select Batch</option>
+                      </select> 
+                  </div>
+              </div>
+
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="">Start Date</label>
+                <label class="control-label col-sm-4" for="" style="text-align: left;">{{batchfromdate | date}}</label>
+
+                <label class="control-label col-sm-2" for="">End Date</label>
+                <label class="control-label col-sm-4" for="" style="text-align: left;">{{batchtodate | date}}</label>
+              </div>
+
+               <div class="form-group">
+                  <label class="control-label col-md-2" for="">Start Time
+                  </label>
+                  <label class="control-label col-md-4" for="" style="text-align: left;">{{batchfromtime}}
+                  </label>
+                  <label class="control-label col-md-2" for="">End Time
+                  </label>
+                  <label class="control-label col-md-4" for="" style="text-align: left;">{{batchtotime}}
+                  </label>
+                </div>
+               <br>
+               <div class="form-group">
+                      <div class="col-md-offset-4 col-md-3">
+                        <button type="submit"  class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                        </button>
+                      </div>
+                    </div>
+                    <div class="clearfix"></div>
+              </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end edit modal  -->
+
+
+        <!-- start view modal -->
+        <div class="modal fade viewOfficeuse" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                </button>
+                <h4 class="modal-title">Office Use
+                </h4>
+              </div>
+              <div class="modal-body">
+                
+                <!-- form -->
+                  <form class="form-horizontal" novalidate>
+
+                  <input type="hidden" ng-model="eEnquiryFormId">
+                  <div class="form-group ">
+                    <label class="control-label col-sm-3" for="">Status:</label>
+                    <label class="control-label col-sm-9" for="" style="text-align: left;"><b>{{viewofficeuseData.type}}</b></label>
+                    </div>
+                  </div>
+                 <div class="clearfix"></div>
+                  <hr>
+                  <div class="form-group">
+                    <label class="control-label col-sm-3" for="">Comment:</label>
+                    <label class="control-label col-sm-9" for="" style="text-align: left;">{{viewofficeuseData.comments}}</label>
+                  </div>
+
+                  <input type="hidden" ng-model="officeData.cBatchId" name="">
+                  <div class="clearfix"></div>
+                  <hr>
+                   <div class="form-group">
+                    <label class="control-label col-sm-3" for="">Admission Date:</label>
+                      <label class="control-label col-sm-3" for="" style="text-align: left;">{{viewofficeuseData.admissiondate | date}}</label>
+                      <label class="control-label col-sm-3" for="">Batch:</label>
+                      <label class="control-label col-sm-3" for="" style="text-align: left;">{{viewofficeuseData.batchname}}</label>
+                  </div>
+                  <div class="clearfix"></div>
+                  <hr>
+                  <div class="form-group">
+                    <label class="control-label col-sm-3" for="">Start Date:</label>
+                    <label class="control-label col-sm-3" for="" style="text-align: left;">{{batchfromdate | date}}</label>
+
+                    <label class="control-label col-sm-3" for="">End Date:</label>
+                    <label class="control-label col-sm-3" for="" style="text-align: left;">{{batchtodate | date}}</label>
+                  </div>
+                  <div class="clearfix"></div>
+                  <hr>
+                   <div class="form-group">
+                      <label class="control-label col-md-3" for="">Start Time:</label>
+                      <label class="control-label col-md-3" for="" style="text-align: left;">{{batchfromtime}}</label>
+                      <label class="control-label col-md-3" for="">End Time:</label>
+                      <label class="control-label col-md-3" for="" style="text-align: left;">{{batchtotime}}</label>
+                    </div>
+                    <div class="clearfix"></div>
+                    <br><br>
+
+                  </form>
+                <!-- form -->
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end view modal -->
+
+        <!-- start delete modal -->
+        <div class="modal fade deleteofficeuse" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;
+                  </button>
+                  <h4 class="modal-title">Delete Officeuse
+                  </h4>
+                </div>
+                <div class="modal-body">
+                  <h4>Are you sure you want to delete 
+                    <strong>{{deleteofficeuseData.type}}?
+                    </strong>
+                  </h4>
+                  <br>
+                  <a class="btn btn-danger btn-sm" ng-click="deleteOfficeUse(deleteofficeuseData.aOfficeUseId)" onclick="$('.modal').modal('hide')">
+                    <i class="fa fa-trash">
+                    </i>&nbsp;&nbsp;Delete
+                  </a>
+                  <a class="btn btn-default btn-sm" data-dismiss="modal">
+                    <i class="fa fa-trash">
+                    </i>&nbsp;&nbsp;Cancel
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        <!-- end delete modal -->
+       
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--====  End of Controller  ====-->
+
+ <script src="view/pages/Sales/Enquiry/OfficeuseCtrl.js"></script>
+
+
+    
+
+   

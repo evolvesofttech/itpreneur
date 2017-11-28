@@ -1,0 +1,23 @@
+<div class="card1">
+    <div class="card-header">
+       Sales Activity Report
+       <i class="fa fa-refresh pull-right" ng-click="refreshPage()" style="cursor: pointer;"></i>
+        
+    </div>
+    <table ng-table="usersTable_Activity" show-filter="true" class="table table-bordered table-striped text-center">
+    <tbody>
+        <tr ng-repeat="bo in data_Activity">
+            <td data-title="'Name '" filter="{'firstname': 'text'}" sortable="'firstname'">{{bo.firstname}}&nbsp;{{bo.middlename}}&nbsp;{{bo.lastname}}
+            </td>
+            <td data-title="'Email Count'" filter="{'Emailcount': 'text'}" sortable="'Emailcount'">{{bo.Emailcount}}
+            </td>
+             <td data-title="'Call Count '" filter="{'callcount': 'text'}" sortable="'callcount'">{{bo.callcount}}
+            </td>
+            <td data-title="'Visit Count '" filter="{'visitcount': 'text'}" sortable="'visitcount'">{{bo.visitcount}}
+            </td>
+            <td data-title="'SMSCount '" filter="{'smscount': 'text'}" sortable="'smscount'">{{bo.smscount}}
+            </td>
+        </tr>
+    </tbody>
+    </table>
+</div>

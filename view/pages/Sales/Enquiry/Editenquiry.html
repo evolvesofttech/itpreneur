@@ -1,0 +1,376 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<style type="text/css">
+  /*  option.green {background-color: #00e699; font-weight: bold; font-size: 12px;}
+    option.blue {background-color: #8db0f2; font-weight: bold; font-size: 12px;}
+    option.red {background-color: #ff4d4d; font-weight: bold; font-size: 12px;}*/
+
+  .green{
+        background-color: #00e699;
+    }
+</style>
+
+<div class="page-content" sidebar-directive="state" >
+    <div class="container-fluid">
+        <div class="row no-margin" ng-controller="enquiryCtrl as Inst">
+         
+            <div class="col-md-12 no-padding">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Edit Enquiry</h3>
+                    </div>
+                    <div class="panel-body">
+                        <!-- alert messages -->
+                        <flash-message duration="5000" show-close="true" on-dismiss="myCallback(flash)">
+                        </flash-message>
+                        <!-- alert messages -->
+                        <form class="form-horizontal mb40" name="enquiryform" ng-submit="saveEnquiry(enquiryData)" novalidate>
+
+                            <div class="button-group">
+                                <a href="#/Enquiry Form" class="btn btn-default btn-labeled btn-sm">
+                                    <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back</a>
+                                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</a>
+                            
+                                <button type="submit" class="btn btn-success btn-labeled btn-sm" ng-disabled="enquiryform.$invalid">
+                                <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Update</button>
+
+                                <div class="form-group pull-right required"> 
+                                
+                                <label style="float: left; line-height: 30px;"> Placement Status</label>
+                                <div class="col-sm-6" >
+                                 <select ng-model="enquiryData.placementstatus" class="form-control inputEle" name="ps" ng-required="true" >
+                                      <option  value="Open">Open</option>
+                                      <option  value="Placed">Placed</option>
+                                      <option  value="Blacklisted">Blacklisted</option>
+                                    </select>
+                                    <div class="clearfix"></div>
+                                  <p class="error" ng-show="enquiryform.ps.$invalid && enquiryform.ps.$touched">Select Status</p>
+                                </div>
+
+                                <div ng-show="enquiryData.placementstatus=='Open'">
+                                <i class="fa fa-circle" style="color: #0091EA; font-size: 23px; line-height: 30px; margin-right: 1px; margin-left: -7px;"></i>
+                                </div>
+
+                                <div ng-show="enquiryData.placementstatus=='Placed'">
+                                <i class="fa fa-circle" style="color: #4CAF50; font-size: 23px; line-height: 30px; margin-right: 1px; margin-left: -7px;"></i>
+                                </div>
+
+                                <div ng-show="enquiryData.placementstatus=='Blacklisted'">
+                                <i class="fa fa-circle" style="color: #F44336; font-size: 23px; line-height: 30px; margin-right: 1px; margin-left: -7px;"></i>
+                                </div>
+
+                              </div>
+                            </div>
+                            <hr>
+                        <input type="hidden" ng-model="enquiryData.eEnquiryFormId" name="">
+                            <div class="form-group required">
+                                <label class="control-label col-sm-2" for="">Branch</label>
+                                <div class="col-sm-4">
+                                   <input type="text"  class="form-control inputEle" ng-model="enquiryData.branchname" ng-required="true" disabled>
+                                </div>
+
+                                 <label class="control-label col-sm-2" for="">Date</label>
+                              <div class="col-sm-4">
+                                 <datepicker date-format="yyyy-MM-dd" date-max-limit="{{currentDate}}">
+                                    <input type="text" name="dat" ng-model="enquiryData.date" placeholder="Enter Date" class="form-control" restrict-to="[0-9]" ng-required="true">
+                                 </datepicker>
+                                 <div class="clearfix"></div>
+                                  <p class="error" ng-show="enquiryform.dat.$invalid && enquiryform.dat.$touched">Please Enter Date</p>
+                              </div>
+                             </div>
+
+                             <div class="form-group required">
+                               <label class="control-label col-sm-2" for="">Candidate Name</label>
+                                <div class="col-sm-3">
+                                   <input type="text" name="caditname" class="form-control inputEle" ng-model="enquiryData.firstname" placeholder="Enter First Name" ng-required="true" ng-required="true">
+                                   <div class="clearfix"></div>
+                                   <p class="error" ng-show="enquiryform.caditname.$invalid && enquiryform.caditname.$touched">Please Enter FirstName</p>
+                                </div>
+
+                              
+                                <div class="col-sm-3">
+                                   <input type="text" name="middlena" class="form-control inputEle" ng-model="enquiryData.middlename" placeholder="Enter Middle Name" ng-required="true" ng-required="true">
+                                   <div class="clearfix"></div>
+                                   <p class="error" ng-show="enquiryform.middlena.$invalid && enquiryform.middlena.$touched">Please Enter MiddleName</p>
+                                </div>
+
+                                <div class="col-sm-4">
+                                   <input type="text" name="lastna" class="form-control inputEle" ng-model="enquiryData.lastname" placeholder="Enter Surname" ng-required="true">
+                                   <div class="clearfix"></div>
+                                   <p class="error" ng-show="enquiryform.lastna.$invalid && enquiryform.lastna.$touched">Please Enter LastName</p>
+                                </div>
+                              </div>
+
+                               <div class="form-group">
+                                 <label class="control-label col-sm-2" for="">College/Company Name</label>
+                                  <div class="col-sm-4">
+                                     <input type="text" name="compname" class="form-control inputEle" ng-model="enquiryData.collegename" placeholder="Enter College/Company Name">
+                                     <!-- <div class="clearfix"></div>
+                                     <p class="error" ng-show="enquiryform.compname.$invalid && enquiryform.compname.$touched">Please Enter Company Name</p> -->
+                                  </div>
+
+                                  <label class="control-label col-sm-2" for="">Status</label>
+                                  <div class="col-sm-4">
+                                      <select ng-model="enquiryData.cStatusId" name="stat" class="form-control inputEle" ng-options="enq.cStatusId as enq.statusname for enq in EnquiryStatus" ng-required="true">
+                                        <option value="">Select Enquiry Status</option>
+                                      </select>
+                                      <div class="clearfix"></div>
+                                     <p class="error" ng-show="enquiryform.stat.$invalid && enquiryform.stat.$touched">Please Select Status</p>
+                                  </div>
+                             </div>
+
+
+                             <div class="form-group required">
+                              <label class="control-label col-sm-2" for="">Address</label>
+                              <div class="col-sm-10">
+                                 <textarea class="form-control inputEle" name="addr" ng-model="enquiryData.presentaddress" placeholder="Enter Permenant Address" ng-required="true"> </textarea>
+                                 <div class="clearfix"></div>
+                                 <p class="error" ng-show="enquiryform.addr.$invalid && enquiryform.addr.$touched">Please Enter Address</p>
+                                 
+                              </div>
+                           </div>
+                           <div class="form-group">
+                              <label class="control-label col-sm-2" for="">Local Area</label>
+                              <div class="col-sm-4">
+                                 <input type="text" name="enquirylocal" class="form-control inputEle" ng-model="enquiryData.localarea" placeholder="Enter Local Area">
+                              </div>
+                              <label class="control-label col-sm-2" for="">Native Place</label>
+                              <div class="col-sm-4">
+                                 <input type="text" name="enquirynative" class="form-control inputEle" ng-model="enquiryData.nativeplace" placeholder="Enter Native Place">
+                              </div>
+                           </div>
+                           <div class="form-group required">
+                              <label class="control-label col-sm-2" for="">Gender</label>
+                              <div class="col-sm-4">
+                                 <label class="radio-inline">
+                                 <input type="radio" name="gender" ng-model="enquiryData.gender" value="Male" ng-required="true">Male
+                                 </label>
+                                 <label class="radio-inline">
+                                 <input type="radio" name="gender" ng-model="enquiryData.gender" value="Female" ng-required="true">Female
+                                 </label>
+                                 <label class="radio-inline">
+                                 <input type="radio" name="gender" ng-model="enquiryData.gender" value="Transgender" ng-required="true">Transgender
+                                 </label>
+                              </div>
+                              <label class="control-label col-sm-2" for="">Marital Status</label>
+                              <div class="col-sm-4">
+                                 <label class="radio-inline">
+                                 <input type="radio" name="mt" ng-model="enquiryData.maritalstatus" value="Unmarried" ng-required="true">Unmarried
+                                 </label>
+                                 <label class="radio-inline">
+                                 <input type="radio" name="mt" ng-model="enquiryData.maritalstatus" value="Married" ng-required="true">Married
+                                 </label>
+                                 <label class="radio-inline">
+                                 <input type="radio" name="mt" ng-model="enquiryData.maritalstatus" value="Divorce" ng-required="true">Divorce
+                                 </label>
+                              </div>
+                           </div>
+                           <div class="form-group">
+                              <label class="control-label col-sm-2" for="">Landline</label>
+                              <div class="col-sm-4">
+                                 <input type="text" class="form-control inputEle" ng-model="enquiryData.telresource" restrict-to="[0-9]"> 
+                              </div>
+                              <label class="control-label col-sm-2 mandatory" for="">Contact No.</label>
+                              <div class="col-sm-4">
+                                 <input type="number" name="cont" class="form-control inputEle" ng-model="enquiryData.contactno" placeholder="Enter Contact Number" ng-required="true" ng-required="true" maxlength="10" minlength="10" restrict-to="[0-9]" required>
+                                 <div class="clearfix"></div>
+                                 <p class="error" ng-show="enquiryform.cont.$invalid && enquiryform.cont.$touched">Please Enter Contact No</p> 
+                              </div>
+                              
+                           </div>
+                           
+                           <div class="form-group">
+                              <label class="control-label col-sm-2 mandatory" for="">Email Id</label>
+                               <div class="col-sm-4">
+                                 <input type="email" name="email" class="form-control inputEle" ng-model="enquiryData.email" placeholder="Enter Email Id" ng-required="true" ng-pattern="/^[a-zA-Z]+[a-zA-Z0-9._]+@[a-zA-Z]+\.[a-zA-Z.]{2,5}$/">
+                                 <div class="clearfix"></div>
+                                 <p class="error" ng-show="enquiryform.email.$invalid && enquiryform.email.$touched">Please Enter Email Id</p>
+                              </div>
+
+                              <label class="control-label col-sm-2" for="">Alternate Email Id</label>
+                               <div class="col-sm-4">
+                                 <input type="email" name="altemail" class="form-control inputEle" ng-model="enquiryData.alternateemail" placeholder="Enter Alternate Email Id"  ng-pattern="/^[a-zA-Z]+[a-zA-Z0-9._]+@[a-zA-Z]+\.[a-zA-Z.]{2,5}$/">
+                                 <!-- <div class="clearfix"></div>
+                                 <p class="error" ng-show="enquiryform.altemail.$invalid && enquiryform.altemail.$touched">Please Enter Alternate Email Id</p> -->
+                              </div>
+                           </div>
+
+                           <div class="form-group required">
+                              <label class="control-label col-sm-2" for="">Date Of Birth</label>
+                                <div class="col-sm-4">
+                                  <datepicker date-format="yyyy-MM-dd" date-max-limit="{{currentDate}}">
+                                      <input ng-model="enquiryData.dob" name="dob" placeholder="Enter Birthdate" class="form-control" restrict-to="[0-9]" type="text" ng-required="true" />
+                                   </datepicker>
+                                   <div class="clearfix"></div>
+                                   <p class="error" ng-show="enquiryform.dob.$invalid && enquiryform.dob.$touched">Please Enter Date Of Birth</p>
+                                </div>
+
+                                <label class="control-label col-sm-2" for="">Candidate Type</label>
+                                  <div class="col-sm-4">
+                                      <select ng-model="enquiryData.cStatusId" name="canditype" class="form-control inputEle" ng-options="stat.cStatusId as stat.statusname for stat in EnquiryStatus" ng-required="true">
+                                        <option value="">Select Status</option>
+                                      </select>
+                                      <div class="clearfix"></div>
+                                      <p class="error" ng-show="enquiryform.canditype.$invalid && enquiryform.canditype.$touched">Please Select Candidate Type</p>
+                                  </div> 
+                             </div>
+
+                              <div class="form-group">
+                              <label class="control-label col-sm-2 mandatory" for="">Hear About Us</label>
+                              <div class="col-sm-4">
+                                  <select ng-model="enquiryData.cSourceId" name="heara" class="form-control inputEle" ng-options="enq.cSourceId as enq.sourcename for enq in Source" ng-required="true" ng-change="sourceChange(enquiryData.cSourceId, Source)" disabled>
+                                    <option value="">Select Source Name</option>
+                                  </select>
+                                  <div class="clearfix"></div>
+                                  <p class="error" ng-show="enquiryform.heara.$invalid && enquiryform.heara.$touched">Please Select Hear About Us</p>
+                              </div>
+
+                              <div ng-show="showStudent">
+                                <label class="control-label col-sm-2" for="">Select Student</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" ng-model="enquiryData.reference" disabled>
+                                </div>
+                              </div>
+
+                              <div ng-show="showStaff">
+                                <label class="control-label col-sm-2" for="">Select Staff</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" ng-model="enquiryData.reference" disabled>
+                                </div>
+                              </div>                            
+                            </div> <!--hear about us form group ends-->
+
+                             <div class="form-group ">
+
+                                <label class="control-label col-sm-2" for="">Highest Qualification</label>
+                                  <div class="col-sm-4">
+                                     <select ng-model="enquiryData.cDegreeId" name="hq" class="form-control inputEle" ng-options="stf.cDegreeId as stf.degreename for stf in HighestQualification" ng-focus="QualificationFocus()">
+                                     </select>
+                                     <!-- <div class="clearfix"></div>
+                                     <p class="error" ng-show="enquiryform.hq.$invalid && enquiryform.hq.$touched">Please Select Highest Qualification</p> -->
+                                  </div>
+
+                                 <label class="control-label col-md-2 mandatory" for="">Year of Passing</label>
+                                <div class="col-md-4">
+                                   <input type="number" name="yearofpassingname" class="form-control inputEle" ng-model="enquiryData.yearofpassing" placeholder="Enter Year of Passing" ng-required="true">
+                                   <div class="clearfix"></div>
+                                     <p class="error" ng-show="enquiryform.yearofpassingname.$invalid && enquiryform.yearofpassingname.$touched">Please Enter Year of Passing</p>
+                                </div>
+                              </div>
+                              <div class="form-group"> 
+                                <label class="control-label col-sm-2" for="">Sub-Status</label>
+                                <div class="col-sm-4" >
+                                    <select ng-model="enquiryData.statusenquiry" name="subs" class="form-control inputEle">
+                                      <option value="New">New</option>
+                                      <option value="Interested">Interested</option>
+                                      <option value="Not Interested">Not Interested</option>
+                                      <option value="Later">Later</option>
+                                    </select>
+                                    <div class="clearfix"></div>
+                                    <p class="error" ng-show="enquiryform.subs.$invalid && enquiryform.subs.$touched">Please Select Sub-Status</p>
+                                </div>
+                                <div class="col-sm-4">
+                                    <input type="hidden" class="form-control" ng-model="enquiryData.windowtype" ng-init="enquiryData.windowtype = 'Registration'">
+                                </div>   
+                              </div>
+
+                              <div class="form-group">
+                                  <label class="control-label col-sm-2" for="">Assign To</label>
+                                  <div class="col-sm-4">
+                                      <select ng-model="enquiryData.assignto" class="form-control inputEle" ng-options="stf.adUserId as (stf.firstname + ' ' + stf.middlename + ' ' + stf.lastname) for stf in Staff" disabled>
+                                      </select>
+                                  </div>
+                                </div>
+
+                            <br>
+                            <div class="form-group form-group required">
+                                <div class="col-md-12 text-center">
+                                    <!-- <button type="submit" class="btn btn-success">Update</button> -->
+                                </div>
+                            </div>
+                        </form>
+                        <!-- tab starts -->
+                        <div id="exTab2">
+                            <ul class="nav nav-tabs">
+                                
+                                <li ng-class="{active:Inst.isSet(1)}">
+                                    <a ng-click="Inst.setTab(1)">Technologies</a>
+                                </li>
+                                <li ng-class="{active:Inst.isSet(2)}" ng-click="showSchoolList()">
+                                    <a ng-click="Inst.setTab(2)">Qualification</a>
+                                </li>
+                                <li ng-class="{active:Inst.isSet(3)}" ng-click="showTeacherList()">
+                                    <a ng-click="Inst.setTab(3)">Activity</a>
+                                </li>
+                               <!--  <li ng-class="{active:Inst.isSet(4)}">
+                                    <a ng-click="Inst.setTab(4)">Office Use</a>
+                                </li> -->
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <!--===========================
+                                =            Tab 1            =
+                                ============================-->
+                                <div class="tab-pane active" ng-show="Inst.isSet(1)">
+
+                                    <div ng-if="Inst.isSet(1)" ng-include="'view/pages/Sales/Enquiry/Technologies.html'"></div>
+                                     
+                                </div>
+                                <!--====  End of Tab 1  ====-->
+
+                                <!--===========================
+                                =            Tab 2            =
+                                ============================-->
+                                
+                                <div class="tab-pane active" ng-show="Inst.isSet(2)">
+                                     
+                                    <div ng-if="Inst.isSet(2)" ng-include="'view/pages/Sales/Enquiry/Qualification.html'"></div>
+
+                                </div>
+                                
+                                <!--====  End of Tab 2  ====-->
+
+                                <!--===========================
+                                =            Tab 3            =
+                                ============================-->
+                                
+                                <div class="tab-pane active" ng-show="Inst.isSet(3)">
+                                     
+                                     <div ng-if="Inst.isSet(3)" ng-include="'view/pages/Sales/Enquiry/EnquiryActivity.html'"></div>
+
+                                </div>
+                                
+                                <!--====  End of Tab 3  ====-->
+
+                                <!--===========================
+                                =            Tab 4            =
+                                ============================-->
+                                
+                                <!-- <div class="tab-pane active" ng-show="Inst.isSet(4)">
+                                     
+                                     <div ng-if="Inst.isSet(4)" ng-include="'view/pages/Sales/Enquiry/Officeuse.html'"></div>
+
+                                </div> -->
+                                
+                                <!--====  End of Tab 4  ====-->
+                                
+                               
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- end controller div -->
+    </div>
+
+
+</div>
+
+
+<script src="view/pages/Sales/Enquiry/EnquiryCtrl.js"></script>

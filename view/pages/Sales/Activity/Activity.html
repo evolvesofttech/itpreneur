@@ -1,0 +1,297 @@
+<!--================================
+=            Controller            =
+=================================-->
+
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state" >
+    <div class="container-fluid">
+
+    <div class="row no-margin" ng-controller="activitiesCtrl">
+    <div class="col-md-12 no-padding">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Activity</h3>
+            </div>
+            <div class="panel-body">
+            
+                <!-- toaster message -->
+                <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+                <!-- toaster message -->
+
+                <div class="button-group">
+                    <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                        <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</a>
+                    <a data-toggle="modal" data-target=".addenquiryactivities" class="btn btn-default btn-labeled btn-sm" ng-click="AddHideActivityStatus();">
+                        <i class="fa fa-plus"></i>&nbsp;&nbsp;Add Activity</a>
+                </div>
+
+                <!--====================================
+                =            Activity Table            =
+                =====================================-->
+                <table ng-table="usersTable_activity" show-filter="true" class="table table-bordered table-striped text-center">
+                  <tbody>
+                    <tr ng-repeat="bo in data_activity">
+                     <td data-title="'Serial Number'" filter="{'index': 'text'}" sortable="'index'">{{$index + 1}}
+                      </td>
+                     <td data-title="'Student Name'" filter="{'firstname': 'text'}" sortable="'firstname'">
+                     <span ng-if="bo.activityagainst != 'Lead'">{{bo.firstname}}&nbsp;{{bo.middlename}}&nbsp;{{bo.lastname}}</span>
+                     <span ng-if="bo.activityagainst == 'Lead'">{{bo.firstnamelead}}&nbsp;{{bo.middlenamelead}}&nbsp;{{bo.lastnamelead}}</span>
+                      </td>
+                      <td data-title="'Activity Type'" filter="{'activitytype': 'text'}" sortable="'activitytype'">{{bo.activitytype}}
+                      </td>
+                       <!-- <td data-title="'Description'" filter="{'description': 'text'}" sortable="'description'">{{bo.description}}
+                      </td> -->
+                      <td data-title="'Plan Date'" filter="{'followupdate': 'text'}" sortable="'followupdate'">{{bo.followupdate | date}}
+                      </td>
+                       <td data-title="'Activity Date'" filter="{'activitydate': 'text'}" sortable="'activitydate'">{{bo.activitydate | date}}
+                      </td>
+                       
+                      <td data-title="'Activity Against'" filter="{'activityagainst': 'text'}" sortable="'activityagainst'">{{bo.activityagainst}}
+                      </td>
+                      <td data-title="'Activity By'" filter="{'username': 'text'}" sortable="'username'">{{bo.username}}
+                      </td>
+                       <td data-title="'Activity Status'" filter="{'activitystatus': 'text'}" sortable="'activitystatus'">  
+                     
+                         <select class="form-control inputEle" ng-model="model1" ng-change="OnActivityStatusChange(bo.acActivityId, model1)" ng-init="model1 = bo.activitystatus" ng-disabled="bo.activitystatus == 'Close'"> 
+                          <option value="Pending">Pending</option>
+                          <option value="Close">Close</option>
+                        </select>
+                      </td>
+                       <td data-title="'Actions'" class="w150">
+                        <a data-toggle="modal" data-target=".addenquiryactivities" class="btn btn-success btn-xs" ng-click="editEnquiryActivity(bo.acActivityId)" tooltip-placement="top" uib-tooltip="Edit">
+                          <i class="fa fa-pencil-square-o">
+                          </i>
+                        </a>
+
+                        <a ng-click="viewActivity(bo.acActivityId, data_activity)" data-toggle="modal" data-target=".viewactivity" class="btn btn-info btn-xs" tooltip-placement="top" uib-tooltip="View"><i class="fa fa-eye"></i>
+                        </a>
+
+                        <a class="btn btn-primary btn-xs" data-toggle="modal" data-target=".addenquiryactivities" ng-click="addActivityFromTable(bo.acActivityId, data_activity)" tooltip-placement="top" uib-tooltip="Add Activity">
+                          <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                        </a> 
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <!--====  End of Activity Table  ====-->
+
+                <!--==================================
+                =            Add Activity            =
+                ===================================-->
+                <div class="modal fade addenquiryactivities" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                    <div class="modal-dialog modal-lg" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" ng-click="clearModalOnCloseActivity()" data-dismiss="modal">&times;
+                          </button>
+                           <h4 class="modal-title" ng-init="headingMessage='Add Activity'">{{headingMessage}}</h4>
+                        </div>
+                        <div class="modal-body">
+                          <form class="form-horizontal" name="mainactivityform" ng-submit="saveActivities(enquiryactivitiesData)" novalidate >
+
+                            <div class="form-group">
+                              <label class="control-label col-md-2" for="">Activity Against</label>
+                              <div class="col-md-4" >
+                                  <select name="actagn" ng-model="enquiryactivitiesData.activityagainst" class="form-control inputEle" ng-required="true" ng-change="activityAgainstChange(enquiryactivitiesData.activityagainst)" ng-disabled="againstDisabled"> 
+                                    <option value="Lead">Lead</option>
+                                    <option value="Enquiry">Enquiry</option>
+                                    <option value="Application">Application</option>
+                                    <option value="Admission">Admission</option>
+                                  </select>
+                                  <div class="clearfix"></div>
+                                  <p class="error" ng-show="mainactivityform.actagn.$invalid && mainactivityform.actagn.$touched">Please Select Activity Against</p>
+                              </div> 
+                            </div>
+
+                           <div class="form-group">
+                           <label class="control-label col-sm-2" for="">Student</label>
+                              <div class="col-sm-4" ng-hide="hideNameAll">
+                                <input type="hidden" ng-model="enquiryactivitiesData.eEnquiryFormId">
+                              <input type="hidden" ng-model="enquiryactivitiesData.eLeadinformationId">
+                                  <!-- <select name="student" ng-model="enquiryactivitiesData.eEnquiryFormId" class="form-control inputEle" ng-options="stu.eEnquiryFormId as (stu.lastname + ' ' + stu.firstname + ' ' + stu.middlename) for stu in Students" ng-required="true" ng-disabled="disableName"> 
+                                  </select> -->
+                                  <ui-select ng-model="selected" theme="select2" title="Choose Student" on-select="getId(selected)" ng-hide="hideStudentList"  ui-select-required name="student" ng-required="studentreq">
+                                   <div class="clearfix"></div>
+                                  <p class="error" ng-show="mainactivityform.student.$invalid && mainactivityform.student.$touched">Please Select Student Name</p>
+
+                                    <ui-select-match placeholder="Select a Student in the list or search his name..." >{{$select.selected.firstname}}&nbsp;{{$select.selected.middlename}}&nbsp;{{$select.selected.lastname}}</ui-select-match>
+
+                                    <ui-select-choices repeat="person in Students | propsFilter: {firstname: $select.search, lastname: $select.search}" >
+   
+                                      <span ng-bind-html="person.firstname | highlight: $select.search"></span>&nbsp;
+                                      <span ng-bind-html="person.middlename | highlight: $select.search"></span>&nbsp;
+                                      <span ng-bind-html="person.lastname | highlight: $select.search"></span>
+
+
+                                      <div class="clearfix"></div>
+                                      <small>Branch: {{person.branchname}}</small>
+
+                                    </ui-select-choices>
+
+                                  </ui-select>
+
+                                  <input type="text"  class="form-control" ng-model="selectedStudentName" disabled ng-show="hideStudentList" >
+
+                                 
+                              </div>
+                              <div class="col-sm-4" ng-hide="hideNameOne">
+                                  <input type="text" class="form-control" ng-model="studentFullName" disabled>
+                              </div>                             
+                              <label class="control-label col-md-2" for="">Activity</label>
+                              <div class="col-md-4" >
+                                  <select name="act" ng-required="true" ng-model="enquiryactivitiesData.activitytype" class="form-control inputEle"> 
+                                    <option>Email</option>
+                                    <option>Call</option>
+                                    <option>Message</option>
+                                    <option>Visit</option>
+                                  </select>
+                                  <div class="clearfix"></div>
+                                  <p class="error" ng-show="mainactivityform.act.$invalid && mainactivityform.act.$touched">Please Select Activity</p>
+                              </div> 
+                            </div> 
+                            <input type="hidden" ng-model="enquiryactivitiesData.eEnquiryFormId">
+                            <div class="form-group ">
+                               <label class="control-label col-md-2" for="">Description</label>
+                                <div class="col-md-10">
+                                   <textarea name="desc" class="form-control inputEle"  ng-model="enquiryactivitiesData.description" placeholder="Enter Description" ng-required="true"></textarea>
+                                   <div class="clearfix"></div>
+                                  <p class="error" ng-show="mainactivityform.desc.$invalid && mainactivityform.desc.$touched">Please Enter Description</p>
+                                </div>   
+                            </div>
+
+                            <div class="form-group">
+
+                              <label class="control-label col-md-2 mandatory" for="">Plan Date</label>
+                              <div class="col-md-4">
+                               <datepicker date-format="yyyy-MM-dd">
+                                  <input type="text" name="plandate" ng-model="enquiryactivitiesData.followupdate" class="form-control" restrict-to="[0-9]" ng-required="true" />
+                               </datepicker>
+                               <div class="clearfix"></div>
+                                  <p class="error" ng-show="mainactivityform.plandate.$invalid && mainactivityform.plandate.$touched">Please Enter Plan Date</p>
+                              </div>
+
+                              <label class="control-label col-md-2" for="">Activity Date</label>
+                              <div class="col-md-4">
+                               <datepicker date-format="yyyy-MM-dd">
+                                  <input type="text" name="actdate" ng-model="enquiryactivitiesData.activitydate" placeholder="Enter Date" class="form-control"/>
+                               </datepicker>
+                               <!-- <div class="clearfix"></div>
+                                  <p class="error" ng-show="mainactivityform.actdate.$invalid && mainactivityform.actdate.$touched">Please Enter Activity Date</p> -->
+                              </div>
+
+                           </div>
+
+                           <div class="form-group " > 
+                           <div ng-hide="hideActivityStatus">                            
+                              <label class="control-label col-md-2" for="">Activity Status</label>
+                              <div class="col-md-4" >
+                                  <select name="status" ng-model="enquiryactivitiesData.activitystatus" class="form-control inputEle" ng-init="enquiryactivitiesData.activitystatus = 'Pending'"> 
+                                    <option value="Pending">Pending</option>
+                                    <option value="Close">Close</option>
+                                  </select>
+                                  <!-- <div class="clearfix"></div>
+                                  <p class="error" ng-show="mainactivityform.status.$invalid && mainactivityform.status.$touched">Please Select Activity Status</p> -->
+                              </div>
+                              </div> 
+
+                              
+                            </div> 
+
+                            <input type="hidden" value="{{enquiryactivitiesData.activitystatus}}">
+                           
+                           <br>
+                            <div class="form-group">
+                              <div class="col-md-12 text-center">
+                                <button type="submit" ng-disabled="mainactivityform.$invalid"  class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                                </button>
+                              </div>
+                            </div>
+                            <div class="clearfix"></div>
+                           </form>
+                        </div>
+                      </div>
+                    </div>
+
+                </div>
+                <!--====  End of Add Activity  ====-->
+
+                <!--===================================
+                =            View Activity            =
+                ====================================-->
+                <div class="modal fade viewactivity" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">View Activity
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        
+                      <form class="form-horizontal" novalidate>
+                           <div class="form-group ">
+                           <label class="control-label col-sm-2" for="">Student</label>
+                           <label class="control-label col-sm-4" style="text-align: left;" for="">{{viewActivityData.studentname}}</label>
+                                                                   
+                              <label class="control-label col-md-2" for="">Activity</label>
+                              <label class="control-label col-sm-4" style="text-align: left;" for="">{{viewActivityData.activitytype}}</label>
+                            </div> 
+                            <hr>
+                            <div class="form-group ">
+                               <label class="control-label col-md-2" for="">Description</label>
+                               <label class="control-label col-sm-10" style="text-align: left;" for="">{{viewActivityData.description}}</label>  
+                            </div>
+                             <hr>
+                            <div class="form-group ">
+
+                              <label class="control-label col-md-2" for="">Activity Date</label>
+                               <label class="control-label col-sm-4" style="text-align: left;" for="">{{viewActivityData.activitydate | date}}</label>
+                              
+                              <label class="control-label col-md-2" for="">Plan Date</label>
+                              <label class="control-label col-sm-4" style="text-align: left;" for="">{{viewActivityData.followupdate | date}}</label>
+
+                               
+
+                           </div>
+                           <hr>
+                           <div class="form-group ">                                
+                              <label class="control-label col-md-2" for="">Activity Status</label>
+                              <label class="control-label col-sm-4" style="text-align: left;" for="">{{viewActivityData.activitystatus}}</label>
+
+                              <label class="control-label col-md-2" for="">Activity Against</label>
+                              <label class="control-label col-sm-4" style="text-align: left;" for="">{{viewActivityData.activityagainst}}</label>
+                            </div>
+                            <hr>
+                            <div class="form-group ">                                
+                              <label class="control-label col-md-2" for="">Activity By</label>
+                              <label class="control-label col-sm-4" style="text-align: left;" for="">{{viewActivityData.username}}</label>
+                            </div>
+                           
+                            <div class="clearfix"></div>
+                           </form>
+
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!--====  End of View Activity  ====-->
+                
+                <hr>
+          <!-- start edit modal -->
+          
+    
+    
+</div>
+</div>
+<!--====  End of Controller  ====-->
+</div>
+</div>
+</div>
+</div>
+
+<!--====  End of Controller  ====-->
+
+ <script src="view/pages/Sales/Activity/ActivityCtrl.js"></script>

@@ -1,0 +1,178 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+
+
+<div class="page-content" sidebar-directive="state" >
+    <div class="container-fluid">
+        <div class="row no-margin" ng-controller="EditScheduleCtrl as Inst">
+         
+            <div class="col-md-12 no-padding">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Edit Schedule</h3>
+                    </div>
+                    <div class="panel-body">
+
+
+                        <!-- toaster message -->
+                          <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+                        <!-- toaster message -->
+                        
+                        <!-- form -->
+                        <form class="form-horizontal" name="scheduleform" ng-submit="saveSchedule(ScheduleData)" novalidate>
+
+                            <div class="button-group">
+                                <a href="#/Schedule" class="btn btn-default btn-labeled btn-sm">
+                                    <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back</a>
+                                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</a>
+                            
+                                <button type="submit" class="btn btn-success btn-labeled btn-sm">
+                                <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Update</button>
+                            </div>
+                            <hr>
+
+                            <input type="hidden" ng-model="ScheduleData.conScheduleId">  
+                              <div class="form-group required">
+                                <label class="control-label col-md-2" for="">Course</label>
+                                <div class="col-md-4">
+                                  <select ng-model="ScheduleData.cCourseId" name="cou" class="form-control inputEle" ng-options="co.cCourseId as co.coursename for co in Courses" ng-change="courseChange(ScheduleData.cCourseId)" ng-required="true">
+                                  </select> 
+                                  <div class="clearfix"></div>
+                                  <p class="error" ng-show="scheduleform.cou.$invalid && scheduleform.cou.$touched">Please Select Course</p>
+                                </div>
+
+                                <label class="control-label col-md-2" for="">Batch</label>
+                                <div class="col-md-4">
+                                  <select ng-model="ScheduleData.cBatchId" name="bat" class="form-control inputEle" ng-options="btch.cBatchId as btch.batchname for btch in Batch" ng-required="true">
+                                    </select> 
+                                     <div class="clearfix"></div>
+                                   <p class="error" ng-show="scheduleform.bat.$invalid && scheduleform.bat.$touched">Please Select Batch</p>
+                                </div>
+                              </div><!-- form-group -->
+
+                              <div class="form-group required">
+                                <label class="control-label col-md-2" for="">Technology/Subject</label>
+                                <div class="col-md-4">
+                                  <select ng-model="ScheduleData.cTechnologyMasterId" name="technologyname" class="form-control inputEle" ng-options="bran.cTechnologyMasterId as bran.technologyname for bran in Technologies" ng-required="true">
+                                  </select>
+                                  <div class="clearfix"></div>
+                                  <p class="error" ng-show="scheduleform.technologyname.$invalid && scheduleform.technologyname.$touched">Please Select Technology</p>
+                                </div>
+
+                                <label class="control-label col-md-2" for="">Lecture</label>
+                                <div class="col-md-4">
+                                  <select ng-model="ScheduleData.lecture" name="lecture" class="form-control inputEle" ng-required="true">
+                                        <option value="">Select lecture</option>
+                                        <option value="Lecture 1">Lecture 1</option>
+                                        <option value="Lecture 2">Lecture 2</option>
+                                        <option value="Lecture 3">Lecture 3</option>
+                                        <option value="Lecture 4">Lecture 4</option>
+                                        <option value="Lecture 5">Lecture 5</option>
+                                        <option value="Lecture 6">Lecture 6</option>
+                                        <option value="Lecture 7">Lecture 7</option>
+                                        <option value="Lecture 8">Lecture 8</option>
+                                        <option value="Lecture 9">Lecture 9</option>
+                                        <option value="Lecture 10">Lecture 10</option>
+                                        <option value="Lecture 11">Lecture 11</option>
+                                        <option value="Lecture 12">Lecture 12</option>
+                                      </select>
+                                  <div class="clearfix"></div>
+                                  <p class="error" ng-show="scheduleform.lecture.$invalid && scheduleform.lecture.$touched">Please Select lecture</p>
+                                </div>
+                              </div><!-- form-group -->
+
+                              <div class="form-group required">
+                                  <label class="control-label col-sm-2" for="">Lecture Date</label>
+                                  <div class="col-sm-4">
+                                     <datepicker date-format="yyyy-MM-dd">
+                                        <input type="text" name="dat" ng-model="ScheduleData.date" placeholder="Enter Date" class="form-control" restrict-to="[0-9]" ng-required="true" />
+                                     </datepicker>
+                                     <div class="clearfix"></div>
+                                     <p class="error" ng-show="scheduleform.dat.$invalid && scheduleform.dat.$touched">Please Enter Date</p> 
+                                  </div>
+                              </div><!-- form-group -->
+
+                              <div class="form-group required">
+                                <label class="control-label col-md-2" for="">Start Time
+                                </label>
+                                <div class="col-md-4">
+                                 
+                                  <div class="input-group"
+                                     moment-picker="ScheduleData.fromtime"
+                                     format="LT">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-clock-o"></i>
+                                    </span>
+                                    <input class="form-control"
+                                           name="fromtm"
+                                           placeholder="Select a time"
+                                           ng-model="ScheduleData.fromtime"
+                                           ng-model-options="{ updateOn: 'blur' }"
+                                           ng-required="true">
+                                  </div>
+                                  <div class="clearfix"></div>
+                                  <p class="error" ng-show="scheduleform.fromtm.$invalid && scheduleform.fromtm.$touched">Please Enter Time</p>
+                                </div>
+                                <label class="control-label col-md-2" for="">End Time
+                                </label>
+                                <div class="col-md-4">
+                                 
+                                  <div class="input-group" 
+                                     moment-picker="ScheduleData.totime"
+                                     format="LT">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-clock-o"></i>
+                                    </span>
+                                    <input class="form-control"
+                                           name="totm"
+                                           placeholder="Select a time"
+                                           ng-model="ScheduleData.totime"
+                                           ng-model-options="{ updateOn: 'blur' }"
+                                           ng-required="true">
+                                  </div>
+                                  <div class="clearfix"></div>
+                                  <p class="error" ng-show="scheduleform.totm.$invalid && scheduleform.totm.$touched">Please Enter Time</p>
+                                </div>
+                              </div><!-- form-group -->
+
+                        </form>
+                        <!-- form -->
+
+                        <!-- tab starts -->
+                        <div id="exTab2">
+                            <ul class="nav nav-tabs">
+                                
+                                <li ng-class="{active:Inst.isSet(1)}">
+                                    <a ng-click="Inst.setTab(1)">Topics</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <!--===========================
+                                =            Tab 1            =
+                                ============================-->
+                                <div class="tab-pane active" ng-show="Inst.isSet(1)">
+
+                                    <div ng-if="Inst.isSet(1)" ng-include="'view/pages/Schedule/TopicTab.html'"></div>
+                                     
+                                </div>
+                                <!--====  End of Tab 1  ====-->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- end controller div -->
+    </div>
+
+
+</div>
+
+
+<script src="view/pages/Schedule/EditScheduleCtrl.js"></script>

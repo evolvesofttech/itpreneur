@@ -1,0 +1,152 @@
+<!--================================
+=            Controller            =
+=================================-->
+  <div class="row no-margin" ng-controller="coursesCtrl as Inst">
+    <div class="col-md-12 no-padding">
+      <div class="panel panel-info">
+       
+        <div class="panel-body">
+
+           <!-- toaster message -->
+           <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+           <!-- toaster message -->
+
+          <div class="button-group">
+            <a data-toggle="modal" data-target=".addcoursetechnology" ng-click="addtechno()" class="btn btn-default btn-labeled btn-sm">
+              <i class="fa fa-plus-circle">
+              </i>&nbsp;&nbsp;Add Technologies
+            </a>
+          </div>
+
+          <!--===========================
+          =            Table            =
+          ============================-->
+          <table ng-table="usersTable_coursetechnology" show-filter="true" class="table table-bordered table-striped text-center">
+              <tbody>
+                  <tr ng-repeat="rw in data_technology">
+                      <td data-title="'Technology'" filter="{ 'technologyname': 'text' }">{{rw.technologyname}}</td>
+                      <td data-title="'Actions'" class="w150">
+                          <a data-toggle="modal" data-target=".addcoursetechnology" ng-click="editTechCourses(rw.cTechnologycoursesId)" class="btn btn-success btn-xs" tooltip-placement="top" uib-tooltip="Edit"><i class="fa fa-pencil-square-o"></i></a>
+
+                           <a data-toggle="modal" data-target=".viewcoursetechnology" class="btn btn-info btn-xs" ng-click="viewTechCourses(rw.cTechnologycoursesId, data_technology)" tooltip-placement="top" uib-tooltip="View">
+                            <i class="fa fa-eye"></i>
+                           </a> 
+
+                          <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletecoursetechnology" ng-click="delCourseTechnology(rw.cTechnologycoursesId, data_technology)" tooltip-placement="top" uib-tooltip="Delete"><i class="fa fa-trash"></i>
+                          </a>
+
+                         <!--  <a class="btn btn-primary btn-xs" disabled>
+                            <i class="fa fa-plus">
+                            </i>
+                          </a> -->
+                      </td>
+                  </tr>
+              </tbody>
+            </table>
+          <!--====  End of Table  ====-->
+          <hr>
+
+          <!--===========================================
+          =            Add Role Technology Modal            =
+          ============================================-->
+          <div class="modal fade addcoursetechnology" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" ng-click="clearModalOnCloseTechnology()" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title" ng-init="headingMessage = 'Add Technology'">{{headingMessage}}</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal login-form" name="coursetechnologyform" ng-submit="savecoursetechnology(coursetechnologyData)">
+                               
+                            <div class="form-group required">
+                                <label class="control-label col-md-3" for="">Technology</label>
+                                <div class="col-md-7">
+                                    <select ng-model="coursetechnologyData.cTechnologyMasterId" name="technologyname" class="form-control inputEle" ng-options="bran.cTechnologyMasterId as bran.technologyname for bran in TechnologyMaster" ng-required="true">
+                                          <option value="">select Technology</option>
+                                        </select>
+                                    <div class="clearfix"></div>
+                                    <p class="error" ng-show="coursetechnologyform.technologyname.$invalid && coursetechnologyform.technologyname.$touched">Please Select Technology</p>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="form-group">
+                                <div class="col-md-12 text-center">
+                                    <button type="submit" ng-disabled="coursetechnologyform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Add</button>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="clearfix"></div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+          <!--====  End of Add Role Technology Modal  ====-->
+
+           <!-- start view modal -->
+              <div class="modal fade viewcoursetechnology" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">View Technology
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">Technology:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewcoursestechnologyData.technologyname}}
+                        </label>
+                      </div>
+                       <div class="clearfix"></div>
+                       <br>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end view modal -->
+          
+          <!--========================================
+            =            Delete Role Technology            =
+            =========================================-->
+            <div class="modal fade deletecoursetechnology" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;
+                    </button>
+                    <h4 class="modal-title">Delete Technology
+                    </h4>
+                  </div>
+                  <div class="modal-body">
+                    <h4>Are you sure you want to delete 
+                      <strong>{{deleteCoursesData.technologyname}} ?
+                      </strong>
+                    </h4>
+                    <br>
+                    <a class="btn btn-danger btn-sm" ng-click="deleteCourseTechnology(deleteCoursesData.cTechnologycoursesId)" onclick="$('.modal').modal('hide')">
+                      <i class="fa fa-trash">
+                      </i>&nbsp;&nbsp;Delete
+                    </a>
+                    <a class="btn btn-default btn-sm" data-dismiss="modal">
+                      <i class="fa fa-trash">
+                      </i>&nbsp;&nbsp;Cancel
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+             <!--====  End of Delete Role Technology  ====-->
+         
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- </div> -->
+
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Masters/Courses/CoursesCtrl.js"></script>

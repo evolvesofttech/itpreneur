@@ -1,0 +1,154 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="leadsourceCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Lead Source
+              <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{source.length}}</span></span>
+              </h3>
+            </div>
+            <div class="panel-body">
+            
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+
+              <div class="button-group">
+                <a data-toggle="modal" data-target=".addsource" ng-click="addsourceclick()" class="btn btn-default btn-labeled btn-sm">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp;Add Source Name
+                </a>
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+              </div>
+              <table ng-table="usersTable" show-filter="true" class="table table-bordered table-striped text-center">
+                <tbody>
+                  <tr ng-repeat="bo in data">
+                    <td data-title="'Source'" filter="{'sourceofleadname': 'text'}" sortable="'sourceofleadname'">{{bo.sourceofleadname}}
+                    </td>
+                    <td data-title="'Actions'">
+                      <button data-toggle="modal" data-target=".addsource" class="btn btn-success btn-xs" ng-click="editSource(bo.cSourceofLeadId)" tooltip-placement="top" uib-tooltip="Edit" ng-disabled="bo.sourceofleadname == 'Other' || bo.sourceofleadname == 'Others'">
+                        <i class="fa fa-pencil-square-o">
+                        </i>
+                      </button> 
+                      <button data-toggle="modal" data-target=".viewsource" class="btn btn-info btn-xs" ng-click="viewSource(bo.cSourceofLeadId, data)" tooltip-placement="top" uib-tooltip="View">
+                        <i class="fa fa-eye">
+                        </i>
+                      </button>
+                      <button class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletesource" ng-click="delSource(bo.cSourceofLeadId, data)" tooltip-placement="top" uib-tooltip="Delete" ng-disabled="bo.sourceofleadname == 'Other' || bo.sourceofleadname == 'Others'">
+                        <i class="fa fa-trash">
+                        </i>
+                      </button>
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <hr>
+              <!-- start edit modal -->
+              <div class="modal fade addsource" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title" ng-init="headingMessage ='Add Lead Source'">{{headingMessage}}</h4>
+                    </div>
+                    <div class="modal-body">
+                      <form class="form-horizontal" name="sourceform" ng-submit="save(sourceData)" novalidate>
+                        <div class="form-group required">
+                          <label class="control-label col-md-3" for="">Lead Source
+                          </label>
+                          <div class="col-md-7">
+                            <input type="text" name="source" class="form-control inputEle" ng-model="sourceData.sourceofleadname" placeholder="Enter Source Name" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="sourceform.source.$invalid && sourceform.source.$touched">Please Enter Source Name</p>
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                        <div class="form-group">
+                          <div class="col-md-12 text-center">
+                            <button type="submit" ng-disabled="sourceform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                            </button>
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end edit modal  -->
+              <!-- start view modal -->
+              <div class="modal fade viewsource" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">View Lead Source
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">Source:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewsourceData.sourceofleadname}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                       <!-- <br> -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end view modal -->
+              <!-- start delete modal -->
+              <div class="modal fade deletesource" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Delete Lead Source
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Are you sure you want to delete 
+                          <strong>{{deletesourceData.sourceofleadname}}?
+                          </strong>
+                        </h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="delete(deletesourceData.cSourceofLeadId)" onclick="$('.modal').modal('hide')">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Delete
+                        </a>
+                        <a class="btn btn-default btn-sm" data-dismiss="modal">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Cancel
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!-- end delete modal -->
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Masters/Lead Source/LeadsourceCtrl.js"></script>
+

@@ -1,0 +1,170 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="statusCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Status
+              <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{status.length}}</span></span>
+              </h3>
+            </div>
+            <div class="panel-body">
+              
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+              
+              <div class="button-group">
+                <a data-toggle="modal" data-target=".addstatus" ng-click="addstatus()" class="btn btn-default btn-labeled btn-sm">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp;Add Status
+                </a>
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+              </div>
+              <table ng-table="usersTable" show-filter="true" class="table table-bordered table-striped text-center">
+                <tbody>
+                  <tr ng-repeat="bo in data">
+                    <td data-title="'Status'" filter="{'statusname': 'text'}" sortable="'statusname'">{{bo.statusname}}
+                    </td>
+                     <td data-title="'Description'" filter="{'description': 'text'}" sortable="'description'">{{bo.description}}
+                    </td>
+                    <td data-title="'Actions'">
+                      <a data-toggle="modal" data-target=".addstatus" class="btn btn-success btn-xs" ng-click="editStatus(bo.cStatusId)" tooltip-placement="top" uib-tooltip="Edit">
+                        <i class="fa fa-pencil-square-o">
+                        </i>
+                      </a> 
+                      <a data-toggle="modal" data-target=".viewstatus" class="btn btn-info btn-xs" ng-click="viewStatus(bo.cStatusId, data)" tooltip-placement="top" uib-tooltip="View">
+                        <i class="fa fa-eye">
+                        </i>
+                      </a>
+                      <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletestatus" ng-click="delStatus(bo.cStatusId, data)" tooltip-placement="top" uib-tooltip="Delete">
+                        <i class="fa fa-trash">
+                        </i>
+                      </a>
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <hr>
+              <!-- start edit modal -->
+              <div class="modal fade addstatus" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title" ng-init="headingMessage = 'Add Status'">{{headingMessage}}</h4>
+                    </div>
+                    <div class="modal-body">
+                      <form class="form-horizontal" name="addStatus" ng-submit="save(statusData)" novalidate>
+                        <div class="form-group  required">
+                          <label class="control-label col-md-3" for="">Status
+                          </label>
+                          <div class="col-md-7">
+                            <input type="text" name="statusName" class="form-control inputEle" ng-model="statusData.statusname" placeholder="Enter Status Name" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="addStatus.statusName.$invalid && addStatus.statusName.$touched">Please Enter Status Name</p>
+                          </div>
+                        </div>
+                        <div class="form-group ">
+                          <label class="control-label col-md-3" for="">Description
+                          </label>
+                          <div class="col-md-7">
+                            <input type="text" class="form-control inputEle" ng-model="statusData.description" placeholder="Describe your Status" >
+                          </div>
+                        </div>
+                        <br>
+                        <div class="form-group">
+                         <div class="col-md-12 text-center">
+                            <button type="submit" ng-disabled="addStatus.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                            </button>
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end edit modal  -->
+              <!-- start view modal -->
+              <div class="modal fade viewstatus" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">View Status
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">Status:
+                        </label>
+                        <label class="control-label col-md-6" for="">{{viewstatusData.statusname}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <hr>
+                      <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">Description:
+                        </label>
+                        <label class="control-label col-md-6" for="">{{viewstatusData.description}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end view modal -->
+              <!-- start delete modal -->
+              <div class="modal fade deletestatus" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Delete Status
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Are you sure you want to delete 
+                          <strong>{{deletestatusData.statusname}}?
+                          </strong>
+                        </h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="delete(deletestatusData.cStatusId)" onclick="$('.modal').modal('hide')">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Delete
+                        </a>
+                        <a class="btn btn-default btn-sm" data-dismiss="modal">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Cancel
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!-- end delete modal -->
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Masters/Status/StatusCtrl.js"></script>
+

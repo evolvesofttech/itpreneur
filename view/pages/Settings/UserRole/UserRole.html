@@ -1,0 +1,183 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="userroleCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">User Role
+              <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{userrole.length - 2}}</span></span>
+              </h3>
+            </div>
+            <div class="panel-body">
+            
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+
+              <div class="button-group">
+                <button data-toggle="modal" data-target=".adduserrole" class="btn btn-default btn-labeled btn-sm" ng-click="assigneRoleClick()">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp; Assign Role 
+                </button>
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+              </div>
+              <table ng-table="usersTable_userrole" show-filter="true" class="table table-bordered table-striped text-center">
+                <tbody>
+                  <tr ng-repeat="bo in data_userrole" ng-hide="bo.roleName == 'ITP Admin' || bo.roleName == 'Admin'">
+                    <td data-title="'Name - Username'" filter="{'username': 'text'}" sortable="'username'">{{bo.lastname}}&nbsp;{{bo.firstname}}&nbsp;{{bo.middlename}} - {{bo.username}}
+                    </td>
+                    <td data-title="'Role'" filter="{'roleName': 'text'}" sortable="'roleName'">{{bo.roleName}}
+                    </td>
+                    <td data-title="'Actions'" class="w150">
+                      <button class="btn btn-success btn-xs" data-toggle="modal" data-target=".adduserrole" ng-click="editUserrole(bo.adUserroleId, data_userrole)">
+                        <i class="fa fa-pencil-square-o">
+                        </i>
+                      </button> 
+                      <a data-toggle="modal" data-target=".viewuserrole" class="btn btn-info btn-xs" ng-click="viewUserrole(bo.adUserroleId, data_userrole)" tooltip-placement="top" uib-tooltip="View">
+                        <i class="fa fa-eye">
+                        </i>
+                      </a>
+                      <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deleteuserrole" ng-click="delUserrole(bo.adUserroleId, data_userrole)" tooltip-placement="top" uib-tooltip="Delete">
+                        <i class="fa fa-trash">
+                        </i>
+                      </a>
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <hr>
+              <!-- start edit modal -->
+              <div class="modal fade adduserrole" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">Assign Role
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <form class="form-horizontal" name="userroleformname" ng-submit="saveUserrole(userroleData)" novalidate>
+                        <br>
+                        <input type="hidden" ng-model="userroleData.adUserroleId">
+                        <!-- <input type="hidden" ng-model="userroleData.adUserId"> -->
+                        <div class="form-group required">
+                          <label class="control-label col-md-4" for="">User Name</label>
+                            <div class="col-md-7">
+                                <select name="username" ng-model="userroleData.adUserId" class="form-control inputEle" ng-options="user.adUserId as (user.firstname + ' ' + user.middlename + ' ' + user.lastname) for user in Users" ng-required="true" ng-disabled="disableUsername">
+                                <!-- ng-hide="user.firstname == 'ITP'" -->
+                                  <option value="">select User Name</option>
+                                </select>
+                                <div class="clearfix"></div>
+                                <p class="error" ng-show="userroleformname.username.$invalid && userroleformname.username.$touched">Please Select Username</p>
+                            </div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="control-label col-md-4" for="">Roles</label>
+                            <div class="col-md-7">
+                                <select name="userrole" ng-model="userroleData.adRoleId" class="form-control inputEle" ng-options="role.adRoleId as role.roleName for role in Roles | filter:shouldHide" ng-required="true">
+                                 <!-- | filter:shouldHide -->
+                                  <option value="">select Role</option>
+                                </select>
+                                <div class="clearfix"></div>
+                                <p class="error" ng-show="userroleformname.userrole.$invalid && userroleformname.userrole.$touched">Please Select Role</p>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                        <div class="form-group">
+                          <div class="col-md-12 text-center">
+                            <button type="submit" ng-disabled="userroleformname.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                            </button>
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end edit modal  -->
+              <!-- start view modal -->
+              <div class="modal fade viewuserrole" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">View User Role
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">User Name:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewuserroleData.username}}
+                        </label>
+                      </div>
+
+                      <div class="clearfix"></div>
+                      <hr>
+
+                      <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">Role:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewuserroleData.roleName}}
+                        </label>
+                      </div>
+
+                      <div class="clearfix"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end view modal -->
+              <!-- start delete modal -->
+              <div class="modal fade deleteuserrole" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Delete User Role
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Are you sure you want to delete 
+                          <strong>{{deleteuserroleData.username}}?
+                          </strong>
+                        </h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="delete(deleteuserroleData.adUserroleId)" onclick="$('.modal').modal('hide')">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Delete
+                        </a>
+                        <a class="btn btn-default btn-sm" data-dismiss="modal">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Cancel
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!-- end delete modal -->
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Settings/UserRole/UserRoleCtrl.js"></script>
+

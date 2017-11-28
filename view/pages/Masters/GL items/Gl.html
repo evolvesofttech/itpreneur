@@ -1,0 +1,171 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="GlCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">General Ledger
+              <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{gl.length}}</span></span>
+              </h3>
+            </div>
+            <div class="panel-body">
+
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+              
+              <div class="button-group">
+                <a data-toggle="modal" data-target=".addgl" ng-click="addgeneralclick()" class="btn btn-default btn-labeled btn-sm">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp;Add General Ledger
+                </a>
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+              </div>
+              <table ng-table="usersTable_GL" show-filter="true" class="table table-bordered table-striped text-center">
+                <tbody>
+                  <tr ng-repeat="bo in data_GL">
+                    <td data-title="'Name'" filter="{'name': 'text'}" sortable="'name'">{{bo.name}}
+                    </td>
+                    <td data-title="'Narration'" filter="{'narration': 'text'}" sortable="'narration'">{{bo.narration}}
+                    </td>
+                    <td data-title="'Actions'">
+                      <a data-toggle="modal" data-target=".addgl" class="btn btn-success btn-xs" ng-click="editgl(bo.cGeneralledgerId)" tooltip-placement="top" uib-tooltip="Edit">
+                        <i class="fa fa-pencil-square-o">
+                        </i>
+                      </a> 
+                      <a data-toggle="modal" data-target=".viewgl" class="btn btn-info btn-xs" ng-click="viewGL(bo.cGeneralledgerId, data_GL)" tooltip-placement="top" uib-tooltip="View">
+                        <i class="fa fa-eye">
+                        </i>
+                      </a>
+                      <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletegl" ng-click="delGL(bo.cGeneralledgerId, data_GL)" tooltip-placement="top" uib-tooltip="Delete">
+                        <i class="fa fa-trash">
+                        </i>
+                      </a>
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <hr>
+              <!-- start edit modal -->
+              <div class="modal fade addgl" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title" ng-init="headingMessage ='Add General Ledger'">{{headingMessage}}</h4>
+                    </div>
+                    <div class="modal-body">
+                      <form class="form-horizontal" name="glform" ng-submit="saveGL(glData)" novalidate>
+                        <div class="form-group required">
+                          <label class="control-label col-md-3" for="">Name
+                          </label>
+                          <div class="col-md-7">
+                            <input type="text" name="glName" class="form-control inputEle" ng-model="glData.name" placeholder="Enter Name " ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="glform.glName.$invalid && glform.glName.$touched">Please Enter Name</p>
+                          </div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="control-label col-md-3" for="">Narration
+                          </label>
+                          <div class="col-md-7">
+                            <input type="text" name="narrate" class="form-control inputEle" ng-model="glData.narration" placeholder="Enter Narration " ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="glform.narrate.$invalid && glform.narrate.$touched">Please Enter Narration</p> 
+                          </div>
+                        </div>
+                        <div class="form-group">
+                           <div class="col-md-12 text-center">
+                            <button type="submit" ng-disabled="glform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                            </button>
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end edit modal  -->
+              <!-- start view modal -->
+              <div class="modal fade viewgl" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">View General Ledger
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">Name:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewglData.name}}
+                        </label>
+                      </div>
+                       <div class="clearfix"></div>
+                       <hr>
+                      <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">Narration:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewglData.narration}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <br>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end view modal -->
+              <!-- start delete modal -->
+              <div class="modal fade deletegl" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Delete General Ledger
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Are you sure you want to delete 
+                          <strong>{{deleteglData.name}}?
+                          </strong>
+                        </h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="delete(deleteglData.cGeneralledgerId)" onclick="$('.modal').modal('hide')">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Delete
+                        </a>
+                        <a class="btn btn-default btn-sm" data-dismiss="modal">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Cancel
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!-- end delete modal -->
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Masters/GL items/GlCtrl.js"></script>
+

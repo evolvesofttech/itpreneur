@@ -1,0 +1,129 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+        <div class="row no-margin" ng-controller="talukaCtrl">
+        	 <div class="col-md-12 no-padding">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Taluka
+                            <span class="pull-right"><small>Total: </small><span class="badge">{{Taluka.length}}</span></span>
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+                    <!-- alert messages -->
+                    <flash-message duration="5000" show-close="true" on-dismiss="myCallback(flash)">
+                    </flash-message>
+                    <!-- alert messages -->
+                        <div class="button-group">
+                            <a data-toggle="modal" data-target=".addTaluka" class="btn btn-default btn-labeled btn-sm" ng-click="addForEnable()">
+                                <i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Add Taluka</a>
+                            <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                              <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                            </a>
+                        </div>
+                        <table ng-table="usersTable" show-filter="true" class="table table-bordered table-striped text-center">
+                            <tbody>
+                                <tr ng-repeat="tl in data">
+                                    <td data-title="'State'" filter="{ 'statename': 'text' }">{{tl.statename}}</td>
+                                    <td data-title="'District'" filter="{ 'districtname': 'text' }">{{tl.districtname}}</td>
+                                    <td data-title="'Taluka'" filter="{ 'talukaname': 'text' }">{{tl.talukaname}}</td>
+                                    <td data-title="'Actions'" class="w150">
+                                        <a data-toggle="modal" data-target=".addTaluka" class="btn btn-success btn-xs" ng-click="editTaluka(tl.cTalukaId)" tooltip-placement="top" uib-tooltip="Edit">
+                                        <i class="fa fa-pencil-square-o"></i></a>
+
+                                        <a class="btn btn-info btn-xs" disabled>
+                                        <i class="fa fa-eye"></i></a>
+
+                                        <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletetaluka" ng-click="delTaluka(tl.cTalukaId, data)" tooltip-placement="top" uib-tooltip="Delete">
+                                        <i class="fa fa-trash"></i></a>
+
+                                        
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <hr>
+                        <!-- start add Taluka modal -->
+                        <div class="modal fade addTaluka" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content" sc_school_id>
+                                    <div class="modal-header">
+                                        <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title">Add Taluka</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form class="form-horizontal" name="addtaluka" ng-submit="save(talukaData)" novalidate>
+                                            <input type="hidden" ng-model="talukaData.cTalukaId">
+                                            <div class="form-group form-group required">
+                                                <label class="control-label col-sm-4" for="">State</label>
+                                                <div class="col-sm-8">
+                                                    <select ng-model="talukaData.cStateId" name="state" ng-options="st.cStateId as st.statename for st in State" class="form-control" ng-change="OnStateChange(talukaData.cStateId)" ng-disabled="disableState" ng-required="true">
+                                                        <option value="">Select State</option>
+                                                    </select>
+                                                     <div class="clearfix"></div>
+                                                      <p class="error" ng-show="addtaluka.state.$invalid && addtaluka.state.$touched">Please Select State</p>
+                                                </div>
+                                            </div>
+                                            <div class="form-group form-group required">
+                                                <label class="control-label col-sm-4" for="">District</label>
+                                                <div class="col-sm-8">
+                                                    <select ng-model="talukaData.cDistrictId" name="dist" ng-options="ds.cDistrictId as ds.districtname for ds in District" class="form-control" ng-disabled="disableDistrict" ng-required="true">
+                                                        <option value="">Select District</option>
+                                                    </select>
+                                                     <div class="clearfix"></div>
+                                                      <p class="error" ng-show="addtaluka.dist.$invalid && addtaluka.dist.$touched">Please Select District</p>
+                                                </div>
+                                            </div>
+                                            <div class="form-group form-group required">
+                                                <label class="control-label col-md-4" for="">Taluka</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" name="tal" class="form-control inputEle" ng-model="talukaData.talukaname" placeholder="Enter Taluka Name" ng-required="true">
+                                                     <div class="clearfix"></div>
+                                                      <p class="error" ng-show="addtaluka.tal.$invalid && addtaluka.tal.$touched">Please Enter Taluka Name</p>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-md-offset-4 col-md-3">
+                                                    <button type="submit"  ng-disabled="addtaluka.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end add taluka modal -->
+
+                        <!-- start delete modal -->
+                        <div class="modal fade deletetaluka" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                                    <h4 class="modal-title">Delete Taluka</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <h4>Are you sure you want to delete <strong>{{deletetalukaData.talukaname}}?</strong></h4>
+                                    <br>
+                                    <a class="btn btn-danger btn-sm" ng-click="delete(deletetalukaData.cTalukaId)" onclick="$('.modal').modal('hide')"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a>
+
+                                    <a class="btn btn-default btn-sm" data-dismiss="modal"><i class="fa fa-trash"></i>&nbsp;&nbsp;Cancel</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end delete modal -->
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/RegionSetting/Taluka/talukaCtrl.js"></script>

@@ -1,0 +1,30 @@
+<div class="row no-margin" ng-controller="profileCtrl">
+  <div class="col-md-12 no-padding">
+    <div class="panel panel-info">
+      <div class="panel-body">
+        
+        <!-- toaster message -->
+        <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+        <!-- toaster message -->
+        
+        <table ng-table="usersTable_profile" show-filter="true" class="table table-bordered table-striped text-center">
+          <tbody>
+            <tr ng-repeat="bo in data_profile">
+              <td data-title="'Technology Known '" filter="{'technologiesknown': 'text'}" sortable="'technologiesknown'">{{bo.technologiesknown}}
+              </td>
+              <td data-title="'Certification'" filter="{'certificationdetails': 'text'}" sortable="'certificationdetails'">{{bo.certificationdetails}}
+              </td>
+               <td data-title="'Experience '" filter="{'experience': 'text'}" sortable="'experience'">{{bo.experience}}
+              </td>
+              <td data-title="'Hobbies & Interest'" filter="{'hobbiesandinterest': 'text'}" sortable="'hobbiesandinterest'">{{bo.hobbiesandinterest}}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <hr>
+      </div>
+    </div>
+  </div>
+</div>
+ <script src="view/pages/Sales/Enrollment/Profile/EnProfileCtrl.js"></script>
+  

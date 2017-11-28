@@ -1,0 +1,245 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div ng-controller="emailSettingCtrl">
+        <div class="row no-margin">
+          <div class="col-md-12 no-padding">
+              <div class="panel panel-info">
+                  <div class="panel-heading">
+                      <h3 class="panel-title">Email Setting
+                      <!-- <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{data_b.length}}</span></span> -->
+                      </h3>
+                  </div>
+                  <div class="panel-body">
+                    
+                      <!-- toaster message -->
+                       <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+                       <!-- toaster message -->
+
+                      <div class="button-group">
+                          <button data-toggle="modal" data-target=".addEmailModal" class="btn btn-default btn-labeled btn-sm" ng-disabled="data_email.length > 0">
+                            <i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Add Email Setting</button>
+                            
+                            <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                              <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                            </a>
+                      </div>
+                      <div class="row">
+                      
+                        <div class="col-md-12">
+                          <table ng-table="usersTable_b" show-filter="true" class="table table-bordered table-striped text-center">
+                            <tbody>
+                                <tr ng-repeat="email in data_email">
+                                  <td data-title="'Username'" filter="{ 'username': 'text' }">{{email.username}}</td>
+
+                                  <td data-title="'Host'" filter="{ 'hostname': 'text' }">{{email.hostname}}</td>
+
+                                  <td data-title="'Port Numer'" filter="{ 'portno': 'text' }">{{email.portno}}</td>
+
+                                  <td data-title="'Authentication'" filter="{ 'authentication': 'text' }">{{email.authentication}}</td>
+
+                                  <td data-title="'Actions'" class="w150">
+                                      <a class="btn btn-success btn-xs" ng-click="editEmailSetting(email.adEmailsettingId, data_email)" data-toggle="modal" data-target=".addEmailModal" tooltip-placement="top" uib-tooltip="Edit"><i class="fa fa-edit"></i>
+                                      </a>
+
+                                      <a class="btn btn-info btn-xs" data-toggle="modal" data-target=".viewEmailModal" ng-click="viewEmail(email.adEmailsettingId, data_email)">
+                                          <i class="fa fa-eye"></i>
+                                      </a>
+
+                                      <a class="btn btn-xs btn-danger" ng-click="delEmailSetting(email.adEmailsettingId, data_email)" data-toggle="modal" data-target=".deleteEmailSettingModal" tooltip-placement="top" uib-tooltip="Delete">
+                                          <i class="fa fa-trash"></i>
+                                      </a>
+
+                                      <a href="" class="btn btn-primary btn-xs" disabled><i class="fa fa-plus"></i></a>
+                                  </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+
+                      </div>
+                      
+                      <hr>
+                      <!--=====================================
+                      =            Add Email Modal            =
+                      ======================================-->
+                      <div class="modal fade addEmailModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                          <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                      <button type="button" ng-click="clearModalOnClose()" class="close" data-dismiss="modal">&times;</button>
+                                      <h4 class="modal-title">Add Email Setting</h4>
+                                  </div>
+                                  <div class="modal-body">
+                                    <form class="form-horizontal" name="emailForm" ng-submit="saveEmailSetting(emailData)" novalidate>
+                                      <div class="row">
+                                        <div class="col-md-offset-1 col-md-10">
+                                          <input type="hidden" ng-model="emailData.adEmailsettingId">
+                                            <div class="form-group">
+                                                 <label class="control-label col-sm-3" for="current">Username</label>
+                                                 <div class="col-sm-8">
+                                                    <input type="text" ng-model="emailData.username" name="username" class="form-control inputEle" placeholder="e.g. person@domain.com" ng-required="true">
+                                                    <div class="clearfix"></div>
+                                                    <p class="error" ng-show="emailForm.username.$invalid && emailForm.username.$touched">Please enter username</p>
+                                                 </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                 <label class="control-label col-sm-3" for="current">Password</label>
+                                                 <div class="col-sm-8">
+                                                    <input type="password" ng-model="emailData.password" name="password" class="form-control inputEle" placeholder="Password" ng-required="true" ng-minlength="3" ng-maxlength="16" required>
+                                                    <div class="clearfix"></div>
+                                                    <!-- <p class="error" ng-show="emailForm.password.$invalid && emailForm.password.$touched">Please enter password</p> -->
+
+                                                    <p class="error" ng-show="emailForm.password.$error.minlength">Password is too short.</p>
+                                                <p class="error" ng-show="emailForm.password.$error.maxlength">Password is too long.</p>
+                                                <p class="error" ng-show="emailForm.password.$error.required">Your Password is required.</p>
+                                                 </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                 <label class="control-label col-sm-3" for="current">Host Name</label>
+                                                 <div class="col-sm-8">
+                                                    <input type="text" ng-model="emailData.hostname" name="hostname" class="form-control inputEle" placeholder="e.g. smtp.gmail.com" ng-required="true">
+                                                    <div class="clearfix"></div>
+                                                    <p class="error" ng-show="emailForm.hostname.$invalid && emailForm.hostname.$touched">Please enter host name</p>
+                                                 </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                 <label class="control-label col-sm-3" for="current">Port Number</label>
+                                                 <div class="col-sm-8">
+                                                    <input type="number" ng-model="emailData.portno" name="portno" class="form-control inputEle" placeholder="e.g. 25" ng-required="true" restrict-to="[0-9]">
+                                                    <div class="clearfix"></div>
+                                                    <p class="error" ng-show="emailForm.portno.$invalid && emailForm.portno.$touched">Please enter port number</p>
+                                                 </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                 <label class="control-label col-sm-3" for="current">Authentication</label>
+                                                 <div class="col-sm-8">
+                                                    <label class="radio-inline">
+                                                            <input type="radio" name="optradioauth" value="True" ng-model="emailData.authentication" ng-disabled="disableField" ng-required="true">Yes
+                                                        </label>
+                                                        <label class="radio-inline">
+                                                            <input type="radio" name="optradioauth" value="False" ng-model="emailData.authentication" ng-disabled="disableField" ng-required="true">No
+                                                        </label>
+                                                    <div class="clearfix"></div>
+                                                    <p class="error" ng-show="emailForm.optradioauth.$invalid && emailForm.optradioauth.$touched">Please select authentication</p>
+                                                 </div>
+                                            </div>
+                                            <div class="clearfix"></div>
+                                            <hr>
+                                                <div class="form-group">
+                                                  <div class="col-sm-12 text-center">
+                                                    <button type="submit" ng-disabled="emailForm.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save</button>
+                                                  </div>
+                                                </div>
+                                          </div>
+                                        </div>
+                                    </form>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <!--====  End of Add Email Modal  ====-->
+
+                      <!--======================================
+                      =            View Email Modal            =
+                      =======================================-->
+                      <div class="modal fade viewEmailModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                        <div class="modal-dialog" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                              </button>
+                              <h4 class="modal-title">View Email Setting
+                              </h4>
+                            </div>
+                            <div class="modal-body">
+                              <div class="form-group">
+                                <label class="control-label col-md-offset-2 col-md-3" for="">Username:
+                                </label>
+                                <label class="control-label col-md-7" for="">{{viewEmailData.username}}
+                                </label>
+                              </div>
+                              <div class="clearfix"></div>
+                               <hr>
+
+                               <div class="form-group">
+                                <label class="control-label col-md-offset-2 col-md-3" for="">Hostname:
+                                </label>
+                                <label class="control-label col-md-7" for="">{{viewEmailData.hostname}}
+                                </label>
+                              </div>
+                              <div class="clearfix"></div>
+                               <hr>
+
+                               <div class="form-group">
+                                <label class="control-label col-md-offset-2 col-md-3" for="">Port Number:
+                                </label>
+                                <label class="control-label col-md-7" for="">{{viewEmailData.portno}}
+                                </label>
+                              </div>
+                              <div class="clearfix"></div>
+                               <hr>
+
+                               <div class="form-group">
+                                <label class="control-label col-md-offset-2 col-md-3" for="">Authentication:
+                                </label>
+                                <label class="control-label col-md-7" for="">{{viewEmailData.authentication}}
+                                </label>
+                              </div>
+                              <div class="clearfix"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <!--====  End of View Email Modal  ====-->
+                      
+
+                          <!--=================================
+                          =            Delete Role            =
+                          ==================================-->
+                          <div class="modal fade deleteEmailSettingModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                            <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <button type="button" class="close" data-dismiss="modal">&times;
+                                  </button>
+                                  <h4 class="modal-title">Delete Email Setting
+                                  </h4>
+                                </div>
+                                <div class="modal-body">
+                                  <h4>Are you sure you want to delete email setting of following 
+                                    <strong>{{deleteemailData.username}}?
+                                    </strong>
+                                  </h4>
+                                  <br>
+                                  <a class="btn btn-danger btn-sm" ng-click="deleteEmailSetting(deleteemailData.adEmailsettingId)" onclick="$('.modal').modal('hide')">
+                                    <i class="fa fa-trash">
+                                    </i>&nbsp;&nbsp;Delete
+                                  </a>
+                                  <a class="btn btn-default btn-sm" data-dismiss="modal">
+                                    <i class="fa fa-trash">
+                                    </i>&nbsp;&nbsp;Cancel
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <!--====  End of Delete Role  ====-->
+
+                  </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+<!--====  End of Controller  ====-->
+<script src="view/pages/Settings/Email Setting/EmailSettingCtrl.js"></script>

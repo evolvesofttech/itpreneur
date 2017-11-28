@@ -1,0 +1,571 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div class="row no-margin" ng-controller="feescheduleCtrl">
+  <div class="col-md-12 no-padding">
+    <div class="panel panel-info">
+      <div class="panel-body">
+        
+        <!-- toaster message -->
+        <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+        <!-- toaster message -->
+
+        <!--=============================
+        =            Buttons            =
+        ==============================-->
+        <div class="button-group">
+          <a data-toggle="modal" data-target=".addschedule" ng-click="addshedule()" class="btn btn-default btn-labeled btn-sm">
+            <i class="fa fa-plus-circle">
+            </i>&nbsp;&nbsp;Schedule
+          </a> 
+
+          <span class="pull-right"><strong>Remaining Fees: </strong> <span class="badge badge-red">{{CFee - paidAmt}}</span></span>
+
+          <span class="pull-right" style="margin-right: 10px;"><strong>Paid Fees: </strong> <span class="badge badge-green">{{paidAmt}}</span></span>
+
+           <span class="pull-right" style="margin-right: 10px;"><strong>Total Fees: </strong><span class="badge">{{CFee}}</span></span> 
+           
+        </div>
+        <!--====  End of Buttons  ====-->
+
+        <!--===========================
+        =            Table            =
+        ============================-->
+        <table ng-table="usersTable_Schedule" show-filter="true" class="table table-bordered table-striped text-center">
+          <tbody>
+            <tr ng-repeat="bo in data_Schedule">
+              <td data-title="'Sr. No'" filter="{'index': 'text'}" sortable="'index'">{{$index + 1}}
+              </td>
+               <td data-title="'Fee Type'" filter="{'feestype': 'text'}" sortable="'feestype'">{{bo.feestype}}
+              </td>
+              <td data-title="'Total Amount'" filter="{'totalamount': 'text'}" sortable="'totalamount'">{{bo.totalamount}}
+              </td>
+              <td data-title="'Paid Amount'" filter="{'paidamount': 'text'}" sortable="'paidamount'">{{bo.paidamount}}
+              </td>
+               <td data-title="'Due Amount'" filter="{'dueamount': 'text'}" sortable="'dueamount'">{{bo.dueamount}}
+              </td>
+              <td data-title="'Date'" filter="{'scheduledate': 'text'}" sortable="'scheduledate'">{{bo.scheduledate}}
+              </td>
+               <td data-title="'Due Date'" filter="{'duedate': 'text'}" sortable="'duedate'">{{bo.duedate}}
+              </td>
+               <td data-title="'Status'" filter="{'status': 'text'}" sortable="'status'">{{bo.status}}
+              </td>
+               <!-- <td data-title="'Status'" filter="{'status': 'text'}" sortable="'status'"> 
+                  <select class="form-control inputEle" ng-model="model2" ng-change="OnScheduleStatusChange(bo.eFeescheduleregistrationId, model2)" ng-init="model2 = bo.status" ng-disabled="bo.status == 'Completed'"> 
+                    <option value="Draft">Draft</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+              </td> -->
+            
+              <td>
+              <button data-toggle="modal" data-target=".addpayment" ng-click="OnPaymentClick(bo.eFeescheduleregistrationId, data_Schedule)" class="btn btn-default btn-labeled btn-sm" ng-disabled="bo.dueamount=='0'">
+                <i class="fa fa-plus-circle">
+                </i>&nbsp;&nbsp;Payment
+              </button> </td>
+              <td data-title="'Actions'" class="w150">
+                 <a class="btn btn-success btn-xs" ng-click="editSchedule(bo.eFeescheduleregistrationId)" data-toggle="modal" data-target=".addschedule" tooltip-placement="top" uib-tooltip="Edit" ng-disabled="bo.status=='paid'"><i class="fa fa-edit"></i></a>
+
+                  <a ng-click="viewSchedule(bo.eFeescheduleregistrationId, data_Schedule)" data-toggle="modal" data-target=".viewschedule" class="btn btn-info btn-xs" tooltip-placement="top" uib-tooltip="View" ><i class="fa fa-eye"></i>
+                              </a>
+
+                <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deleteschedule" ng-click="delSchedule(bo.eFeescheduleregistrationId, data_Schedule)" tooltip-placement="top" uib-tooltip="Delete" ng-disabled="bo.status=='paid'">
+                  <i class="fa fa-trash">
+                  </i>
+                </a>
+                
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <!--====  End of Table  ====-->
+        <hr>
+
+
+        <!--========================================
+        =            Add Schedule Modal            =
+        =========================================-->
+        <div class="modal fade addschedule" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="clearModalOnCloseSchedule()" data-dismiss="modal">&times;
+                </button>
+                 <h4 class="modal-title" ng-init="headingMessage='Add Schedule'">{{headingMessage}}</h4>
+              </div>
+              <div class="modal-body">
+                
+              <form class="form-horizontal" name="rescheduleform"  ng-submit="saveSchedule(scheduleData)" novalidate>
+              <input type="hidden" ng-model="eEnquiryFormId">
+              <input type="hidden" ng-model="bBranchId">
+               <div class="form-group required">
+                <label class="control-label col-md-2" for="">Student</label>
+                <div class="col-sm-4">
+                    <input ng-model="fullName" class="form-control inputEle" disabled>    
+                </div> 
+             
+
+                <div class="form-group text-center"><strong>Total Fee: <span class="badge">{{calcFee.totalamount}}</span> &nbsp;&nbsp;&nbsp;Un-Scheduled Fee: <span class="badge badge-red">{{calcFee.pendingamount}}</span></strong></div>
+               </div>  
+              <div class="form-group">
+               <label class="control-label col-sm-2" for="">Fees Type</label>
+                <div class="col-sm-4" >
+                    <select name="type" ng-model="scheduleData.feestype" class="form-control inputEle" ng-change="feesTypeChange(scheduleData.feestype)" ng-required="true">
+                    <!-- ng-click="hideRegistration()" -->
+                      <option value="Registration" ng-hide="hideRegistration">Registration</option>
+                      <!-- <option value="Advanced" ng-hide="hideAdvanced">Advanced</option>
+                      <option value="1st Installment" ng-hide="hideFirst">1st Installment</option>
+                      <option value="2nd Installment" ng-hide="hideSecond">2nd Installment</option>
+                      <option value="3rd Installment" ng-hide="hideThird">3rd Installment</option>
+                      <option value="Placement" ng-hide="hidePlacement">Placement</option> -->
+                    </select>
+                    <div class="clearfix"></div>
+                   <p class="error" ng-show="rescheduleform.type.$invalid && rescheduleform.type.$touched">Please Select FeesType</p>
+                </div>
+             
+                <label class="control-label col-sm-2" for="">Amount</label>
+                <div class="col-sm-4">
+                   <input type="number" name="amount1" class="form-control inputEle" ng-model="scheduleData.totalamount" placeholder="Enter Amount" ng-required="true" min="1" max="{{valFee}}">
+                   <div class="clearfix"></div>
+                   <p class="error" ng-show="rescheduleform.amount1.$invalid && rescheduleform.amount1.$touched">Please Enter Amount</p>
+                   <p class="error" ng-show="rescheduleform.amount1.$error.max">Amount should be less than remaining fee</p>
+                </div>
+              </div>
+
+            <div ng-show="scheduleData.feestype=='Placement'" >
+            <div class="form-group" >
+              <label class="control-label col-sm-2 mandatory" for="">Cheque No</label>
+              <div class="col-sm-4">
+                 <input type="number" name="cheque" class="form-control inputEle" ng-model="scheduleData.chequeno" placeholder="Enter Cheque No" ng-required="Plc" >
+                 <div class="clearfix"></div>
+                 <p class="error" ng-show="rescheduleform.cheque.$invalid && rescheduleform.cheque.$touched">Please Enter Cheque No</p>
+              </div>
+              
+              <label class="control-label col-sm-2" for="">Cheque Date</label>
+                <div class="col-sm-4">
+                   <datepicker date-format="yyyy-MM-dd" >
+                    <input ng-model="scheduleData.chequedate" restrict-to="[0-9]" placeholder="Enter Date" class="form-control" type="text"/>
+                 </datepicker>
+                  <!-- ng-required="Plc" -->
+                 <!-- <div class="clearfix"></div>
+                 <p class="error" ng-show="rescheduleform.cheque.$invalid && rescheduleform.cheque.$touched">Please Enter Cheque Date</p> -->
+                </div>
+              </div>                            
+            </div>
+
+             <div ng-show="scheduleData.feestype=='Placement'" >
+             <div class="form-group" >
+              <label class="control-label col-sm-2 mandatory" for="">Bank Name</label>
+                <div class="col-sm-4">
+                  <input type="text" name="bank" class="form-control inputEle" ng-model="scheduleData.bankname" placeholder="Enter Bank Name" ng-required="Plc" >
+                  <div class="clearfix"></div>
+                  <p class="error" ng-show="rescheduleform.bank.$invalid && rescheduleform.bank.$touched">Please Enter Bank Name</p>
+                </div>
+
+                 <label class="control-label col-sm-2" for="">Deposit Date</label>
+                   <div class="col-sm-4">
+                   <datepicker date-format="yyyy-MM-dd">
+                    <input type="text" name="depdate" class="form-control inputEle" ng-model="scheduleData.depositdate" restrict-to="[0-9]" placeholder="Enter Deposit Date">
+                    </datepicker>
+                     <!-- ng-required="Plc" -->
+                    <!-- <div class="clearfix"></div>
+                    <p class="error" ng-show="enscheduleform.depdate.$invalid && enscheduleform.depdate.$touched">Please Select Date</p> -->
+                  </div>
+                </div>
+              </div>
+
+              <div ng-hide="scheduleData.feestype=='Placement'" >
+              <div class="form-group required">
+               <label class="control-label col-sm-2" for="">Schedule Date</label>
+                <div class="col-sm-4">
+                    <datepicker date-format="yyyy-MM-dd" date-min-limit="{{currentDate1}}">
+                      <input name="sdate" ng-model="scheduleData.scheduledate" placeholder="Enter Schedule Date" class="form-control" type="text" restrict-to="[0-9]" ng-required="Plc1" ng-change="sheduledateclick(scheduleData.scheduledate)" required />
+                   </datepicker>
+                   <div class="clearfix"></div>
+                   <p class="error" ng-show="rescheduleform.sdate.$invalid && rescheduleform.sdate.$touched">Please Enter Date</p>
+                </div>
+             
+                <label class="control-label col-sm-2" for="">Due Date</label>
+                <div class="col-sm-4">
+                    <datepicker date-format="yyyy-MM-dd" date-min-limit="{{currentDate1}}">
+                      <input name="ddate" ng-model="scheduleData.duedate"  placeholder="Enter Due Date" class="form-control" restrict-to="[0-9]" type="text" ng-required="Plc1" />
+                   </datepicker>
+                   <div class="clearfix"></div>
+                   <p class="error" ng-show="rescheduleform.ddate.$invalid && rescheduleform.ddate.$touched">Please Enter Date</p>
+                </div>
+              </div>
+              </div>
+
+               <div class="form-group ">
+                 <label class="control-label col-sm-2" for="">Description</label>
+                  <div class="col-sm-10">
+                     <textarea type="text" class="form-control inputEle"  ng-model="scheduleData.description" placeholder="Enter Description"></textarea>
+                  </div>   
+                </div>
+
+              
+               <br>
+               <div class="form-group">
+                      <div class="col-md-12 text-center">
+                        <button type="submit" class="btn btn-success" ng-disabled="rescheduleform.$invalid"  onclick="$('.modal').modal('hide')">Save
+                        </button>
+                      </div>
+                    </div>
+                    <div class="clearfix"></div>
+              </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--====  End of Add Schedule Modal  ====-->
+
+       <!--===================================
+       =            View Schedule            =
+       ====================================-->
+       <div class="modal fade viewschedule" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" ng-click="clearModalOnCloseSchedule()" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">View Schedule</h4>
+                </div>
+                <div class="modal-body">
+
+                   <div class="form-group">
+                        <label class="control-label col-md-4" for="">Student: </label>
+                        <div class="col-md-4">
+                            {{fullName}}
+                        </div>
+                      </div>    
+                    <div class="clearfix"></div>
+                    <hr>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4" for="">Fees Type: </label>
+                        <div class="col-md-4">
+                            {{viewscheduleData.feestype}}
+                        </div>
+                      </div>    
+                    <div class="clearfix"></div>
+                    <hr>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4" for="">Total Amount: </label>
+                        <div class="col-md-4">
+                            {{viewscheduleData.totalamount}}
+                        </div>
+                      </div>    
+                    <div class="clearfix"></div>
+                    <hr>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4" for="">Paid Amount: </label>
+                        <div class="col-md-4">
+                            {{viewscheduleData.paidamount}}
+                        </div>
+                      </div>    
+                    <div class="clearfix"></div>
+                    <hr>
+
+                     <div class="form-group">
+                        <label class="control-label col-md-4" for="">Due Amount: </label>
+                        <div class="col-md-4">
+                            {{viewscheduleData.dueamount}}
+                        </div>
+                      </div>    
+                    <div class="clearfix"></div>
+                    <hr>
+
+                     <div class="form-group">
+                        <label class="control-label col-md-4" for="">Schedule Date: </label>
+                        <div class="col-md-4">
+                            {{viewscheduleData.scheduledate}}
+                        </div>
+                      </div>    
+                    <div class="clearfix"></div>
+                    <hr>
+
+                      <div class="form-group">
+                        <label class="control-label col-md-4" for="">Due Date: </label>
+                        <div class="col-md-4">
+                            {{viewscheduleData.duedate}}
+                        </div>
+                      </div>    
+                    <div class="clearfix"></div>
+                    <hr>
+
+                      <div class="form-group">
+                        <label class="control-label col-md-4" for="">Description: </label>
+                        <div class="col-md-4">
+                            {{viewscheduleData.description}}
+                        </div>
+                      </div>    
+                    <div class="clearfix"></div>
+                    <hr>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4" for="">Status: </label>
+                        <div class="col-md-4">
+                            {{viewscheduleData.status}}
+                        </div>
+                      </div>    
+                    <div class="clearfix"></div>
+                    <hr>
+
+
+
+                    <!-- </form> -->
+                </div>
+            </div>
+          </div>
+       </div>
+       <!--====  End of View Schedule  ====-->
+       
+
+
+        <!--=======================================
+        =            Add Payment Modal            =
+        ========================================-->
+        <div class="modal fade addpayment" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="clearModalOnCloseSchedule()" data-dismiss="modal">&times;
+                </button>
+                <h4>Add Payment</h4>
+              </div>
+              <div class="modal-body">
+                
+              <form class="form-horizontal" name="repaymentform"  ng-submit="savePayment(paymentData)" novalidate>
+              
+              <input type="hidden" ng-model="paymentData.eFeescheduleregistrationId">
+              <div class="form-group required">
+                
+               <label class="control-label col-sm-2" for="">Student</label>
+                  <div class="col-sm-4">
+                      <input ng-model="fullName" class="form-control inputEle" disabled>    
+                  </div> 
+                
+                  <label class="control-label col-md-2" for="">Branch
+                  </label>
+                  <div class="col-md-4">
+                  <input type="hidden" ng-model="paymentData.bBranchId">
+                  <input type="text" ng-model="bname" class="form-control inputEle" disabled>
+                  </div>
+                </div>
+
+                <div class="form-group required">
+                  <label class="control-label col-md-2" for="">Course</label>
+                  <div class="col-md-4">
+                   <input type="hidden" ng-model="paymentData.cCourseId">
+                  <input type="text" ng-model="cname" class="form-control inputEle" disabled> 
+                  </div>
+                  <label class="control-label col-md-2" for="">Batch</label>
+                  <div class="col-md-4">
+                   <input type="hidden" ng-model="paymentData.cBatchId">
+                  <input type="text" ng-model="btchname" class="form-control inputEle" disabled> 
+                  </div>
+                </div>
+
+              <div class="form-group required">
+               <label class="control-label col-sm-2" for="">Fees Type</label>
+                <div class="col-sm-4" >
+                    <input type="text" ng-model="paymentData.feestype" class="form-control" disabled>
+                </div>
+             
+                <label class="control-label col-sm-2" for="">Pending Fees</label>
+                <div class="col-sm-4">
+                    <input type="text" class="form-control inputEle" ng-model="paymentData.dueamount" disabled>
+                </div>
+              </div>
+
+              <div class="form-group">
+                  <label class="control-label col-md-2" for="">Document Date</label>
+                  <div class="col-md-4">
+                     <datepicker date-format="yyyy-MM-dd" >
+                      <input name="docdate" ng-model="paymentData.documentdate" placeholder="Enter Date" class="form-control" type="text" ng-required="true" />
+                   </datepicker>
+                   <div class="clearfix"></div>
+                   <p class="error" ng-show="repaymentform.docdate.$invalid && repaymentform.docdate.$touched">Enter Date</p>
+                  </div>
+
+                  <label class="control-label col-sm-2" for="">Payment Date</label>
+                  <div class="col-sm-4">
+                     <datepicker date-format="yyyy-MM-dd" date-min-limit="{{currentDate1}}"> 
+                      <input name="paydate" ng-model="paymentData.paymentdate"   placeholder="Enter Date" class="form-control" type="text" ng-required="true"/ >
+                   </datepicker>
+                   <div class="clearfix"></div>
+                   <p class="error" ng-show="repaymentform.paydate.$invalid && repaymentform.paydate.$touched">Enter Date</p>
+                  </div>
+              </div>
+
+               <div class="form-group required">
+                  <label class="control-label col-sm-2" for="">Payment Status</label>
+                  <div class="col-sm-4">
+                     <label class="radio-inline">
+                     <input type="radio" name="paymentstatus" ng-model="paymentData.paymentstatus" value="Full Payment" ng-required="true" ng-click="fullPaymentClick(paymentData.dueamount)">Full Payment
+                     </label>
+                     <label class="radio-inline">
+                     <input type="radio" name="paymentstatus" ng-model="paymentData.paymentstatus" value="Partial Payment" ng-required="true" ng-click="partialPaymentClick()">Partial Payment
+                     </label>
+                  </div>
+
+                   <label class="control-label col-sm-2" for="">Payment Mode</label>
+                   <div class="col-sm-4">
+                     <select name="paymode" ng-required="true" ng-model="paymentData.modeofpayment" class="form-control inputEle" ng-change="paymentModeChange(paymentData.modeofpayment)">
+                      <option value="Cash">Cash</option>
+                      <option value="Cheque">Cheque</option>
+                      <option value="Card">Card</option>
+                      <option value="Electronic Payment">Electronic Payment</option> 
+                    </select>
+                    <div class="clearfix"></div>
+                    <p class="error" ng-show="repaymentform.paymode.$invalid && repaymentform.paymode.$touched">Please Select Payment Mode</p>
+                  </div>
+              </div>
+
+              <div class="form-group required">
+                  <label class="control-label col-sm-2" for="">Amount</label>
+                <div class="col-sm-4">
+                   <input type="number" name="payam" class="form-control" ng-model="paymentData.paymentamount" placeholder="Enter Amount" ng-required="true" ng-disabled="fullpay" min="1" max="{{DueAmt}}">
+                   <!-- limit-to-max -->
+                   <div class="clearfix"></div>
+                   <p class="error" ng-show="repaymentform.payam.$invalid && repaymentform.payam.$touched">Please Enter Amount</p>
+                   <p class="error" ng-show="repaymentform.payam.$error.max">Amount should be less than pending fee</p>
+                </div>
+
+                <div ng-show="paymentData.modeofpayment=='Cheque'">
+                <label class="control-label col-sm-2" for="">Cheque No</label>
+                <div class="col-sm-4">
+                   <input type="number" name="cheque" class="form-control inputEle" ng-model="paymentData.chequeno" placeholder="Enter Cheque No" ng-required="Chq">
+                   <div class="clearfix"></div>
+                   <p class="error" ng-show="repaymentform.cheque.$invalid && repaymentform.cheque.$touched">Please Enter Cheque No </p>
+                </div>
+                </div>
+
+                 <div ng-show="paymentData.modeofpayment=='Card'">
+                  <label class="control-label col-sm-2" for="">Transaction Id</label>
+                  <div class="col-sm-4">
+                     <input name="trans" type="number" class="form-control inputEle" ng-model="paymentData.transactionno" placeholder="Enter Transaction Id" ng-required="Crd" >
+                     <div class="clearfix"></div>
+                     <p class="error" ng-show="repaymentform.trans.$invalid && repaymentform.trans.$touched">Please Enter Transaction No</p>
+                  </div>
+                </div>
+
+
+                 <div ng-show="paymentData.modeofpayment=='Electronic Payment'">
+                  <label class="control-label col-sm-2" for="">Transaction Id</label>
+                  <div class="col-sm-4">
+                     <input name="transaction" type="number" class="form-control inputEle" ng-model="paymentData.transactionno" placeholder="Enter Transaction Id" ng-required="Epay" >
+                     <div class="clearfix"></div>
+                     <p class="error" ng-show="repaymentform.transaction.$invalid && repaymentform.transaction.$touched">Please Enter Transaction No</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group required" >
+                <div ng-show="paymentData.modeofpayment=='Cheque'">
+                <label class="control-label col-sm-2" for="">Bank Name</label>
+                <div class="col-sm-4">
+                   <input name="bank" type="text" class="form-control inputEle" ng-model="paymentData.bankname" placeholder="Enter Bank Name" ng-required="Chq" >
+                   <div class="clearfix"></div>
+                   <p class="error" ng-show="repaymentform.bank.$invalid && repaymentform.bank.$touched">Please Enter Date</p>
+                </div>
+
+                 <label class="control-label col-sm-2" for="">Branch Name</label>
+                <div class="col-sm-4">
+                   <input name="branch" type="text" class="form-control inputEle" ng-model="paymentData.bankbranchname" placeholder="Enter Branch Name" ng-required="Chq" >
+                   <div class="clearfix"></div>
+                   <p class="error" ng-show="repaymentform.branch.$invalid && repaymentform.branch.$touched">Please Enter Date</p>
+                </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="">Manual Receipt No.</label>
+                <div class="col-sm-4">
+                   <input type="text" class="form-control inputEle" ng-model="paymentData.manualreceiptno" placeholder="Enter Receipt No" >
+                </div>
+
+                <div ng-show="paymentData.modeofpayment=='Cheque'">
+                  <label class="control-label col-sm-2" for="">Cheque Date</label>
+                  <div class="col-sm-4">
+                     <datepicker date-format="yyyy-MM-dd">
+                      <input name="chdate" ng-model="paymentData.chequedate" placeholder="Enter Date" class="form-control" type="text" ng-required="Chq"/>
+                     </datepicker>
+                     <div class="clearfix"></div>
+                     <p class="error" ng-show="repaymentform.chdate.$invalid && repaymentform.chdate.$touched">Please Enter Date</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                  <label class="control-label col-sm-2" for="">Status</label>
+                   <div class="col-sm-4">
+                     <select name="paystatus" ng-required="true" ng-model="paymentData.status" class="form-control inputEle" ng-init="paymentData.status = 'Uncleared'" ng-disabled="!fullAccess">
+                      <option value="Cleared">Cleared</option>
+                      <option value="Uncleared">Uncleared</option>
+                    </select>
+                    <div class="clearfix"></div>
+                    <p class="error" ng-show="repaymentform.paystatus.$invalid && repaymentform.paystatus.$touched">Please Select Status</p>
+                  </div>
+              </div>
+              
+               <br>
+               <div class="form-group">
+                      <div class="col-md-12 text-center">
+                        <button type="submit" class="btn btn-success" ng-disabled="repaymentform.$invalid" onclick="$('.modal').modal('hide')">Save
+                        </button>
+                      </div>
+                    </div>
+                    <div class="clearfix"></div>
+              </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--====  End of Add Payment Modal  ====-->
+
+    
+        <!--===========================================
+        =            Delete Schedule Modal            =
+        ============================================-->
+        <div class="modal fade deleteschedule" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;
+                  </button>
+                  <h4 class="modal-title">Delete Score
+                  </h4>
+                </div>
+                <div class="modal-body">
+                  <h4>Are you sure you want to delete 
+                    <strong>{{deletescheduleData.feestype}}?
+                    </strong>
+                  </h4>
+                  <br>
+                  <a class="btn btn-danger btn-sm" ng-click="deleteSchedule(deletescheduleData.eFeescheduleregistrationId, deletescheduleData.feestype)" onclick="$('.modal').modal('hide')">
+                    <i class="fa fa-trash">
+                    </i>&nbsp;&nbsp;Delete
+                  </a>
+                  <a class="btn btn-default btn-sm" data-dismiss="modal">
+                    <i class="fa fa-trash">
+                    </i>&nbsp;&nbsp;Cancel
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        <!--====  End of Delete Schedule Modal  ====-->
+       
+      </div>
+    </div>
+  </div>
+</div>
+ <!-- End of Controller   -->
+
+ <script src="view/pages/Sales/Registration/ReScheduleCtrl.js"></script>
+
+
+    
+
+   

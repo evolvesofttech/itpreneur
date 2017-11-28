@@ -1,0 +1,255 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state" >
+    <div class="container-fluid">
+        <div class="row no-margin" ng-controller="createUserCtrl as Inst">
+         
+            <div class="col-md-12 no-padding">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Edit User</h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <!-- toaster message -->
+                        <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+                        <!-- toaster message -->
+                        
+                        <form class="form-horizontal" name="adduserform" ng-submit="saveUser(userData1)" novalidate>
+                        <input type="hidden" ng-model="userData1.adUserId">
+                        <div class="button-group">
+                            <a href="#/Create User" class="btn btn-default btn-labeled btn-sm">
+                                <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back</a>
+                            <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                                <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</a>
+                        
+                            <button type="submit" class="btn btn-success btn-labeled btn-sm">
+                            <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Update</button>
+                        </div>
+                        <br>
+                        <input type="hidden" ng-model="userData1.uUserdetailId">
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">User Type</label>
+                          <div class="col-md-4">
+                             <label class="radio-inline">
+                             <input type="radio" name="usertype" ng-model="userData1.usertype" value="Staff" ng-required="true" ng-click="staffClick()">Staff
+                             </label>
+                             <label class="radio-inline">
+                             <input type="radio" name="usertype" ng-model="userData1.usertype" value="Trainer" ng-required="true" ng-click="trainerClick()">Trainer
+                             </label> 
+                          </div>
+
+                          <label class="control-label col-md-2" for="">Branch</label>
+                          <div class="col-md-4">
+                          <input type="hidden" ng-model="userData1.cBranchId">
+                            <input type="text" name="enquirybranch" class="form-control inputEle" ng-model="userData1.branchname"  ng-required="true" disabled>
+                          </div>
+                        </div> <!--institute ends-->
+
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Name
+                          </label>
+                          <div class="col-md-3">
+                            <input type="text" name="fname" class="form-control inputEle" ng-model="userData1.firstname" placeholder="Enter First Name" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="adduserform.fname.$invalid && adduserform.fname.$touched">Please Enter First Name</p>
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text" name="mname" class="form-control inputEle" ng-model="userData1.middlename" placeholder="Enter Middle Name" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="adduserform.mname.$invalid && adduserform.mname.$touched">Please Enter Middle Name</p>
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text" name="lname" class="form-control inputEle" ng-model="userData1.lastname" placeholder="Enter Last Name" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="adduserform.lname.$invalid && adduserform.lname.$touched">Please Enter Last Name</p>
+                          </div>
+                        </div> <!--name ends-->
+
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Gender</label>
+                          <div class="col-md-4">
+                             <label class="radio-inline">
+                             <input type="radio" name="gender" ng-model="userData1.gender" value="Male" ng-required="true">Male
+                             </label>
+                             <label class="radio-inline">
+                             <input type="radio" name="gender" ng-model="userData1.gender" value="Female" ng-required="true">Female
+                             </label>
+                             <label class="radio-inline">
+                             <input type="radio" name="gender" ng-model="userData1.gender" value="Transgender" ng-required="true">Transgender
+                             </label>
+                          </div>
+                          <label class="control-label col-md-2" for="">Marital Status</label>
+                          <div class="col-md-4">
+                             <label class="radio-inline">
+                             <input type="radio" name="mt" ng-model="userData1.maritalstatus" value="Unmarried" ng-required="true">Unmarried
+                             </label>
+                             <label class="radio-inline">
+                             <input type="radio" name="mt" ng-model="userData1.maritalstatus" value="Married" ng-required="true">Married
+                             </label>
+                             <label class="radio-inline">
+                             <input type="radio" name="mt" ng-model="userData1.maritalstatus" value="Divorced" ng-required="true">Divorce
+                             </label>
+                          </div>
+                       </div> <!--gender marital status-->
+
+                       <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Contact No.</label>
+                          <div class="col-md-4">
+                             <input type="number" name="cont" class="form-control inputEle" ng-model="userData1.contactno" placeholder="Enter Contact Number" ng-required="true" maxlength="10" minlength="10" required>
+                             <div class="clearfix"></div>
+                             <p class="error" ng-show="adduserform.cont.$error.required">Please Enter Valid Contact Number</p>
+                             <p class="error" ng-show="adduserform.cont.$error.maxlength">Please Enter 10 digits Number</p>
+                             <p class="error" ng-show="adduserform.cont.$error.minlength">Too Short Number !!!</p>
+                          </div>
+                          <label class="control-label col-md-2" for="">Date Of Birth</label>
+                          <div class="col-md-4">
+                             <datepicker date-format="yyyy-MM-dd" date-max-limit= "{{currentDate}}">
+                                <input ng-model="userData1.dob" name="dob" placeholder="Enter Birthdate" class="form-control" type="text" restrict-to="[0-9]" ng-required="true"/>
+                             </datepicker>
+                             <div class="clearfix"></div>
+                              <p class="error" ng-show="adduserform.dob.$invalid && adduserform.dob.$touched">Please Enter Date Of Birth</p>
+                          </div>
+                       </div> <!--contact dob ends-->
+
+                       <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Email</label>
+                          <div class="col-md-4">
+                             <input type="email" class="form-control inputEle" name="email" ng-model="userData1.email" placeholder="Enter Email Address" ng-required="true" required>
+                             <div class="clearfix"></div>
+                              <p class="error" ng-show="adduserform.email.$invalid && adduserform.email.$touched">Please Enter Email</p>
+                          </div>
+                          <label class="control-label col-md-2" for="">Designation</label>
+                          <div class="col-md-4">
+                             <select ng-model="userData1.cDesignationId" name="designation" class="form-control inputEle" ng-options="desi.cDesignationId as desi.designationname for desi in Designation" ng-required="true">
+                                <option value="">Select Status</option>
+                              </select>
+                              <div class="clearfix"></div>
+                              <p class="error" ng-show="adduserform.designation.$invalid && adduserform.designation.$touched">Select Designation</p>
+                          </div>
+                       </div> <!--email designation ends-->
+
+                       <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Username</label>
+                          <div class="col-md-4">
+                             <input type="text" class="form-control inputEle" name="username" ng-model="userData1.username" placeholder="Enter Username" ng-required="true" required>
+                             <div class="clearfix"></div>
+                              <p class="error" ng-show="adduserform.username.$invalid && adduserform.username.$touched">Please Enter Username</p>
+                          </div>
+                          <label class="control-label col-md-2 mandatory">Sales Executive</label>
+                          <div class="col-md-4" ng-hide="hideSalesExecutive">
+                              <select ng-model="userData1.issalesexecutive" name="isexe" class="form-control inputEle" ng-required="true">
+                                  <option value="Yes">Yes</option>
+                                  <option value="No">No</option>
+                              </select>
+                              <div class="clearfix"></div>
+                              <p class="error" ng-show="roleform.isexe.$invalid && roleform.isexe.$touched">Please Select Option</p>
+                          </div>
+                          <input type="hidden" ng-model="userData1.password">
+                          
+                       </div> <!--email designation ends-->
+
+                       <div class="clearfix"></div>
+
+                        <br>
+                      </form>
+
+
+                        <!-- tab starts -->
+                        <div id="exTab2">
+                            <ul class="nav nav-tabs">
+                                
+                                <li ng-class="{active:Inst.isSet(1)}">
+                                    <a ng-click="Inst.setTab(1)">Address Details</a>
+                                </li>
+                                <li ng-class="{active:Inst.isSet(2)}">
+                                    <a ng-click="Inst.setTab(2)">Qualification</a>
+                                </li>
+                                <li ng-class="{active:Inst.isSet(3)}">
+                                    <a ng-click="Inst.setTab(3)">Professional Experience</a>
+                                </li>
+                                <li ng-class="{active:Inst.isSet(4)}" ng-show="userData1.usertype=='Trainer'">
+                                    <a ng-click="Inst.setTab(4)">Technology</a>
+                                </li>
+                                <li ng-class="{active:Inst.isSet(5)}" ng-show="userData1.usertype=='Trainer'">
+                                    <a ng-click="Inst.setTab(5)">Courses</a>
+                                </li>
+                                <!-- <li ng-class="{active:Inst.isSet(4)}">
+                                    <a ng-click="Inst.setTab(4)">Office Use</a>
+                                </li> -->
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <!--===========================
+                                =            Tab 1            =
+                                ============================-->
+                                <div class="tab-pane active" ng-show="Inst.isSet(1)">
+
+                                    <div ng-if="Inst.isSet(1)" ng-include="'view/pages/Users/Sales/userAddress.html'"></div>
+                                     
+                                </div>
+                                <!--====  End of Tab 1  ====-->
+
+                                <!--===========================
+                                =            Tab 2            =
+                                ============================-->
+                                
+                                <div class="tab-pane active" ng-show="Inst.isSet(2)">
+                                     
+                                    <div ng-if="Inst.isSet(2)" ng-include="'view/pages/Users/Sales/userQualification.html'"></div>
+
+                                </div>
+                                
+                                <!--====  End of Tab 2  ====-->
+
+                                <!--===========================
+                                =            Tab 3            =
+                                ============================-->
+                                
+                                <div class="tab-pane active" ng-show="Inst.isSet(3)">
+                                     
+                                     <div ng-if="Inst.isSet(3)" ng-include="'view/pages/Users/Sales/userExperience.html'"></div>
+
+                                </div>
+                                
+                                <!--====  End of Tab 3  ====-->
+
+                                <!--===========================
+                                =            Tab 4            =
+                                ============================-->
+                                
+                                <div class="tab-pane active" ng-show="Inst.isSet(4)">
+                                     
+                                     <div ng-if="Inst.isSet(4)" ng-include="'view/pages/Users/Sales/userTechnology.html'"></div>
+
+                                </div>
+                                
+                                <!--====  End of Tab 4  ====-->
+                                 <!--===========================
+                                =            Tab 5            =
+                                ============================-->
+                                
+                                <div class="tab-pane active" ng-show="Inst.isSet(5)">
+                                     
+                                     <div ng-if="Inst.isSet(5)" ng-include="'view/pages/Users/Sales/userCourses.html'"></div>
+
+                                </div>
+                                
+                                <!--====  End of Tab 5  ====-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- end controller div -->
+    </div>
+
+
+</div>
+
+
+<script src="view/pages/Users/Sales/CreateUserCtrl.js"></script>

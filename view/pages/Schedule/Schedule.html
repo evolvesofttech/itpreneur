@@ -1,0 +1,354 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="ScheduleCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Schedule
+              <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{Schedule.length}}</span></span>
+              </h3>
+            </div>
+            <div class="panel-body">
+              
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+              
+              <div class="button-group">
+                <a data-toggle="modal" data-target=".addschedule" ng-click="addClick()" class="btn btn-default btn-labeled btn-sm">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp;Add Schedule
+                </a>
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+              </div>
+              <table ng-table="usersTable_schedule" show-filter="true" class="table table-bordered table-striped text-center">
+                <tbody>
+                  <tr ng-repeat="bo in data_schedule">
+                    <td data-title="'Course'" filter="{'coursename': 'text'}" sortable="'coursename'">{{bo.coursename}}
+                    </td>
+                    <td data-title="'Batch'" filter="{'batchname': 'text'}" sortable="'batchname'">{{bo.batchname}}
+                    </td>
+                    <td data-title="'Technology'" filter="{'technologyname': 'text'}" sortable="'technologyname'">{{bo.technologyname}}
+                    </td>
+                    <td data-title="'Lecture'" filter="{'lecture': 'text'}" sortable="'lecture'">{{bo.lecture}}
+                    </td>
+                    <td data-title="'Date'" filter="{'date': 'text'}" sortable="'date'">{{bo.date}}
+                    </td>
+                    <td data-title="'Time'" filter="{'fromtime': 'text'}" sortable="'fromtime'">{{bo.fromtime}} to {{bo.totime}}
+                    </td>
+                   
+                    <td data-title="'Actions'" class="w150">
+                      <a href="#/Edit Schedule/{{bo.conScheduleId}}" class="btn btn-success btn-xs" tooltip-placement="top" uib-tooltip="Edit">
+                        <i class="fa fa-pencil-square-o">
+                        </i>
+                      </a> 
+                      <a data-toggle="modal" data-target=".viewschedule" class="btn btn-info btn-xs" ng-click="viewSchedule(bo)" tooltip-placement="top" uib-tooltip="View">
+                        <i class="fa fa-eye">
+                        </i>
+                      </a>
+                      <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deleteschedule" ng-click="delSchedule(bo)" tooltip-placement="top" uib-tooltip="Delete">
+                        <i class="fa fa-trash">
+                        </i>
+                      </a>
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <hr>
+              
+              <!--===============================
+              =            Add Modal            =
+              ================================-->
+              <div class="modal fade addschedule" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title" ng-init="headingMessage ='Add Schedule'">{{headingMessage}}</h4>
+                    </div>
+                    <div class="modal-body">
+                      <form class="form-horizontal" name="scheduleform" ng-submit="saveSchedule(ScheduleData)" novalidate>
+                          <input type="hidden" ng-model="ScheduleData.conScheduleId">  
+                          <div class="form-group required">
+                            <label class="control-label col-md-2" for="">Course</label>
+                            <div class="col-md-4">
+                              <select ng-model="ScheduleData.cCourseId" name="cou" class="form-control inputEle" ng-options="co.cCourseId as co.coursename for co in Courses" ng-change="courseChange(ScheduleData.cCourseId)" ng-required="true">
+                                <option value="">Select Course</option>
+                              </select> 
+                              <div class="clearfix"></div>
+                              <p class="error" ng-show="scheduleform.cou.$invalid && scheduleform.cou.$touched">Please Select Course</p>
+                            </div>
+
+                            <label class="control-label col-md-2" for="">Batch</label>
+                            <div class="col-md-4">
+                              <select ng-model="ScheduleData.cBatchId" name="bat" class="form-control inputEle" ng-options="btch.cBatchId as btch.batchname for btch in Batch" ng-required="true" ng-change="batchChange(ScheduleData.cBatchId)" ng-disabled="disableBatch">
+                                  <option value="">Select Batch</option>
+                                </select> 
+                                 <div class="clearfix"></div>
+                               <p class="error" ng-show="scheduleform.bat.$invalid && scheduleform.bat.$touched">Please Select Batch</p>
+                            </div>
+                          </div><!-- form-group -->
+
+                          <div class="form-group required">
+                            <label class="control-label col-md-2" for="">Technology/Subject</label>
+                            <div class="col-md-4">
+                              <select ng-model="ScheduleData.cTechnologyMasterId" name="technologyname" class="form-control inputEle" ng-options="bran.cTechnologyMasterId as bran.technologyname for bran in Technologies" ng-required="true" ng-change="technologyChange(ScheduleData.cTechnologyMasterId, ScheduleData.cBatchId)" ng-disabled="disableTechnology">
+                                    <option value="">Select Technology</option>
+                                  </select>
+                              <div class="clearfix"></div>
+                              <p class="error" ng-show="scheduleform.technologyname.$invalid && scheduleform.technologyname.$touched">Please Select Technology</p>
+                            </div>
+                          </div><!-- form-group -->
+                          <div class="clearfix"></div>
+                          <div style="border:1px solid #eee;margin: 20px 0;"></div>
+
+                          <!-- display -->
+                          <div class="form-group">
+                            <label class="control-label col-md-2" for=""></label>
+                            <div class="col-md-9">
+                              <table class="table table-bordered" ng-if="saveArray.length != 0">
+                                <tr>
+                                  <th>Lecture No.</th>
+                                  <th>Date</th>
+                                  <th>Start Time</th>
+                                  <th>End Time</th>
+                                  <th>Action</th>
+                                </tr>
+                                <tr ng-repeat="arr in saveArray">
+                                  <td>{{ arr.lecture }}</td>
+                                  <td>{{ arr.date }}</td>
+                                  <td>{{ arr.fromtime }}</td>
+                                  <td>{{ arr.totime }}</td>
+                                  <td>
+                                    <a class="btn btn-danger btn-xs" ng-click="removeItem(arr)">
+                                      <i class="fa fa-trash"></i>
+                                    </a>
+                                  </td>
+                                </tr>
+                              </table>
+                            </div>
+                          </div>
+                          <!-- display -->
+
+                          <!--=====================================
+                          =            Date Time Block            =
+                          ======================================-->
+                          <div class="form-group required">
+                              <label class="control-label col-md-2" for="">Lecture</label>
+                              <div class="col-md-4">
+                                <select ng-model="ScheduleData1.lecture" name="lecture" class="form-control inputEle" ng-options="lect for lect in lectureData" ng-disabled="disableInput">
+                                      <option value="">Select lecture</option>
+                                    </select>
+                                <div class="clearfix"></div>
+                                <p class="error" ng-show="scheduleform.lecture.$invalid && scheduleform.lecture.$touched">Please Select lecture</p>
+                              </div>
+
+                              <label class="control-label col-sm-2" for="">Lecture Date</label>
+                              <div class="col-sm-4">
+                                 <datepicker date-format="yyyy-MM-dd" date-min-limit="{{fDate}}" date-max-limit="{{tDate}}">
+                                    <input type="text" name="dat" ng-model="ScheduleData1.date" placeholder="Enter Date" class="form-control" restrict-to="[0-9]"  ng-disabled="disableInput" />
+                                 </datepicker>
+                                 <div class="clearfix"></div>
+                                 <p class="error" ng-show="scheduleform.dat.$invalid && scheduleform.dat.$touched">Please Enter Date</p> 
+                              </div>
+                          </div><!-- form-group -->
+
+                          <div class="form-group required">
+                            <label class="control-label col-md-2" for="">Start Time
+                            </label>
+                            <div class="col-md-4">
+                             
+                              <div class="input-group"
+                                 moment-picker="ScheduleData1.fromtime"
+                                 format="LT">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-clock-o"></i>
+                                </span>
+                                <input class="form-control"
+                                       name="fromtm"
+                                       placeholder="Select a time"
+                                       ng-model="ScheduleData1.fromtime"
+                                       ng-model-options="{ updateOn: 'blur' }" 
+                                       ng-disabled="disableInput">
+                              </div>
+                              <div class="clearfix"></div>
+                              <p ng-if="saveArray.length != 0"><a ng-click="setTime()" style="cursor: pointer;">Same as previous</a></p>
+                              <p class="error" ng-show="scheduleform.fromtm.$invalid && scheduleform.fromtm.$touched">Please Enter Time</p>
+                            </div>
+                            <label class="control-label col-md-2" for="">End Time
+                            </label>
+                            <div class="col-md-4">
+                             
+                              <div class="input-group" 
+                                 moment-picker="ScheduleData1.totime"
+                                 format="LT">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-clock-o"></i>
+                                </span>
+                                <input class="form-control"
+                                       name="totm"
+                                       placeholder="Select a time"
+                                       ng-model="ScheduleData1.totime"
+                                       ng-model-options="{ updateOn: 'blur' }" 
+                                       ng-disabled="disableInput">
+                              </div>
+                              <div class="clearfix"></div>
+                              <p ng-if="saveArray.length != 0"><a ng-click="setTime1()" style="cursor: pointer;">Same as previous</a></p>
+                              <p class="error" ng-show="scheduleform.totm.$invalid && scheduleform.totm.$touched">Please Enter Time</p>
+                            </div>
+                          </div><!-- form-group -->
+                          <br>
+                          <div class="form-group text-center">
+                            <button type="button" class="btn btn-default btn-xs" ng-click="addMore(ScheduleData,ScheduleData1)" ng-disabled="!ScheduleData1.lecture || !ScheduleData1.date || !ScheduleData1.fromtime || !ScheduleData1.totime">Add More</button>
+                          </div><!-- form-group -->
+                          <!--====  End of Date Time Block  ====-->
+
+                          <div class="clearfix"></div>
+                          <hr>
+                          <div class="form-group">
+                            <div class="col-md-12 text-center">
+                              <button type="submit" class="btn btn-success" ng-disabled="scheduleform.$invalid || saveArray.length == 0" onclick="$('.modal').modal('hide')">Save
+                              </button>
+                              <!-- ng-disabled="scheduleform.$invalid" -->
+                            </div>
+                          </div>
+                        <div class="clearfix"></div>
+                        <br>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!--====  End of Add Modal  ====-->
+
+              <!--================================
+              =            View Modal            =
+              =================================-->
+              <div class="modal fade viewschedule" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">{{viewScheduleData.lecture}} - Schedule
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label class="control-label col-md-3" for="">Course:
+                        </label>
+                        <label class="control-label col-md-9" for="">{{viewScheduleData.coursename}}
+                        </label>
+                      </div>
+                    
+                    <div class="clearfix"></div>
+                    <hr>
+                    
+                      <div class="form-group">
+                        <label class="control-label col-md-3" for="">Batch:
+                        </label>
+                        <label class="control-label col-md-9" for="">{{viewScheduleData.batchname}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                    <hr>
+
+                      <div class="form-group">
+                        <label class="control-label col-md-3" for="">Technology:
+                        </label>
+                        <label class="control-label col-md-9" for="">{{viewScheduleData.technologyname}}
+                        </label>
+                      </div>
+                    
+                    <div class="clearfix"></div>
+                    <hr>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3" for="">Lecture:
+                        </label>
+                        <label class="control-label col-md-9" for="">{{viewScheduleData.lecture}}
+                        </label>
+                      </div>
+                    
+                    <div class="clearfix"></div>
+                    <hr>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3" for="">Lecture Date:
+                        </label>
+                        <label class="control-label col-md-9" for="">{{viewScheduleData.date}}
+                        </label>
+                      </div>
+                    
+                    <div class="clearfix"></div>
+                    <hr>
+
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3" for="">Lecture Timing:
+                        </label>
+                        <label class="control-label col-md-9" for="">{{viewScheduleData.fromtime}} to {{viewScheduleData.totime}}
+                        </label>
+                      </div>
+                    
+                       <div class="clearfix"></div>
+                       <br>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!--====  End of View Modal  ====-->
+
+              <!--==================================
+              =            Delete Modal            =
+              ===================================-->
+              <div class="modal fade deleteschedule" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Delete Schedule
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Are you sure you want to delete following lecture?<br><br>
+                          <strong>Lecture: {{deleteScheduleData.lecture}}</strong><br>
+                          <strong>Course: {{deleteScheduleData.coursename}}</strong><br>
+                          <strong>Batch: {{deleteScheduleData.batchname}}</strong><br>
+                          <strong>Technology/Subject: {{deleteScheduleData.technologyname}}</strong><br>
+                        </h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="deleteSchedule(deleteScheduleData.conScheduleId)" onclick="$('.modal').modal('hide')">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Delete
+                        </a>
+                        <a class="btn btn-default btn-sm" data-dismiss="modal">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Cancel
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!--====  End of Delete Modal  ====-->
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Schedule/ScheduleCtrl.js"></script>
+

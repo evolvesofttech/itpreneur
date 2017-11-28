@@ -1,0 +1,147 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div ng-controller="roleCtrl">
+        <div class="row no-margin">
+          <div class="col-md-12 no-padding">
+              <div class="panel panel-info">
+                  <div class="panel-heading">
+                      <h3 class="panel-title">Role
+                      <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{data_b.length}}</span></span>
+                      </h3>
+                  </div>
+                  <div class="panel-body">
+                    
+                      <!-- toaster message -->
+                       <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+                       <!-- toaster message -->
+
+                      <div class="button-group">
+                          <a data-toggle="modal" data-target=".addRole" class="btn btn-default btn-labeled btn-sm">
+                            <i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Add Role</a>
+                            
+                            <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                              <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                            </a>
+                      </div>
+                      <div class="row">
+                      
+                        <div class="col-md-12">
+                          <table ng-table="usersTable_b" show-filter="true" class="table table-bordered table-striped text-center">
+                            <tbody>
+                                <tr ng-repeat="role in data_b" ng-hide="role.roleName == 'ITP Admin'">
+                                    <td data-title="'Role'" filter="{ 'roleName': 'text' }">{{role.roleName}}</td>
+                                    <td data-title="'Is Executive'" filter="{ 'isexecutive': 'text' }">{{role.isexecutive}}</td>
+
+                                    <td data-title="'Actions'" class="w150">
+                                        <a href="#/EditRole/{{role.adRoleId}}" class="btn btn-success btn-xs" tooltip-placement="top" uib-tooltip="Edit"><i class="fa fa-pencil-square-o"></i></a>
+
+                                        <button class="btn btn-info btn-xs" disabled><i class="fa fa-eye"></i></button>
+
+                                        <button class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deleteRole" ng-click="delRole(role.adRoleId, data_b)" tooltip-placement="top" uib-tooltip="Delete" 
+                                        ng-disabled="!adminUser || role.roleName == 'Admin'"><i class="fa fa-trash"></i></button>
+
+                                        <button class="btn btn-primary btn-xs" disabled>
+                                          <i class="fa fa-plus">
+                                          </i>
+                                        </button>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                          </table>
+                        </div>
+
+                      </div>
+                      
+                      <hr>
+                      <!--==============================
+                      =            Add Role            =
+                      ===============================-->
+                      <div class="modal fade addRole" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                          <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                      <button type="button" ng-click="clearModalOnClose()" class="close" data-dismiss="modal">&times;</button>
+                                      <h4 class="modal-title">Add Role</h4>
+                                  </div>
+                                  <div class="modal-body">
+                                    <form class="form-horizontal login-form" name="roleform" novalidate ng-submit="saveRole(roleData)">
+                                      <div class="form-group form-group required">
+                                          <label class="control-label col-md-4" for="">Add Role</label>
+                                          <div class="col-md-8">
+                                              <input type="text" name="rolenm" class="form-control inputEle" ng-model="roleData.roleName" placeholder="Enter Menu" ng-required="true">
+                                              <div class="clearfix"></div>
+                                              <p class="error" ng-show="roleform.rolenm.$invalid && roleform.rolenm.$touched">Please Enter Role</p>
+                                          </div>
+                                      </div>
+                                      <div class="form-group form-group required">
+                                          <label class="control-label col-md-4" for="">Is Executive</label>
+                                          <div class="col-md-8">
+                                              <div class="checkbox">
+                                                <label><input type="checkbox" ng-model="roleData.isexecutive" ng-true-value="'Yes'"></label>
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <br>
+                                      <div class="form-group">
+                                          <div class="col-md-12 text-center">
+                                              <button type="submit" ng-disabled="roleform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Add Role</button>
+                                          </div>
+                                      </div>
+                                  </form>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <!--====  End of Add Role  ====-->
+
+                      <!-- start view assign role to window modal -->
+                      
+                          <!-- end view assign role to window modal -->
+
+                          <!--=================================
+                          =            Delete Role            =
+                          ==================================-->
+                          <div class="modal fade deleteRole" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                            <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <button type="button" class="close" data-dismiss="modal">&times;
+                                  </button>
+                                  <h4 class="modal-title">Delete Role
+                                  </h4>
+                                </div>
+                                <div class="modal-body">
+                                  <h4>Are you sure you want to delete 
+                                    <strong>{{deleteroleData.roleName}}?
+                                    </strong>
+                                  </h4>
+                                  <br>
+                                  <a class="btn btn-danger btn-sm" ng-click="deleteRole(deleteroleData.adRoleId)" onclick="$('.modal').modal('hide')">
+                                    <i class="fa fa-trash">
+                                    </i>&nbsp;&nbsp;Delete
+                                  </a>
+                                  <a class="btn btn-default btn-sm" data-dismiss="modal">
+                                    <i class="fa fa-trash">
+                                    </i>&nbsp;&nbsp;Cancel
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <!--====  End of Delete Role  ====-->
+
+                  </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+<!--====  End of Controller  ====-->
+<script src="view/pages/Settings/role/roleCtrl.js"></script>

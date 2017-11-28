@@ -1,0 +1,256 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<style type="text/css">
+  .ta-editor {
+    border: 1px solid #ddd;
+  }
+</style>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="emailTemplateCtrl as vm">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Email Template
+              <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{EmailTemplate.length}}</span></span>
+              </h3>
+            </div>
+            <div class="panel-body">
+            
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+              <form class="form-horizontal" name="emailtemplateform" ng-submit="saveEmailTemplate(EmailTemplateData)" novalidate>
+              <!--=============================
+              =            Buttons            =
+              ==============================-->
+              <div class="button-group">
+                <a href="#/Email Template" class="btn btn-default btn-labeled btn-sm">
+                                    <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back</a>
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+                <button type="submit" class="btn btn-success btn-labeled btn-sm"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Update</button>
+              </div>
+              <!--====  End of Buttons  ====-->
+
+              
+                  <div class="form-group required">
+                    <label class="control-label col-md-4" for="">Template Name
+                    </label>
+                    <div class="col-md-4">
+                      <input type="text" name="title" class="form-control inputEle" ng-model="EmailTemplateData.title" placeholder="Enter Template Name" ng-required="true">
+                      <!-- <div class="clearfix"></div>
+                      <p class="error" ng-show="sourceform.source.$invalid && sourceform.source.$touched">Please Enter Source Name</p> -->
+                    </div>
+                  </div>
+              </form>
+
+              <hr>
+
+              <!--=============================
+              =            Buttons            =
+              ==============================-->
+              <div class="button-group">
+                <a data-toggle="modal" data-target=".addEmailTagsModal" class="btn btn-default btn-labeled btn-sm">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp;Add Email Tags
+                </a>
+              </div>
+              <!--====  End of Buttons  ====-->
+
+              <!--===========================
+              =            Table            =
+              ============================-->
+              <table ng-table="usersTable_Tags" show-filter="true" class="table table-bordered table-striped text-center">
+                <tbody>
+                  <tr ng-repeat="eml in EmailTemplate_Tags">
+                    <td data-title="'Email Tag'" filter="{'emailtagname': 'text'}" sortable="'emailtagname'">{{eml.emailtagname}}
+                    </td>
+                    <td data-title="'Email Tag Value'" filter="{'emailtagvalue': 'text'}" sortable="'emailtagvalue'">{{eml.emailtagvalue}}
+                    </td>
+                    <td data-title="'Actions'">
+                      <a data-toggle="modal" data-target=".addEmailTagsModal" class="btn btn-success btn-xs" ng-click="editEmailTag(eml.eEmailtemplatedetailsId)" tooltip-placement="top" uib-tooltip="Edit">
+                        <i class="fa fa-pencil-square-o">
+                        </i>
+                      </a> 
+                      <a data-toggle="modal" data-target=".viewtag" class="btn btn-info btn-xs" ng-click="viewTag(eml.eEmailtemplatedetailsId, EmailTemplate_Tags)" tooltip-placement="top" uib-tooltip="View">
+                        <i class="fa fa-eye">
+                        </i>
+                      </a>
+                      <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deleteEmailTemplateTagsModal" ng-click="delEmailTemplateTags(eml.eEmailtemplatedetailsId, EmailTemplate_Tags)" tooltip-placement="top" uib-tooltip="Delete">
+                        <i class="fa fa-trash">
+                        </i>
+                      </a>
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <!--====  End of Table  ====-->
+              
+              <!--==========================================
+              =            Add Email Tags Modal            =
+              ===========================================-->
+              <div class="modal fade addEmailTagsModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnCloseTags()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">Add Email Tags
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <form class="form-horizontal" name="emailtemplatetagsform" ng-submit="saveEmailTemplateTags(EmailTemplateTagsData)" novalidate>
+                        <input type="hidden" ng-model="EmailTemplateTagsData.eEmailtemplatedetailsId">
+                        <div class="form-group required">
+                          <label class="control-label col-md-4" for="">Tag Name
+                          </label>
+                          <div class="col-md-4">
+                            <input type="text" name="title" class="form-control inputEle" ng-model="EmailTemplateTagsData.emailtagname" placeholder="Enter Email Tag Name" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="emailtemplatetagsform.title.$invalid && emailtemplatetagsform.title.$touched">Please Enter Tag Name</p>
+                          </div>
+                        </div>
+
+                        <div class="form-group required">
+                          <label class="control-label col-md-4" for="">Tag Value
+                          </label>
+                          <div class="col-md-6">
+                           <select ng-model="EmailTemplateTagsData.emailtagvalue" name="tagvalue" class="form-control" ng-required="true">
+                                <option value="jobtitle">Job Title</option>
+                                <option value="nameofcompany">Name of Company</option>
+                                <option value="keyskills">Key Skills</option>
+                                <option value="experience">Experience</option>
+                                <option value="jobtype">Job Type</option>
+                                <option value="jobdescription">Job Description</option>
+                                <option value="marksrequired">Marks Required</option>
+                                <option value="educationqualification">Education Qualification</option>
+                                <option value="joblocation">Job Location</option>
+                                <option value="salaryrange">Salary Range</option>
+                                <option value="termsandconditions">Terms and Conditions</option>
+                                <option value="technologies">Technologies</option>
+                                <option value="round">Round</option>
+                                <option value="roundlocation">Round Location</option>
+                                <!-- <option value="roundaddress">Round Address</option>
+                                <option value="roundcontactpersondetails">Round Contact Person Details</option> -->
+                                <option value="interviewdate">Interview Date</option>
+                                <option value="roundinterviewdescription">Round Interview Desription</option>
+                                <!-- <option value="feestype">Fees Type</option>
+                                <option value="dueamount">Due Amount</option>
+                                <option value="scheduledate">Schedule Date</option>
+                                <option value="duedate">Due Date</option>
+                                <option value="footer">Email Footer</option> -->
+
+                                <!-- <option value="otherdescription">Other Description</option> -->
+
+                            </select>
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="emailtemplatetagsform.tagvalue.$invalid && emailtemplatetagsform.tagvalue.$touched">Please Select Tag Value</p>
+                          </div>
+                        </div>
+                        
+                        <div class="clearfix"></div>
+                        <br>
+                        <!-- <div class="form-group" ng-bind="EmailTemplateTagsData.emailbody">
+                          
+                        </div> -->
+                        <div class="form-group">
+                          <div class="col-md-12 text-center">
+                            <button type="submit" ng-disabled="emailtemplatetagsform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                            </button>
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!--====  End of Add Email Tags Modal  ====-->
+
+
+              <!--=========================================
+              =            View Email Template            =
+              ==========================================-->
+              <div class="modal fade viewtag" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">Email Tags
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">Tag Name:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewtagData.emailtagname}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <hr>
+
+                      <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">Tag Value:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewtagData.emailtagvalue}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <br>
+                       <!-- <br> -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!--====  End of View Email Template  ====-->
+
+              <!--===========================================
+              =            Delete Email Template            =
+              ============================================-->
+              <div class="modal fade deleteEmailTemplateTagsModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Delete Email Template Tags
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Are you sure you want to delete 
+                          <strong>{{deleteEmailTagsData.emailtagname}} - {{deleteEmailTagsData.emailtagvalue}}?
+                          </strong>
+                        </h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="deleteEmailTemplateTags(deleteEmailTagsData.eEmailtemplatedetailsId)" onclick="$('.modal').modal('hide')">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Delete
+                        </a>
+                        <a class="btn btn-default btn-sm" data-dismiss="modal">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Cancel
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!--====  End of Delete Email Template  ====-->
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Masters/Email/EmailTemplateCtrl.js"></script>

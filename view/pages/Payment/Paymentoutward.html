@@ -1,0 +1,473 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="PaymentoutwardCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Payment Outward
+              <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{Paymentout.length}}</span></span>
+              </h3>
+            </div>
+            <div class="panel-body">
+
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+              
+              <div class="button-group">
+                <a data-toggle="modal" data-target=".addPaymentout" class="btn btn-default btn-labeled btn-sm">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp;Add Payment
+                </a>
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+                <button ng-click="exportAction('excel','Payment Outward')" class="btn btn-default btn-labeled btn-sm pull-right" ng-disabled="data_paymentout.length > 0 ? false : true">
+                  <i class="fa fa-file-excel-o"></i>&nbsp;&nbsp;Export to Excel</button>
+              </div>
+              <table ng-table="usersTable_paymentout" show-filter="true" class="table table-bordered table-striped text-center export-table">
+                <tbody>
+                  <tr ng-repeat="bo in data_paymentout">
+                  <td data-title="'Branch'" filter="{'branchname': 'text'}" sortable="'branchname'">{{bo.branchname}}
+                    </td>
+                    <td data-title="'Document Date'" filter="{'documentdate': 'text'}" sortable="'documentdate'">{{bo.documentdate}}
+                    </td>
+                    <td data-title="'Payment Amount'" filter="{'paymentamount': 'text'}" sortable="'paymentamount'">{{bo.paymentamount}}
+                    </td>
+                    <td data-title="'Payable Amount'" filter="{'payableamount': 'text'}" sortable="'payableamount'">{{bo.payableamount}}
+                    </td>
+                    <td data-title="'TDS %'" filter="{'tdspercentage': 'text'}" sortable="'tdspercentage'">{{bo.tdspercentage}}
+                    </td>
+                    <td data-title="'Vendor Name'" filter="{'vendorname': 'text'}" sortable="'vendorname'">{{bo.vendorname}}
+                    </td>
+                    
+                    <td data-title="'Received Amount'" filter="{'receivedamount': 'text'}" sortable="'receivedamount'">{{bo.receivedamount}}
+                    </td>
+                    <td data-title="'Payment Mode'" filter="{'modeofpayment': 'text'}" sortable="'modeofpayment'">{{bo.modeofpayment}}
+                    </td>
+                    <td data-title="'Payment Date'" filter="{'paymentdate': 'text'}" sortable="'paymentdate'">{{bo.paymentdate}}
+                    </td>
+                    <td data-title="'Updated By'" filter="{'updatedbyname': 'text'}" sortable="'updatedbyname'">{{bo.updatedbyname}}
+                    </td>
+                     <td data-title="'Status'" filter="{'status': 'text'}" sortable="'status'"> 
+                     <select class="form-control inputEle" ng-model="model1" ng-change="OnStatusChange(bo.pPaymentoutwardId, model1)" ng-init="model1 = bo.status" ng-disabled="bo.status == 'Cleared' || !fullAccess"> 
+                      <!-- || role != 'Admin' || role != 'System Admin' || role != 'Account Manager' -->
+                          <option value="Cleared">Cleared</option>
+                          <option value="Uncleared">Uncleared</option>
+                        </select>
+                      </td>
+                    
+                    <td data-title="'Actions'" class="w150">
+                      <a data-toggle="modal" data-target=".addPaymentout" class="btn btn-success btn-xs" ng-click="editPaymentout(bo.pPaymentoutwardId)" tooltip-placement="top" uib-tooltip="Edit">
+                        <i class="fa fa-pencil-square-o">
+                        </i>
+                      </a> 
+                      <a data-toggle="modal" data-target=".viewPaymentout" class="btn btn-info btn-xs" ng-click="viewPaymentout(bo.pPaymentoutwardId, data_paymentout)" tooltip-placement="top" uib-tooltip="View">
+                        <i class="fa fa-eye">
+                        </i>
+                      </a>
+                      <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletePaymentout" ng-click="delPaymentout(bo.pPaymentoutwardId, data_paymentout)" tooltip-placement="top" uib-tooltip="Delete">
+                        <i class="fa fa-trash">
+                        </i>
+                      </a>
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <hr>
+              <!-- start edit modal -->
+              <div class="modal fade addPaymentout" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">Payment Out
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <form class="form-horizontal" name="addpaymentout" ng-submit="save(PaymentoutData)" novalidate>
+
+                        <div class="form-group">
+                          <label class="control-label col-sm-2" for="">Branch</label>
+                          <div class="col-sm-4">
+                              <select ng-model="PaymentoutData.bBranchId" name="enquirybranch" class="form-control inputEle" ng-options="bran.bBranchId as bran.branchname for bran in currentRoleBranches1"  ng-change="branchChange(PaymentoutData.bBranchId, currentRoleBranches1)" ng-required="true">
+                                <option value="">Select Branch</option>
+                              </select> 
+                              <div class="clearfix"></div>
+                            <p class="error" ng-show="addpaymentout.enquirybranch.$invalid && addpaymentout.enquirybranch.$touched">Select Branch</p>
+                          </div>
+                        </div>
+                        
+                        <div class="form-group">
+                          <label class="control-label col-md-2 mandatory" for="">Document Date
+                          </label>
+                          <div class="col-md-4">
+                           <datepicker date-format="yyyy-MM-dd" >
+                              <input ng-model="PaymentoutData.documentdate" name="docu" date-min-limit="{{currentDate}}" placeholder="Enter Date" class="form-control" type="text" ng-required="true" restrict-to="[0-9]"/> 
+                           </datepicker>
+						              <div class="clearfix"></div>
+                            <p class="error" ng-show="addpaymentout.docu.$invalid && addpaymentout.docu.$touched">Enter Document Date</p>
+                          </div>
+                          <label class="control-label col-md-2" for="">Document No
+                          </label>
+                          <div class="col-md-4">
+                            <input type="text"  class="form-control inputEle" ng-model="PaymentoutData.documentno" placeholder="Enter Number " > 
+                            
+                          </div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Vendor Name</label>
+                          <div class="col-md-4">
+                             <select name="vendor" ng-model="PaymentoutData.cVendorId" class="form-control inputEle" ng-options="ven.cVendorId as ven.vendorname for ven in Vendor" ng-required="true">
+                              <option value="">select Vendor Name</option>
+                            </select>
+                            <p class="error" ng-show="addpaymentout.vendor.$invalid && addpaymentout.vendor.$touched">Select Vendor Name</p> 
+                          </div>
+
+                          <label class="control-label col-md-2" for="">General Ledger</label>
+                          <div class="col-md-4">
+                            <select name="general" ng-model="PaymentoutData.cGeneralledgerId" class="form-control inputEle" ng-options="gl.cGeneralledgerId as gl.name for gl in GeneralLedger" ng-required="true">
+                                <option value="">Select General Ledger</option>
+                              </select>
+                              <p class="error" ng-show="addpaymentout.general.$invalid && addpaymentout.general.$touched">Select General Ledger</p>
+                          </div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Payment Amount</label>
+                          <div class="col-md-4">
+                              <input type="number" name="pay" class="form-control inputEle" ng-model="PaymentoutData.paymentamount" placeholder="Enter Amount "  ng-required="true"> 
+                              <p class="error" ng-show="addpaymentout.pay.$invalid && addpaymentout.pay.$touched">Enter Payment Amount</p> 
+                          </div>
+
+                          <label class="control-label col-sm-2" for="">TDS Percentage</label>
+                          <div class="col-sm-4">
+                             <input type="number" name="tdsper" class="form-control inputEle" ng-model="PaymentoutData.tdspercentage" placeholder="Enter Amount" ng-required="true" ng-blur="calTDS(PaymentoutData.paymentamount, PaymentoutData.tdspercentage)">
+                             <p class="error" ng-show="addpaymentout.tdsper.$invalid && addpaymentout.tdsper.$touched">Enter TDS Percentage</p>
+                          </div>
+
+                          
+                        </div>
+
+                         <div class="form-group required" >
+
+                         <label class="control-label col-sm-2" for="">TDS Amount</label>
+                          <div class="col-sm-4">
+                             <input type="text" name="tdsamount" class="form-control inputEle" ng-model="PaymentoutData.tdsamount" placeholder="Enter Amount" disabled>
+                          </div>
+                          
+
+                          <label class="control-label col-sm-2" for="">Payable Amount</label>
+                          <div class="col-sm-4">
+                             <input type="text" name="payable" class="form-control inputEle" ng-model="PaymentoutData.payableamount" placeholder="Enter Amount" disabled >
+                             <p class="error" ng-show="addpaymentout.payable.$invalid && addpaymentout.payable.$touched">Enter Payable Amount</p>
+                          </div>
+
+                          
+                        </div>
+                       
+                        <div class="form-group required">
+                        <label class="control-label col-sm-2" for="">Payment Mode</label>
+                            <div class="col-sm-4">
+                              <!-- <select ng-model="PaymentoutData.modeofpayment" name="modeofpayment" class="form-control inputEle" ng-options=" " ng-change=" " ng-disabled="disableDistrict" ng-required="true">
+                                <option value="Cash">Cash</option>
+                                <option value="Cheque">Cheque</option>
+                                <option value="Card">Card Payment</option>
+                                <option value="E T">E T</option>
+                              </select> -->
+                               <label class="radio-inline">
+                               <input type="radio" name="modeofpayment" ng-model="PaymentoutData.modeofpayment" value="Cash" ng-required="true" ng-click="CashChecked()">Cash
+                               </label>
+                               <label class="radio-inline">
+                               <input type="radio" name="modeofpayment" ng-model="PaymentoutData.modeofpayment" value="Cheque" ng-required="true" ng-click="ChequeChecked()">Cheque
+                               </label>
+                               <label class="radio-inline">
+                               <input type="radio" name="modeofpayment" ng-model="PaymentoutData.modeofpayment" value="Card" ng-required="true" ng-click="CardChecked()">Card Payment
+                               </label>
+                               <label class="radio-inline">
+                               <input type="radio" name="modeofpayment" ng-model="PaymentoutData.modeofpayment" value="E T" ng-required="true" ng-click="ETChecked()">E T
+                               </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group required">
+                            <label class="control-label col-sm-2" for="">Received Amount</label>
+                          <div class="col-sm-4">
+                             <input type="text" name="rece" class="form-control inputEle" ng-model="PaymentoutData.receivedamount" placeholder="Enter Amount" ng-required="true" >
+                             <p class="error" ng-show="addpaymentout.rece.$invalid && addpaymentout.rece.$touched">Enter Received Amount</p>
+                          </div>
+                          
+                          <div ng-show="PaymentoutData.modeofpayment=='Card'">
+                            <label class="control-label col-sm-2" for="">Trasaction Id</label>
+                            <div class="col-sm-4">
+                              <input type="text" name="tras" class="form-control inputEle" ng-model="PaymentoutData.transactionno" placeholder="Enter Trasaction Id" ng-required="ca" >
+                              <p class="error" ng-show="addpaymentout.tras.$invalid && addpaymentout.tras.$touched">Enter Trasaction Id</p>
+                            </div>
+                          </div>
+
+                          <div ng-show="PaymentoutData.modeofpayment=='E T'">
+                            <label class="control-label col-sm-2" for="">Trasaction Id</label>
+                            <div class="col-sm-4">
+                              <input type="text" name="trasa" class="form-control inputEle" ng-model="PaymentoutData.transactionno" placeholder="Enter Trasaction Id" ng-required="et" >
+                              <p class="error" ng-show="addpaymentout.trasa.$invalid && addpaymentout.trasa.$touched">Enter Trasaction Id</p>
+                            </div>
+                          </div>
+
+                          <div ng-show="PaymentoutData.modeofpayment=='Cheque'">
+                          <label class="control-label col-sm-2" for="">Cheque No</label>
+                          <div class="col-sm-4">
+                             <input type="number" name="che1" class="form-control inputEle" ng-model="PaymentoutData.chequeno" placeholder="Enter Cheque No" ng-required="che" >
+                             <p class="error" ng-show="addpaymentout.che1.$invalid && addpaymentout.che1.$touched">Enter Cheque No</p>
+                          </div>
+                          </div>
+                        </div>
+
+                        <div class="form-group required" >
+                          <div ng-show="PaymentoutData.modeofpayment=='Cheque'">
+                          <label class="control-label col-sm-2" for="">Cheque Date</label>
+                          <div class="col-sm-4">
+                            <datepicker date-format="yyyy-MM-dd" >
+                              <input name="che2" ng-model="PaymentoutData.chequedate" placeholder="Enter Date" class="form-control" restrict-to="[0-9]" type="text" ng-required="che"/>
+
+                           </datepicker>
+                           <div class="clearfix"></div>
+                           <p class="error" ng-show="addpaymentout.che2.$invalid && addpaymentout.che2.$touched">Enter Cheque Date</p>
+
+                          </div>
+
+                           <label class="control-label col-sm-2" for="">Bank Name</label>
+                          <div class="col-sm-4">
+                             <input type="text" name="che3" class="form-control inputEle" ng-model="PaymentoutData.bankname" placeholder="Enter Branch Name" ng-required="che" >
+                             <div class="clearfix"></div>
+                             <p class="error" ng-show="addpaymentout.che3.$invalid && addpaymentout.che3.$touched">Enter Bank Name</p>
+                          </div>
+                          </div>
+                        </div>
+                       
+                        <div class="form-group required" >
+                            
+                          <label class="control-label col-sm-2" for="">Payment Date</label>
+                          <div class="col-sm-4">
+                             <datepicker date-format="yyyy-MM-dd" date-min-limit="{{currentDate}}">
+                              <input name="paymentd" ng-model="PaymentoutData.paymentdate" placeholder="Enter Date" class="form-control" restrict-to="[0-9]" type="text" ng-required="true"/ >
+                           </datepicker>
+                           <div class="clearfix"></div>
+                           <p class="error" ng-show="addpaymentout.paymentd.$invalid && addpaymentout.paymentd.$touched">Enter Payment Date</p>
+                          </div>
+                          <label class="control-label col-sm-2" for="">Status</label>
+                          <div class="col-sm-4">
+                            <select name="sta" ng-model="PaymentoutData.status" class="form-control inputEle"  ng-required="true"  ng-init="PaymentoutData.status = 'Uncleared'" ng-disabled="!fullAccess">
+                              <option value="Cleared">Cleared</option>
+                              <option value="Uncleared">Uncleared</option>
+                            </select>
+                            <div class="clearfix"></div>
+                           <p class="error" ng-show="addpaymentout.sta.$invalid && addpaymentout.sta.$touched">Enter Status</p>
+                          </div>
+                        </div>
+
+                        <br>
+                        <div class="form-group">
+                          <div class="col-md-offset-5 col-md-5 ">
+                            <button type="submit"  ng-disabled="addpaymentout.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                            </button>
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <!-- <br> -->
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end edit modal  -->
+              <!-- start view modal -->
+              <div class="modal fade viewPaymentout" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">Payment Out
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                    <!-- <div class="form-group"> -->
+                      <div class="form-group">
+                        <label class="control-label col-md-2" for="">Branch:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewPaymentoutData.branchname}}
+                        </label>
+                      </div>
+
+                      <div class="clearfix"></div>
+                      <hr>
+                      <div class="form-group">
+                        <label class="control-label col-md-2" for=""> Document Date:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewPaymentoutData.documentdate}}
+                        </label>
+                      
+                        <label class="control-label col-md-2" for=""> Document No:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewPaymentoutData.documentno}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <hr>
+
+                       <div class="form-group">
+                        <label class="control-label col-md-2" for=""> Vendor Name:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewPaymentoutData.vendorname}}
+                        </label>
+                      
+                        <label class="control-label col-md-2" for=""> General Ledger:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewPaymentoutData.name}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <hr>
+
+                       <div class="form-group">
+                        <label class="control-label col-md-2" for="">Received Amount:</label>
+                        <label class="control-label col-md-4" for="">{{viewPaymentoutData.receivedamount}} 
+                        </label>
+                    
+                        <label class="control-label col-md-2" for="">TDS Percentage:</label>
+                        <label class="control-label col-md-4" for="">{{viewPaymentoutData.tdspercentage}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <hr>
+
+
+                       <div class="form-group">
+                        <label class="control-label col-md-2" for="">TDS Amount:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewPaymentoutData.tdsamount}}
+                        </label>
+                      
+                        <label class="control-label col-md-2" for="">Payable Amount:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewPaymentoutData.payableamount}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <hr>
+
+                       <div class="form-group">
+                        <label class="control-label col-md-2" for="">Payment Date:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewPaymentoutData.paymentdate}}
+                        </label>
+                        <label class="control-label col-md-2" for="">Payment Mode:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewPaymentoutData.modeofpayment}}
+                        </label>
+                       </div>
+                    <!-- </div> -->
+                        
+                        
+
+                      <div class="form-group" ng-show="viewCard">
+                        <div class="clearfix"></div>
+                        <hr>
+                        <label class="control-label col-md-2" for="">Trasaction Id:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewPaymentoutData.transactionno}}
+                        </label>
+                      </div>
+
+
+                      <div class="form-group" ng-show="ET">
+                        <div class="clearfix"></div>
+                        <hr>
+                        <label class="control-label col-md-2" for="">Trasaction Id:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewPaymentoutData.transactionno}}
+                        </label>
+                      </div>
+                      
+                      <div class="clearfix"></div>
+                      <hr>
+
+                      <div ng-show="viewCheque">
+                        <div class="form-group">
+                          <label class="control-label col-md-2" for=""> Cheque No:
+                          </label>
+                          <label class="control-label col-md-4" for="">{{viewPaymentoutData.chequeno}}
+                          </label>
+                        
+                          <label class="control-label col-md-2" for=""> Cheque Date:
+                          </label>
+                          <label class="control-label col-md-4" for="">{{viewPaymentoutData.chequedate}}
+                          </label>
+                        </div>
+                        <div class="clearfix"></div>
+                        <hr>
+
+                        <div class="form-group">
+                          <label class="control-label col-md-2" for="">Bank Name:
+                          </label>
+                          <label class="control-label col-md-4" for="">{{viewPaymentoutData.bankname}}
+                          </label>
+                        </div>
+                      </div> <!--view cheque ends-->
+
+
+                      <div class="clearfix"></div>
+                      <!-- <br> -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end view modal -->
+              <!-- start delete modal -->
+              <div class="modal fade deletePaymentout" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Delete Payment Out
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Are you sure you want to delete 
+                          <strong>{{deletePaymentoutData.vendorname}}?
+                          </strong>
+                        </h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="delete(deletePaymentoutData.pPaymentoutwardId)" onclick="$('.modal').modal('hide')">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Delete
+                        </a>
+                        <a class="btn btn-default btn-sm" data-dismiss="modal">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Cancel
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!-- end delete modal -->
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Payment/PaymentoutwardCtrl.js"></script>
+

@@ -1,0 +1,255 @@
+<!--================================
+=            Controller            =
+=================================-->
+
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state" >
+    <div class="container-fluid">
+
+    <div class="row no-margin" ng-controller="CActivityCtrl">
+    <div class="col-md-12 no-padding">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Client Activity</h3>
+            </div>
+            <div class="panel-body">
+            
+                <!-- toaster message -->
+                <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+                <!-- toaster message -->
+
+                <div class="button-group">
+                   <!--  <a href="#/Activity" class="btn btn-default btn-labeled btn-sm">
+                        <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back</a> -->
+                    <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                        <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</a>
+                        <a data-toggle="modal" data-target=".addclientactivities" class="btn btn-default btn-labeled btn-sm" ng-click="addActivityButtonClick()">
+                        <i class="fa fa-plus"></i>&nbsp;&nbsp;Add Activity</a>
+                </div>
+
+                <!--===================================
+                =            Student table            =
+                ====================================-->
+
+                <table ng-table="usersTable_activity" show-filter="true" class="table table-bordered table-striped text-center">
+                  <tbody>
+                    <tr ng-repeat="bo in data_activity">
+                     <td data-title="'Serial Number'" filter="{'index': 'text'}" sortable="'index'">{{$index + 1}}
+                      </td>
+                     <td data-title="'Client Name'" filter="{'companyname': 'text'}" sortable="'companyname'">{{bo.companyname}}
+                      </td>
+                      <td data-title="'Activity Type'" filter="{'activitytype': 'text'}" sortable="'activitytype'">{{bo.activitytype}}
+                      </td>
+                       <td data-title="'Description'" filter="{'description': 'text'}" sortable="'description'">{{bo.description}}
+                      </td>
+                       <td data-title="'Activity Date'" filter="{'activitydate': 'text'}" sortable="'activitydate'">{{bo.activitydate | date}}
+                      </td>
+                       <td data-title="'Pla Date'" filter="{'followupdate': 'text'}" sortable="'followupdate'">{{bo.followupdate | date}}
+                      </td>
+                       <td data-title="'Activity By'" filter="{'username': 'text'}" sortable="'username'">{{bo.username}}
+                      </td>
+                       <td data-title="'Activity Status'" filter="{'activitystatus': 'text'}" sortable="'activitystatus'">  
+                   
+                       <select class="form-control inputEle" ng-model="model1" ng-change="OnClientActivityStatusChange(bo.clClientactivityId, model1)" ng-init="model1 = bo.activitystatus" ng-disabled="bo.activitystatus == 'Close'"> 
+                
+                        <option value="Pending">Pending</option>
+                        <option value="Close">Close</option>
+                      </select>
+                      </td>
+
+                      <td data-title="'Actions'" class="w150">
+                        <button data-toggle="modal" data-target=".addclientactivities" class="btn btn-success btn-xs" ng-click="editClientActivity(bo.clClientactivityId)" tooltip-placement="top" uib-tooltip="Edit" ng-disabled="bo.activitystatus == 'Close'">
+                        <i class="fa fa-pencil-square-o">
+                        </i>
+                      </button> 
+
+                        <a ng-click="viewClientActivity(bo.clClientactivityId, data_activity)" data-toggle="modal" data-target=".viewclientactivity" class="btn btn-info btn-xs" tooltip-placement="top" uib-tooltip="View"><i class="fa fa-eye"></i>
+                        </a>
+
+                        <a class="btn btn-primary btn-xs" data-toggle="modal" data-target=".addclientactivities" ng-click="addClientActivityFromTable(bo.clClientactivityId, data_activity)" tooltip-placement="top" uib-tooltip="Add Activity">
+                          <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                        </a> 
+                      </td>
+                      
+                    </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!--==================================
+                =            Add Activity            =
+                ===================================-->
+                <div class="modal fade addclientactivities" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                    <div class="modal-dialog modal-lg" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" ng-click="clearModalOnCloseActivity()" data-dismiss="modal">&times;
+                          </button>
+                          <h4 class="modal-title">Add Activity
+                          </h4>
+                        </div>
+                        <div class="modal-body">
+                          <form class="form-horizontal" name="clientactivityform" ng-submit="saveClientActivities(ClientactivitiesData)" novalidate >
+                           <div class="form-group ">
+                           <label class="control-label col-sm-2 mandatory" for="">Client Name</label>
+                              <div class="col-sm-4">
+                                  <select name="client" ng-model="ClientactivitiesData.clClientId"  class="form-control inputEle" ng-options="com.clClientId as com.companyname for com in Company" ng-required="true" ng-disabled="disabledClientName">
+                                  <option value="">Select Company</option>
+                                  </select>
+                                  <div class="clearfix"></div>
+                                  <p class="error" ng-show="clientactivityform.client.$invalid && clientactivityform.client.$touched">Please Enter Client Name</p> 
+                              </div>                                      
+                              <label class="control-label col-md-2 mandatory" for="">Activity</label>
+                              <div class="col-md-4" >
+                                  <select name="act" ng-required="true" ng-model="ClientactivitiesData.activitytype" class="form-control inputEle"> 
+                                    <option>Email</option>
+                                    <option>Call</option>
+                                    <option>Messege</option>
+                                    <option>Visit</option>
+                                  </select>
+                                  <div class="clearfix"></div>
+                                    <p class="error" ng-show="clientactivityform.act.$invalid && clientactivityform.act.$touched">Please Select Activity</p>
+                              </div> 
+                            </div> 
+                            <input type="hidden" ng-model="ClientactivitiesData.eEnquiryFormId">
+                            <div class="form-group ">
+                               <label class="control-label col-md-2" for="">Description</label>
+                                <div class="col-md-10">
+                                   <textarea name="desc" class="form-control inputEle"  ng-model="ClientactivitiesData.description" placeholder="Enter Description" ></textarea>
+                                   <!-- <div class="clearfix"></div>
+                                    <p class="error" ng-show="clientactivityform.desc.$invalid && clientactivityform.desc.$touched">Please Enter Description</p> -->
+                                </div>   
+                            </div>
+
+                            <div class="form-group">
+
+                            <label class="control-label col-md-2 mandatory" for="">Plan Date</label>
+                              <div class="col-md-4">
+                               <datepicker date-format="yyyy-MM-dd">
+                                  <input name="plandate" ng-required="true" ng-model="ClientactivitiesData.followupdate" restrict-to="[0-9]" placeholder="Enter Date" class="form-control" type="text"/>
+                                  <div class="clearfix"></div>
+                                    <p class="error" ng-show="clientactivityform.plandate.$invalid && clientactivityform.plandate.$touched">Please Enter Date</p>
+                               </datepicker>
+                              </div>
+                              
+                               <label class="control-label col-md-2" for="">Activity Date</label>
+                              <div class="col-md-4">
+                               <datepicker date-format="yyyy-MM-dd">
+                                  <input ng-model="ClientactivitiesData.activitydate" restrict-to="[0-9]" placeholder="Enter Date" class="form-control" type="text"/>
+                               </datepicker>
+                               <!-- <div class="clearfix"></div>
+                                    <p class="error" ng-show="clientactivityform.actdate.$invalid && clientactivityform.actdate.$touched">Please Enter Date</p> -->
+                              </div>
+
+                               
+                           </div>
+                           
+                           <div ng-hide="hideActivityStatus"> 
+                            <div class="form-group ">                                
+                              <label class="control-label col-md-2 mandatory" for="">Activity Status</label>
+                              <div class="col-md-4" >
+                                  <select name="actstatus" ng-required="statusReq" ng-model="ClientactivitiesData.activitystatus" class="form-control inputEle"> 
+                                    <option>Pending</option>
+                                    <option>Close</option>
+                                  </select>
+                                  <div class="clearfix"></div>
+                                    <p class="error" ng-show="clientactivityform.actstatus.$invalid && clientactivityform.actstatus.$touched">Please Select Status</p>
+                              </div> 
+                            </div> 
+                            </div>
+
+                            <input type="hidden" value="{{ClientactivitiesData.activitystatus}}">
+                           
+                           <br>
+                            <div class="form-group">
+                              <div class="col-md-12 text-center">
+                                <button type="submit" ng-disabled="clientactivityform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                                </button>
+                              </div>
+                            </div>
+                            <div class="clearfix"></div>
+                           </form>
+                        </div>
+                      </div>
+                    </div>
+
+                </div>
+                <!--====  End of Add Activity  ====-->
+
+                  <!--===================================
+                =            View Activity            =
+                ====================================-->
+                <div class="modal fade viewclientactivity" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">View Activity
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        
+                      <form class="form-horizontal" novalidate>
+                           <div class="form-group ">
+                           <label class="control-label col-sm-2" for="">Client</label>
+                           <label class="control-label col-sm-4" style="text-align: left;" for="">{{viewClientActivityData.companyname}}</label>
+                                                                   
+                              <label class="control-label col-md-2" for="">Activity</label>
+                              <label class="control-label col-sm-4" style="text-align: left;" for="">{{viewClientActivityData.activitytype}}</label>
+                            </div> 
+                            <div class="clearfix"></div>
+                            <hr>
+
+                            <div class="form-group ">
+                               <label class="control-label col-md-2" for="">Description</label>
+                               <label class="control-label col-sm-10" style="text-align: left;" for="">{{viewClientActivityData.description}}</label>  
+                            </div>
+                             <div class="clearfix"></div>
+                            <hr>
+
+                            <div class="form-group ">
+                              
+                              <label class="control-label col-md-2" for="">Plan Date</label>
+                              <label class="control-label col-sm-4" style="text-align: left;" for="">{{viewClientActivityData.followupdate | date}}</label>
+
+                               <label class="control-label col-md-2" for="">Activity Date</label>
+                               <label class="control-label col-sm-4" style="text-align: left;" for="">{{viewClientActivityData.activitydate | date}}</label>
+
+                           </div>
+                            <div class="clearfix"></div>
+                            <hr>
+
+                           <div class="form-group ">                                
+                              <label class="control-label col-md-2" for="">Activity Status</label>
+                              <label class="control-label col-sm-4" style="text-align: left;" for="">{{viewClientActivityData.activitystatus}}</label>
+
+                              <label class="control-label col-md-2" for="">Activity By</label>
+                              <label class="control-label col-sm-4" style="text-align: left;" for="">{{viewClientActivityData.username}}</label>
+                            </div>
+
+
+                            <div class="clearfix"></div>
+                            <br>
+                           </form>
+
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!--====  End of View Activity  ====-->
+
+    
+</div>
+</div>
+<!--====  End of Controller  ====-->
+</div>
+</div>
+</div>
+</div>
+
+<!--====  End of Controller  ====-->
+
+ <script src="view/pages/Client/Client Activity/CActivityCtrl.js"></script>

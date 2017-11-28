@@ -1,0 +1,63 @@
+<!--================================
+=            Controller            =
+=================================-->
+
+<div class="row no-margin" ng-controller="paymentCtrl">
+  <div class="col-md-12 no-padding">
+    <div class="panel panel-info">
+      <div class="panel-body">
+
+        <!-- toaster message -->
+        <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+        <!-- toaster message -->
+
+        <div class="button-group">
+            <button ng-click="exportAction('excel','Payment')" class="btn btn-default btn-labeled btn-sm pull-right" ng-disabled="data_Payment.length > 0 ? false : true">
+                  <i class="fa fa-file-excel-o"></i>&nbsp;&nbsp;Export to Excel</button>
+        </div>
+        <br><br>
+
+        <table ng-table="usersTable_Payment" show-filter="true" class="table table-bordered table-striped text-center export-table">
+          <tbody>
+            <tr ng-repeat="bo in data_Payment">
+              <td data-title="'Sr No.'" filter="{'index': 'text'}" sortable="'index'">{{$index + 1}}
+              </td>
+               <td data-title="'Receipt No.'" filter="{'receiptno': 'text'}" sortable="'receiptno'">{{bo.receiptno}}
+              </td>
+               <td data-title="'Payment Type'" filter="{'feestype': 'text'}" sortable="'feestype'">{{bo.feestype}}
+              </td>
+              <td data-title="'Paid Amount'" filter="{'paymentamount': 'text'}" sortable="'paymentamount'">{{bo.paymentamount}}
+              </td>
+              <td data-title="'Payment Date'" filter="{'created': 'text'}" sortable="'created'">{{bo.created | date}}
+              </td>
+              <td data-title="'Payment Mode'" filter="{'modeofpayment': 'text'}" sortable="'modeofpayment'">{{bo.paymentstatus}}
+              </td>
+              <td data-title="'Payment Status'" filter="{'paymentstatus': 'text'}" sortable="'paymentstatus'">
+              {{bo.modeofpayment}}
+                  <!-- <select class="form-control inputEle" ng-model="model1" ng-change="OnPaymentStatusChange(bo.ePaymentregistrationId, model1)" ng-init="model1 = bo.paymentclearstatus" ng-disabled="bo.paymentclearstatus == 'Cleared'"> 
+                    <option value="Cleared">Cleared</option>
+                    <option value="Uncleared">Uncleared</option>
+                  </select> -->
+              </td>
+              <td data-title="'Remaining Amount'" filter="{'dueamount': 'text'}" sortable="'dueamount'">{{bo.dueamount}}
+              </td>
+              <td data-title="'Created By'" filter="{'createdbyusername': 'text'}" sortable="'createdbyusername'">{{bo.createdbyusername}}
+              </td>
+              <td data-title="'Updated By'" filter="{'updatedusername': 'text'}" sortable="'updatedusername'">{{bo.updatedusername}}
+              </td>
+              <td data-title="'Status'" filter="{'status': 'text'}" sortable="'status'"><!-- {{bo.status}} -->
+              <span style="font-size: 12px;" class="label" ng-class="{'label-success' : bo.status=='Cleared', 'label-danger' : bo.status=='Uncleared'}">{{bo.status}}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <hr> 
+      </div>
+    </div>
+  </div>
+</div>
+  
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Sales/Registration/RePaymentCtrl.js"></script>
+

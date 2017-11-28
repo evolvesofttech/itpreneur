@@ -1,0 +1,309 @@
+<style type="text/css">
+    .view-label {
+        margin-top: 7px;
+    }
+</style>
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-controller="userLocationCtrl">
+    <!-- toaster message -->
+    <toaster-container toaster-options="{'time-out': 3000}"></toaster-container>
+    <!-- toaster message -->
+
+	<a data-toggle="modal" data-target=".adduseraddress" class="btn btn-default btn-labeled btn-sm" ng-click="addLocationClick()">
+    <i class="fa fa-map-marker"></i>&nbsp;&nbsp;Add User Address</a>
+    <!-- table starts -->
+    <div class="clearifx"></div>
+    <br>
+    <table ng-table="usersTable_location" show-filter="true" class="table table-bordered table-striped text-center">
+        <tbody>
+            <tr ng-repeat="loc in data_location">
+                <td data-title="'Address Type'" filter="{ 'addresstype': 'text' }">{{loc.addresstype}}</td>
+
+                <td data-title="'Address'" filter="{ 'line1': 'text' }">
+                {{loc.line1}}&nbsp;&nbsp;{{loc.line2}}&nbsp;&nbsp;{{loc.line3}}
+                </td>
+
+                 <td data-title="'Country'" filter="{ 'country': 'text' }">{{loc.country}}</td>
+
+                <td data-title="'State'" filter="{ 'statename': 'text' }">{{loc.statename}}</td>
+
+                <td data-title="'City'" filter="{ 'city': 'text' }">{{loc.city}}</td>
+
+                <td data-title="'District'" filter="{ 'districtname': 'text' }">{{loc.districtname}}</td>
+
+                <td data-title="'Taluka'" filter="{ 'talukaname': 'text' }">{{loc.talukaname}}</td>
+
+                <td data-title="'Pincode'" filter="{ 'pincode': 'text' }">{{loc.pincode}}</td>
+
+                <td data-title="'Actions'" class="w150 text-center">
+                    <a class="btn btn-success btn-xs" ng-click="editLocation(loc.adUseraddressdetailId)" data-toggle="modal" data-target=".adduseraddress" tooltip-placement="top" uib-tooltip="Edit">
+                    <i class="fa fa-edit"></i>
+                    </a>
+
+                    <a href="" class="btn btn-info btn-xs" ng-click="viewLocation(loc.adUseraddressdetailId, data_location)" data-toggle="modal" data-target=".viewuseraddress" tooltip-placement="top" uib-tooltip="View">
+                    <i class="fa fa-eye"></i>
+                    </a>
+
+                    <a class="btn btn-xs btn-danger" data-toggle="modal" data-target=".deleteLocation" ng-click="delLocation(loc.adUseraddressdetailId, data_location)" tooltip-placement="top" uib-tooltip="Delete">
+                    <i class="fa fa-trash"></i>
+                    </a>
+
+                    <a href="" class="btn btn-primary btn-xs" disabled><i class="fa fa-plus"></i></a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <!-- table ends -->
+
+    <!--===========================================
+    =            Address Details Modal            =
+    ============================================-->
+    <div class="modal fade adduseraddress" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" sc_school_id>
+                <div class="modal-header">
+                    <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                    <!-- <h4 class="modal-title">Add User Address</h4> -->
+                    <h4 class="modal-title" >Add Address</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" name="addlocation" ng-submit="saveaddress(userData1Add)" novalidate>
+
+                        <input type="hidden" ng-model="userData1Add.adUseraddressdetailId">
+                        <!-- address 1 starts -->
+                        <div class="address1">
+                            <div class="form-group required">
+                                
+                                <label class="control-label col-md-2" for="">Address Type</label>
+                                <div class="col-md-8">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="radio1" value="Correspondance Address" ng-model="userData1Add.addresstype" ng-disabled="disableField" ng-required="true">Correspondance Address
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="radio1" value="Permanant Address" ng-model="userData1Add.addresstype" ng-disabled="disableField" ng-required="true">Permanant Address
+                                    </label>
+                                </div>
+                            </div>
+                            <input type="hidden" ng-model="userData1Add.bBranchId">
+                            <div class="form-group required">
+                                <label class="control-label col-md-2" for="">Address </label>
+                                <div class="col-md-3">
+                                    <input type="text" name="flat" class="form-control" ng-model="userData1Add.line1" placeholder="Flat Number" ng-disabled="disableField" ng-required="true"/>
+                                    <!--  <button ng-click="add()">+</button>   -->
+                                    <div class="clearfix"></div>
+                                      <p class="error" ng-show="addlocation.flat.$invalid && addlocation.flat.$touched">Please Enter Flat No.</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" name="area" class="form-control" ng-model="userData1Add.line2" placeholder="Street" ng-disabled="disableField" ng-required="true" />
+                                    <div class="clearfix"></div>
+                                      <p class="error" ng-show="addlocation.area.$invalid && addlocation.area.$touched">Please Enter Area</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" name="landMark" class="form-control" ng-model="userData1Add.line3" placeholder="Area" ng-disabled="disableField" ng-required="true" />
+                                    <div class="clearfix"></div>
+                                  <p class="error" ng-show="addlocation.landMark.$invalid && addlocation.landMark.$touched">Please Enter Landmark</p>
+                             </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-2" for="">Landmark </label>
+                                <div class="col-md-4">
+                                    <input type="text" name="land" class="form-control" ng-model="userData1Add.landmark" placeholder="Enter Landmark" ng-disabled="disableField" ng-required="true"/>
+                                    <!--  <button ng-click="add()">+</button>   -->
+                                    <div class="clearfix"></div>
+                                    <p class="error" ng-show="addlocation.land.$invalid && addlocation.land.$touched">Please Enter Landmark</p>
+
+                                </div>
+                                 <label class="control-label col-md-2" for="">Country </label>
+                                <div class="col-md-4">
+                                    <input type="text" name="con" class="form-control" ng-model="userData1Add.country" placeholder="Enter Country" ng-disabled="disableField" ng-required="true"/>
+                                    <!--  <button ng-click="add()">+</button>   -->
+                                    <div class="clearfix"></div>
+                                      <p class="error" ng-show="addlocation.con.$invalid && addlocation.con.$touched">Please Enter Country</p>
+                                </div>
+                               
+                            </div>
+                            <div class="form-group required">
+                                <label class="control-label col-md-2" for="">State</label>
+                                <div class="col-md-4">
+                                    <select ng-model="userData1Add.cStateId" name="state" class="form-control inputEle" ng-options="st.cStateId as st.statename for st in State" ng-change="OnStateChange(userData1Add.cStateId)" ng-disabled="disableField" ng-focus="ngStateFocus()" ng-required="true">
+                                        <option value="">select a State</option>
+                                    </select>
+                                    <div class="clearfix"></div>
+                                  <p class="error" ng-show="addlocation.state.$invalid && addlocation.state.$touched">select a State</p>
+                                </div>
+                                <label class="control-label col-md-2" for="">City</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="CiTy" class="form-control" name="City" placeholder="Enter City" ng-model="userData1Add.city" ng-required="true" ng-disabled="disableField"/>
+                                    <div class="clearfix"></div>
+                                  <p class="error" ng-show="addlocation.CiTy.$invalid && addlocation.CiTy.$touched">Please Enter City</p>
+                                </div>
+                            </div>
+                            <div class="form-group required">
+                                <label class="control-label col-md-2" for="">District</label>
+                                <div class="col-md-4">
+                                    <select ng-model="userData1Add.cDistrictId" name="district" class="form-control inputEle" ng-options="ds.cDistrictId as ds.districtname for ds in District" ng-change="OnDistrictChange(userData1Add.cDistrictId)" ng-disabled="disableDistrict" ng-required="true">
+                                        <option value="">Select a District</option>
+                                    </select>
+                                     <div class="clearfix"></div>
+                                  <p class="error" ng-show="addlocation.district.$invalid && addlocation.district.$touched">Select a District</p>
+                                </div>
+                                <label class="control-label col-md-2" for="">Taluka</label>
+                                <div class="col-md-4">
+                                    <select ng-model="userData1Add.cTalukaId" name="taluka" class="form-control inputEle" ng-options="tk.cTalukaId as tk.talukaname for tk in Taluka" ng-disabled="disableTaluka" ng-required="true">
+                                        <option value="">Select a Taluka</option>
+                                    </select>
+                                     <div class="clearfix"></div>
+                                  <p class="error" ng-show="addlocation.taluka.$invalid && addlocation.taluka.$touched">Select a Taluka</p>
+                                </div>
+                            </div>
+                            <div class="form-group required">
+                                <label class="control-label col-md-2" for="">Pin Code</label>
+                                <div class="col-md-4">
+                                    <input type="number" name="PinCode" class="form-control inputEle" ng-model="userData1Add.pincode" placeholder="Enter Pin Code" ng-disabled="disableField" ng-required="true">
+                                    <div class="clearfix"></div>
+                                  <p class="error" ng-show="addlocation.PinCode.$invalid && addlocation.PinCode.$touched">Please Enter Pin Code</p>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="form-group">
+                                <div class="col-md-12 text-center">
+                                    <button type="submit" ng-disabled="addlocation.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')" ng-disabled="disableField">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--====  End of Address Details Modal  ====-->
+
+    <!--==========================================
+    =            View Address Details            =
+    ===========================================-->
+    <div class="modal fade viewuseraddress" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" sc_school_id>
+                <div class="modal-header">
+                    <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                    <!-- <h4 class="modal-title">Add Institute Address Details</h4> -->
+                    <h4 class="modal-title">View Address Details</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" novalidate>
+                        <!-- address 1 starts -->
+                        <div class="address1">
+                            <div class="form-group">
+                                <input type="hidden" value="{{intituteIdLabel}}">
+                                <label class="control-label col-md-2" for="">Address Type</label>
+                                <div class="col-md-8">
+                                    <label class="control-label col-md-2">{{viewAddressData.addresstype}}</label>
+                                </div>
+                                
+                            </div>
+                            <hr>
+                            <div class="form-group">
+                                <label class="control-label col-md-2" for="">Address </label>
+                                <div class="col-md-3">
+                                  <label class="control-label col-md-2">{{viewAddressData.line1}}</label>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="control-label col-md-2">{{viewAddressData.line2}}</label>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="control-label col-md-2">{{viewAddressData.line3}}</label>
+                                </div>
+                            </div>
+                             <hr>
+                             <div class="form-group ">
+                                <label class="control-label col-md-2" for="">Landmark</label>
+                                <div class="col-md-4">
+                                    <label class="control-label col-md-2">{{viewAddressData.landmark}}</label>
+                                </div>
+                                <label class="control-label col-md-2" for="">Country</label>
+                                <div class="col-md-4">
+                                  <label class="control-label col-md-2">{{viewAddressData.country}}</label>
+                                </div>
+                                
+                            </div>
+                             <hr>
+                            <div class="form-group ">
+                                <label class="control-label col-md-2" for="">State</label>
+                                <div class="col-md-4">
+                                  <label class="control-label col-md-2" >{{viewAddressData.statename}}</label>
+                                </div>
+                                <label class="control-label col-md-2" for="">City</label>
+                                <div class="col-md-4">
+                                    <label class="control-label col-md-2">{{viewAddressData.city}}</label>
+                                </div>
+                            </div>
+                             <hr>
+                            <div class="form-group ">
+                                <label class="control-label col-md-2" for="">District</label>
+                                <div class="col-md-4">
+                                    <label class="control-label col-md-2">{{viewAddressData.districtname}}</label>
+                                </div>
+                                <label class="control-label col-md-2" for="">Taluka</label>
+                                <div class="col-md-4">
+                                    <label class="control-label col-md-2">{{viewAddressData.talukaname}}</label>
+                                </div>
+                            </div>
+                             <hr>
+                            <div class="form-group ">
+                                <label class="control-label col-md-2" for="">Pin Code</label>
+                                <div class="col-md-4">
+                                    <label class="control-label col-md-2">{{viewAddressData.pincode}}</label>
+                                </div>
+                            </div>
+                            <br>
+                        </div>
+                        <div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--====  End of View Address Details  ====-->
+    
+
+    <!--=====================================
+    =            Delete Location            =
+    ======================================-->
+    <div class="modal fade deleteLocation" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;
+            </button>
+            <h4 class="modal-title">Delete Location
+            </h4>
+          </div>
+          <div class="modal-body">
+            <h4>Are you sure you want to delete 
+              <strong>{{deleteuserData1.addressone}}&nbsp;&nbsp;{{deleteuserData1.addresstwo}}&nbsp;&nbsp;{{deleteuserData1.addressthree}}?
+              </strong>
+            </h4>
+            <br>
+            <a class="btn btn-danger btn-sm" ng-click="deleteLocation(deleteuserData1.adUseraddressdetailId)" onclick="$('.modal').modal('hide')">
+              <i class="fa fa-trash">
+              </i>&nbsp;&nbsp;Delete
+            </a>
+            <a class="btn btn-default btn-sm" data-dismiss="modal">
+              <i class="fa fa-trash">
+              </i>&nbsp;&nbsp;Cancel
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--====  End of Delete Location  ====-->
+
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Users/Sales/userAddressCtrl.js"></script>

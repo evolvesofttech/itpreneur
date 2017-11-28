@@ -1,0 +1,109 @@
+<style>
+  
+  /*.col-md-4{
+     margin-top: 10px;
+  }*/
+</style>
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="summaryCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Test Summary</h3>
+            </div>
+            <div class="panel-body">
+              <!-- <div class="card" > -->
+                <table class="table table-bordered">
+                  <tbody>
+                    <tr>
+                      <td>Test Name</td>
+                      <td>{{sumarry[0].title}}</td>
+                    </tr>
+                    <tr>
+                      <td>Total Question</td>
+                      <td>{{sumarry[0].totalquestions}}</td>
+                    </tr>
+                    <tr>
+                      <td>Attempted Question</td>
+                      <td>{{sumarry[0].attemptedquestions}}</td>
+                    </tr>
+                    <tr>
+                      <td>Not Attempted Question</td>
+                      <td>{{(sumarry[0].totalquestions) - (sumarry[0].attemptedquestions)}}</td>
+                    </tr>
+                    <tr>
+                      <td>Total Marks</td>
+                      <td>{{sumarry[0].totalmarks}}</td>
+                    </tr>
+                    <tr>
+                      <td>Scored Marks</td>
+                      <td>{{sumarry[0].marks}}</td>
+                    </tr>
+                    <tr>
+                      <td>Percentage</td>
+                      <td>{{sumarry[0].percentage | limitTo: 5}}%</td>
+                    </tr>
+                    <tr>
+                      <td>Result</td>
+                      <td>{{sumarry[0].result}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <!-- </div> -->
+                <div class="clearfix"></div><br><br>
+                <div class="form-group">
+                 <div class="col-md-12 text-center">
+                     <button type="button"  class="btn btn-info" ng-click="backbtnclick()">Back</button>
+                    <button type="button"  class="btn btn-info" ng-click="detailsclick()">Details Question</button>
+                  </div>
+                </div> 
+                <div class="clearfix"></div><br><br>
+                <!--Start Details Question -->
+                <div class="col-md-12" ng-show="showdetails">
+                  <table ng-table="detailsTable" class="table table-bordered table-sm" show-filter="true">
+                    <tr ng-repeat="tst in detailsqueData">
+                        <td data-title="'Sr. No.'" sortable="'index'">{{$index + 1}}</td>
+                        
+                        <td data-title="'Question'" sortable="'question'"  style="width: 95%">
+                            <h3>Q: {{tst.question}}</h3>
+                              <p class="pull-right"><b>Marks  : &nbsp;{{tst.marks}}<b></p>
+                              <p ng-class="{'label label-default': tst.attemptedanswer == '1'}"><span>
+                                <i ng-class="{'fa fa-check': tst.rightanswer == '1' }"></i></span> 1) {{ tst.text1 }}</p>
+
+                              <p ng-class="{'label label-default': tst.attemptedanswer == '2'}"><span>
+                                <i ng-class="{'fa fa-check': tst.rightanswer == '2' }"></i></span> 2) {{ tst.text2 }}</p>
+
+                              <p ng-class="{'label label-default': tst.attemptedanswer == '3'}"><span>
+                                <i ng-class="{'fa fa-check': tst.rightanswer == '3' }"></i></span> 3) {{ tst.text3 }}</p>
+
+                              <p ng-class="{'label label-default': tst.attemptedanswer == '4'}"><span>
+                                <i ng-class="{'fa fa-check': tst.rightanswer == '4' }"></i></span> 4) {{ tst.text4 }}</p>
+                              <span class="pull-right">
+                                &nbsp;&nbsp;<i class="fa fa-check"></i>&nbsp; - Correct Answer
+                              </span>
+                              <span class="pull-right">
+                                <i class="label label-default" style="width: 30px;display: inline-block;height: 14px;position: relative;top: 4px;"></i>&nbsp; - Your Answer&nbsp;&nbsp;|
+                              </span>
+                              <!-- <p><b>Attempt Answer  : &nbsp;{{tst.attemptedanswer}}</b></p> -->
+                              <!-- <p><b>Correct Answer  : &nbsp;{{tst.rightanswer}}</b></p> -->
+                        </td>
+                      </tr>
+                  </table>
+                </div>
+                <!--End Details Question -->       
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Student/Test/summaryCtrl.js"></script>
+

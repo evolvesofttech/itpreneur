@@ -1,0 +1,235 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div class="row no-margin" ng-controller="clientcpCtrl">
+  <div class="col-md-12 no-padding">
+    <div class="panel panel-info">
+      <div class="panel-body">
+        
+        <!-- toaster message -->
+        <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+        <!-- toaster message -->
+
+        <div class="button-group">
+          <a data-toggle="modal" data-target=".addclientcp" ng-click="addcontactperson()" class="btn btn-default btn-labeled btn-sm">
+            <i class="fa fa-plus-circle">
+            </i>&nbsp;&nbsp;Add Contact Person
+          </a>
+        </div>
+        <table ng-table="usersTable_clientcp" show-filter="true" class="table table-bordered table-striped text-center">
+          <tbody>
+            <tr ng-repeat="bo in data_clientcp">
+              <td data-title="'Incharge Person'" filter="{'inchargeperson': 'text'}" sortable="'inchargeperson'">{{bo.inchargeperson}}
+              </td>
+               <td data-title="'Designation'" filter="{'designation': 'text'}" sortable="'designation'">{{bo.designation}}
+              </td>
+              <td data-title="'Mobile No'" filter="{'contactno': 'text'}" sortable="'contactno'">{{bo.contactno}}
+              </td>
+               <td data-title="'Landline No'" filter="{'landline': 'text'}" sortable="'landline'">{{bo.extension}}
+              </td>
+               <td data-title="'Email Id'" filter="{'email': 'text'}" sortable="'email'">{{bo.email}}
+              </td>
+              <td data-title="'Actions'" class="w150">
+                <a data-toggle="modal"  class="btn btn-success btn-xs" data-target=".addclientcp" ng-click="editClientcp(bo.clClientcontactpersonId)" tooltip-placement="top" uib-tooltip="Edit">
+                  <i class="fa fa-pencil-square-o"></i>
+                </a> 
+                <a data-toggle="modal" data-target=".viewclientcp" class="btn btn-info btn-xs" ng-click="viewClientcp(bo.clClientcontactpersonId, data_clientcp)" tooltip-placement="top" uib-tooltip="View">
+                  <i class="fa fa-eye">
+                  </i>
+                </a>
+                <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deleteclientcp" ng-click="delClientcp(bo.clClientcontactpersonId, data_clientcp)" tooltip-placement="top" uib-tooltip="Delete">
+                  <i class="fa fa-trash">
+                  </i>
+                </a>
+                
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <hr>
+        
+        <!-- start edit modal -->
+        <div class="modal fade addclientcp" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="clearModalOnCloseContactPerson()" data-dismiss="modal">&times;
+                </button>
+                <h4 class="modal-title" ng-init="headingMessage = 'Add Contact Person'">{{headingMessage}}</h4>
+              </div>
+              <div class="modal-body">
+                
+              <form class="form-horizontal" name="jobspecificationform" ng-submit="saveClientcp(clientcpData)" novalidate>
+             <!--  <legend>Office Use</legend> -->
+
+              <input type="hidden" ng-model="eEnquiryFormId">
+              <div class="form-group required ">
+                <label class="control-label col-sm-2" for="">Incharge Person</label>
+                <div class="col-sm-4">
+                <input type="text" name="inchargep" class="form-control inputEle" ng-model="clientcpData.inchargeperson" placeholder="Enter Incharge" ng-required="true">
+                <div class="clearfix"></div>
+                <p class="error" ng-show="jobspecificationform.inchargep.$invalid && jobspecificationform.inchargep.$touched">Please Enter Incharge Person </p> 
+                </div>
+                <label class="control-label col-sm-2" for="">Designation</label>
+                <div class="col-sm-4">
+                   <input name="desg" type="text" class="form-control inputEle" ng-model="clientcpData.designation" placeholder="Enter Designation" ng-required="true" >
+                   <div class="clearfix"></div>
+                   <p class="error" ng-show="jobspecificationform.desg.$invalid && jobspecificationform.desg.$touched">Please Enter Designation</p>
+                </div>
+              </div>
+             
+              <div class="form-group"> 
+                  <label class="control-label col-sm-2 mandatory" for="">Mobile No</label>
+                  <div class="col-sm-4">
+                     <input type="number" name="mob" class="form-control inputEle" ng-model="clientcpData.contactno" placeholder="Enter Contact Number" ng-required="true" maxlength="10" minlength="10" required restrict-to="[0-9]">
+                     <div class="clearfix"></div>
+                      <p class="error" ng-show="jobspecificationform.mob.$invalid && jobspecificationform.mob.$touched">Please Enter Contact Number</p>
+                  </div>
+                  <label class="control-label col-sm-2" for="">Alternate No</label>
+                  <div class="col-sm-4">
+                     <input type="text" name="mob1" class="form-control inputEle" ng-model="clientcpData.altcontactno" placeholder="Enter Contact Number" maxlength="10" minlength="10" restrict-to="[0-9]">
+                     <!-- <div class="clearfix"></div>
+                      <p class="error" ng-show="jobspecificationform.mob1.$invalid && jobspecificationform.mob1.$touched">Please Enter Contact Number</p> -->
+                  </div>
+                </div>
+
+                 <div class="form-group">
+                  <label class="control-label col-sm-2" for="">Landline No</label>
+                  <div class="col-sm-4">
+                      <input type="text" name="exten" class="form-control inputEle" ng-model="clientcpData.extension" restrict-to="[0-9]">
+                      <!-- <div class="clearfix"></div>
+                   <p class="error" ng-show="jobspecificationform.exten.$invalid && jobspecificationform.exten.$touched">Please Enter Landline Number</p> -->
+                  </div> 
+                  
+
+                <!-- <label class="control-label col-sm-2" for="">Landline No</label> -->
+                 
+                  <label class="control-label col-sm-2 mandatory" for="">Email Id</label>
+                  <div class="col-sm-4">
+                      <input type="email" name="mail" class="form-control inputEle" ng-model="clientcpData.email" placeholder="Enter Email Id" ng-required="true"  ng-pattern="/^[a-zA-Z]+[a-zA-Z0-9._]+@[a-zA-Z]+\.[a-zA-Z.]{2,5}$/">
+                      <div class="clearfix"></div>
+                      <p class="error" ng-show="jobspecificationform.mail.$invalid && jobspecificationform.mail.$touched">Please Enter Email Id</p>
+                  </div>
+                </div>
+  
+               <br>
+               <div class="form-group">
+                      <div class="col-md-12 text-center">
+                        <button type="submit" ng-disabled="jobspecificationform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                        </button>
+                      </div>
+                    </div>
+                    <div class="clearfix"></div>
+              </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end edit modal  -->
+
+
+        <!-- start view modal -->
+        <div class="modal fade viewclientcp" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="clearModalOnCloseContactPerson()" data-dismiss="modal">&times;
+                </button>
+                <h4 class="modal-title">Contact Person
+                </h4>
+              </div>
+              <div class="modal-body">
+                
+                <!-- form -->
+                  <form class="form-horizontal" novalidate>
+                  <div class="form-group ">
+                    <label class="control-label col-sm-2" for="">Incharge Person:</label>
+                    <label class="control-label col-sm-4" for="" style="text-align: left;">{{viewclientcpData.inchargeperson}}</label>
+                  
+                    <label class="control-label col-sm-2" for="">Designation:</label>
+                    <label class="control-label col-sm-4" for="" style="text-align: left;">{{viewclientcpData.designation}}</label>
+                  </div>
+
+ 
+                  <div class="clearfix"></div>
+                  <hr>
+                  <div class="form-group">
+                    <label class="control-label col-sm-2" for="">Mobile No:</label>
+                    <label class="control-label col-sm-4" for="" style="text-align: left;">{{viewclientcpData.contactno}}</label>
+
+                    <label class="control-label col-sm-2" for="">Alternate No:</label>
+                    <label class="control-label col-sm-4" for="" style="text-align: left;">{{viewclientcpData.altcontactno}}</label>
+                  </div>
+                  <div class="clearfix"></div>
+                  <hr>
+                   <div class="form-group">
+                      <label class="control-label col-md-2" for="">Landline No:</label>
+                      <label class="control-label col-md-4" for="" style="text-align: left;">{{viewclientcpData.extension}}</label>
+                      <label class="control-label col-md-2" for="">Email:</label>
+                      <label class="control-label col-md-4" for="" style="text-align: left;">{{viewclientcpData.email}}</label>
+                    </div>
+
+                     <div class="clearfix"></div>
+                    
+
+                    <!--  <div class="form-group">
+                    <label class="control-label col-sm-2" for="">Email:</label>
+                    <label class="control-label col-sm-4" for="" style="text-align: left;">{{viewclientcpData.email}}</label>
+                  </div> -->
+ 
+                  <div class="clearfix"></div>
+                  
+                  </form>
+                <!-- form -->
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end view modal -->
+
+        <!-- start delete modal -->
+        <div class="modal fade deleteclientcp" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;
+                  </button>
+                  <h4 class="modal-title">Delete clientcp
+                  </h4>
+                </div>
+                <div class="modal-body">
+                  <h4>Are you sure you want to delete 
+                    <strong>{{deleteclientcpData.inchargeperson}}?
+                    </strong>
+                  </h4>
+                  <br>
+                  <a class="btn btn-danger btn-sm" ng-click="deleteClientcp(deleteclientcpData.clClientcontactpersonId)" onclick="$('.modal').modal('hide')">
+                    <i class="fa fa-trash">
+                    </i>&nbsp;&nbsp;Delete
+                  </a>
+                  <a class="btn btn-default btn-sm" data-dismiss="modal">
+                    <i class="fa fa-trash">
+                    </i>&nbsp;&nbsp;Cancel
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        <!-- end delete modal -->
+       
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--====  End of Controller  ====-->
+
+ <script src="view/pages/Client/ClientContactPerson/ClientContactPersonCtrl.js"></script>
+
+
+    
+
+   

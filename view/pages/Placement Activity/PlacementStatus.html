@@ -1,0 +1,225 @@
+  <!--================================
+=            Controller            =
+=================================-->
+<style type="text/css">
+  .studentlist {
+    line-height: 30px;
+  }
+</style>
+
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state" >
+   <div class="container-fluid">
+      <div class="row no-margin" ng-controller="PlacementStatusCtrl">
+         <div class="col-md-12 no-padding">
+            <div class="panel panel-info">
+               <div class="panel-heading">
+                  <h3 class="panel-title">Placement Status
+                     <span class="pull-right"><small>Total: </small><span class="badge" ng-init="Status.length = '0'">{{Status.length}}</span></span>
+                  </h3>
+               </div>
+               <div class="panel-body">
+                  <!-- toaster message -->
+                  <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+                  <!-- toaster message -->
+
+                  <div class="button-group">
+                    <a data-toggle="modal" data-target=".addstudent" class="btn btn-default btn-labeled btn-sm">
+                      <i class="fa fa-plus-circle">
+                      </i>&nbsp;&nbsp;Add Student
+                    </a>
+                    <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                      <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                    </a>
+                  </div>
+                  
+                  <table ng-table="usersTable_Status" show-filter="true" class="table table-bordered table-striped text-center">
+                     <tbody>
+                        <tr ng-repeat="pmt in data_Status" ng-hide=" ">
+                           <!-- <td data-title="''">
+                              <input type="checkbox" checklist-model="user.eEnquiryformId" checklist-value="pmt.eEnquiryformId" ng-change="check(pmt.eEnquiryformId, checked, pmt.email)">
+                           </td>
+                           <td data-title="'Sr No.'">{{$index+1}}</td> -->
+                          <!--  <td data-title="'enquiryFormNo'" filter="{ 'enquiryFormNo': 'text' }">{{pmt.enquiryFormNo}}</td> -->
+                           <td data-title="'Student Name'" filter="{ 'studentname': 'text' }">{{pmt.studentname}}</td>
+                           <td data-title="'Branch'" filter="{ 'branchName': 'text' }">{{pmt.branchName}}</td>
+                           <td data-title="'Batch'" filter="{ 'batchName': 'text' }">{{pmt.batchName}}</td>
+                           <td data-title="'Year of Passing'" filter="{ 'yearofpassing': 'text' }">{{pmt.yearofpassing}}</span>
+                           <td data-title="'Client'" filter="{ 'companyname': 'text' }">{{pmt.companyname}}</span>
+                           <td data-title="'Job Profile'" filter="{ 'jobprofile': 'text' }">{{pmt.jobprofile}}</span>
+                           </td>
+                           <td data-title="'Status'" filter="{ 'status': 'text' }">{{pmt.status}}</span>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+                  <hr>
+
+                  <!--======================================
+                   =            Send Email Modal            =
+                   =======================================-->
+                   <div class="modal fade sendemailmodal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Send Email</h4>
+                            </div>
+                              <div class="modal-body">
+
+                                <form class="form-horizontal" name="sendemaildata" ng-submit="sendEmailData(emailData)" novalidate>
+                                  <div class="form-group">
+                                    <label class="control-label col-md-3" for="">Email:</label>
+                                    <div class="col-md-9">
+                                      <span class="studentlist" ng-repeat="nam in studentNameArray track by $index">[ {{nam}} ]&nbsp;&nbsp;</span>
+                                    </div>
+                                    
+                                  </div>
+                                  
+                                    <div class="form-group required">
+                                      <label class="control-label col-md-3" for="">Email Content:</label>
+                                      <div class="col-md-9">
+                                        <textarea class="form-control" placeholder="Email Content" ng-model="emailData.body"></textarea>
+                                      </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <br>
+                                    <div class="form-group">
+                                      <div class="col-md-12 text-center">
+                                        <button type="submit" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                                        </button>
+                                      </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <br>
+                                  </form>
+                                  
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                   <!--====  End of Send Email Modal  ====-->
+
+                   <!--=================================
+                   =            Add Student            =
+                   ==================================-->
+                  <div class="modal fade addstudent" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                          </button>
+                          <h4 class="modal-title">Add Status For Student
+                          </h4>
+                        </div>
+                        <div class="modal-body">
+                          <form class="form-horizontal" name="addStudentStatus" ng-submit="saveStudentStatus(studentStatusData)" novalidate>
+                            <div class="form-group required">
+                              <label class="control-label col-sm-3" for="">Company</label>
+                              <div class="col-sm-7">
+                                 <select ng-model="studentStatusData.clClientId"  class="form-control inputEle" ng-options="com.clClientId as com.companyname for com in Company"  ng-change="companyChange(studentStatusData.clClientId, Company)" >
+                                    <option value="">Select Company</option>
+                                 </select>
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <label class="control-label col-sm-3" for="">Jobs</label>
+                              <div class="col-sm-7">
+                                 <select ng-model="studentStatusData.clClientjobprofileId"  class="form-control inputEle" ng-options="job.clClientjobprofileId as job.jobprofile for job in Job"  ng-change="jobChange(studentStatusData.clClientjobprofileId, Job)" ng-disabled="disableJobs">
+                                    <option value="">Select Job</option>
+                                 </select>
+                              </div>
+                            </div>
+                            <div class="form-group required">
+                              <label class="control-label col-md-3" for="">Student
+                              </label>
+                              <div class="col-md-7">
+                                <select ng-model="studentStatusData.eEnquiryFormId" class="form-control inputEle" ng-options="stu.eEnquiryFormId as (stu.lastname + ' ' + stu.firstname + ' ' + stu.middlename) for stu in Students" ng-required="true" ng-disabled="disableName" ng-change="studentChange(studentStatusData.eEnquiryFormId)"> 
+                                  </select>
+                              </div>
+                            </div>
+
+                            <div class="form-group">
+                              <label class="control-label col-md-3" for="">Branch
+                              </label>
+                              <div class="col-md-7">
+                                <input type="text" class="form-control" ng-model="studentBranchName" readonly>
+                              </div>
+                            </div>
+
+                            <div class="form-group">
+                              <label class="control-label col-md-3" for="">Batch
+                              </label>
+                              <div class="col-md-7">
+                                <input type="text" class="form-control" ng-model="studentBatchName" readonly>
+                              </div>
+                            </div>
+
+                            <div class="form-group">
+                              <label class="control-label col-md-3" for="">Status</label>
+                              <div class="col-md-7" >
+                                  <select ng-model="studentStatusData.status" class="form-control inputEle" ng-init="studentStatusData.status = 'firstround'"> 
+                                    <option value="firstround">First Round</option>
+                                  </select>
+                              </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <br>
+                            <div class="form-group">
+                              <div class="col-md-12 text-center">
+                                <button type="submit" ng-disabled="addSource.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                                </button>
+                              </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <br>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                   <!--====  End of Add Student  ====-->
+                   
+
+                   <!--============================================
+                    =            Move Enquiry Modal            =
+                    =============================================-->
+                    <div class="modal fade movetonext" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Move Candidate to Next Round</h4>
+                            </div>
+                            <div class="modal-body">
+                                <h4>Move following candidate to next round? <br> 
+                                <strong>{{moveenquiryData.firstname}}</strong></h4>
+                                <br>
+                                <a class="btn btn-success btn-sm" ng-click="moveEnquiry(moveenquiryData.eEnquiryFormId, moveenquiryData.windowtype, moveenquiryData.statusregistration)" onclick="$('.modal').modal('hide')"><i class="fa fa-icon-move"></i>Move</a>
+
+                                <a class="btn btn-default btn-sm" data-dismiss="modal"><i class="fa icon-remove-sign"></i>Cancel</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--====  End of Move enquiry Modal  ====-->
+                  
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+
+
+   
+</div>
+<!--====  End of Controller  ====-->
+
+
+
+
+
+
+<script src="view/pages/Placement Activity/PlacementStatusCtrl.js"></script>
+

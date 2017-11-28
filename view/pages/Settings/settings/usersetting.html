@@ -1,0 +1,136 @@
+<style type="text/css">
+	.h4 {
+		padding: 10px 0;
+	}
+</style>
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+		<div class="row no-margin" ng-controller="userSettingCtrl as uCtrl">
+		  <div class="col-md-12 no-padding">
+		    <div class="panel panel-info">
+		      <div class="panel-heading">
+		        <h3 class="panel-title">User Settings</h3>
+		      </div> <!--panel-heading-->
+		      <div class="panel-body">
+		  		  <!-- alert messages -->
+		          <flash-message duration="5000" show-close="true" on-dismiss="myCallback(flash)">
+		          </flash-message>
+		          <!-- alert messages -->
+			      <div class="row mt20">
+			    	<!-- <div class="col-md-3 col-md-offset-1 text-center">
+			    		<img src="http://placehold.it/200x200" class="img-responsive">
+			    	</div> -->
+			    	<div class="col-md-4">
+			    		<form ng-submit="setProfileImage(picFile)">
+				    		<div class="row">
+				    			<img ng-src="data:image/png;charset=utf-8;base64,{{imageBase64}}" style="height: 120px;margin: 0 auto;" class="img-responsive">
+				    			<div class="clearfix"></div>
+				    			<hr>
+				    			<!-- <span class="col-md-3">Change:</span>  -->
+				    			<span class="col-md-12 text-center"><input type="file" ngf-select ng-model="picFile" name="filessc" ngf-accept="'image/*'" style="margin: 0 auto;"></span>	
+				    			<div class="clearfix"></div>
+				    			<div class="col-md-12 text-center" style="margin-top: 20px;">
+				    				<button type="submit" class="btn btn-success btn-sm">Change</button>
+				    				
+				    			</div>
+				    		</div>
+		    			</form>
+			    	</div>
+			    	<div class="col-md-7">
+			    		<form class="form-horizontal">
+				    		<div class="form-group">
+				    			<label class="control-label col-md-2">Name</label>
+				    			<label class="control-label col-md-4" style="text-align: left;">
+				    				{{username}}
+				    			</label>
+				    		</div>
+				    		<div class="form-group">
+				    			<label class="control-label col-md-2">Institute</label>
+				    			<label class="control-label col-md-4" style="text-align: left;">
+				    				{{instituteName}}
+				    			</label>
+				    		</div>
+				    		<div class="form-group">
+				    			<label class="control-label col-md-2">Current Role</label>
+				    			<label class="control-label col-md-4" style="text-align: left;">
+				    				{{role}}
+				    			</label>
+				    		</div>
+				    		<div class="form-group" ng-if="role != 'Student'">
+				    			<label class="control-label col-md-2">Change Role</label>
+				    			<div class="col-md-4">
+				    				<select ng-model="roleData.adRoleId" name="enquirybranch" class="form-control inputEle" ng-options="bran.adRoleId as bran.roleName for bran in RoleNames"  ng-change="roleChange(roleData.adRoleId)" ng-required="true">
+	                                  <option value="">Select Role</option>
+	                                </select>
+				    			</div>
+				    		</div>
+		    			</form>
+			    	</div>
+			      </div>
+			      
+			      <br><br>
+			      <hr>
+				  <!--===================================
+				  =            Email Setting            =
+				  ====================================-->
+				  <!-- <div class="panel panel-default mt40">
+					  <div class="panel-heading">Other Settings</div>
+					  <div class="panel-body">
+					    Panel content
+					  </div>
+				  </div> -->
+				  <!--====  End of Email Setting  ====-->
+
+				    <!-- tab starts -->
+			        <div id="exTab4">
+			            <!-- ul starts -->
+			            <ul class="nav nav-tabs">
+			                <li ng-class="{active:uCtrl.isSet(1)}" ng-if="role != 'Student'">
+			                    <a ng-click="uCtrl.setTab(1)">Profile</a>
+			                </li>
+			                <li ng-class="{active:uCtrl.isSet(2)}" disabled>
+			                    <a ng-click="uCtrl.setTab(2)">Password Settings</a>
+			                </li>
+			            </ul>
+			            <!-- ul ends -->
+
+			            <!-- tab content starts -->
+			            <div class="tab-content">
+			                <!--===========================
+			                =            Tab 1            =
+			                ============================-->
+			                <div class="tab-pane active" ng-show="uCtrl.isSet(1)" ng-if="role != 'Student'">
+
+			                	<div ng-include="'view/pages/Settings/settings/profiletab.html'"></div>
+			                        
+			                </div>
+			                <!--====  End of Tab 1  ====-->
+
+			                <!--===========================
+			                =            Tab 2            =
+			                ============================-->
+			                <div class="tab-pane active" ng-show="uCtrl.isSet(2)">
+			                    
+			                    <!-- <div ng-if="uCtrl.isSet(2)" ng-include="'view/pages/Settings/settings/emailSettingTab.html'"></div> -->
+			                    <div ng-include="'view/pages/Settings/settings/passwordSettingTab.html'"></div>
+
+			                </div>
+			                <!--====  End of Tab 2  ====-->
+			            </div> 
+			            <!-- tab content ends -->
+			        </div> <!-- tab ends -->
+
+		      </div> <!--panel-body-->
+		    </div> <!--panel-->
+		  </div> <!--col-md-12-->
+		</div>
+	</div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Settings/settings/usersettingCtrl.js"></script>

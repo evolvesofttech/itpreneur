@@ -1,0 +1,135 @@
+<!--================================
+=            Controller            =
+=================================-->
+  <div class="row no-margin" ng-controller="roleBranchCtrl">
+    <div class="col-md-12 no-padding">
+      <div class="panel panel-info">
+       
+        <div class="panel-body">
+
+           <!-- toaster message -->
+           <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+           <!-- toaster message -->
+
+          <div class="button-group">
+            <a data-toggle="modal" data-target=".addroleBranch" class="btn btn-default btn-labeled btn-sm">
+              <i class="fa fa-plus-circle">
+              </i>&nbsp;&nbsp;Assign Branch
+            </a>
+          </div>
+
+          <!--===========================
+          =            Table            =
+          ============================-->
+          <table ng-table="usersTable_rolebranch" show-filter="true" class="table table-bordered table-striped text-center">
+              <tbody>
+                  <tr ng-repeat="rw in data_roleBranch">
+                      <td data-title="'Role'" filter="{ 'roleName': 'text' }">{{rw.roleName}}</td>
+                      <td data-title="'Branch'" filter="{ 'branchname': 'text' }">{{rw.branchname}}</td>
+                      <td data-title="'Actions'" class="w150">
+                          <button data-toggle="modal" data-target=".addroleBranch" ng-click="editroleBranch(rw.adWindowbranchId)" class="btn btn-success btn-xs" tooltip-placement="top" uib-tooltip="Edit" disabled><i class="fa fa-pencil-square-o"></i></button>
+
+                          <a class="btn btn-info btn-xs" disabled>
+                            <i class="fa fa-eye"></i>
+                          </a>
+
+                          <button class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deleteroleBranch" ng-click="delRoleBranch(rw.adWindowbranchId, data_roleBranch)" tooltip-placement="top" uib-tooltip="Delete" ng-disabled="rw.branchname == 'admin'"><i class="fa fa-trash"></i>
+                          </button>
+
+                          <a class="btn btn-primary btn-xs" disabled>
+                            <i class="fa fa-plus">
+                            </i>
+                          </a>
+                      </td>
+                  </tr>
+              </tbody>
+            </table>
+          <!--====  End of Table  ====-->
+          <hr>
+
+          <!--===========================================
+          =            Add Role Window Modal            =
+          ============================================-->
+          <div class="modal fade addroleBranch" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" ng-click="clearModalOnClose()" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Assign Branch to Role</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal login-form" name="rolebranchform" ng-submit="saveRoleBranch(roleBranchData)">
+                                <!-- <input type="hidden" ng-model="roleBranchData.adWindowaccessId"> -->
+                                <!-- <div class="form-group form-group required">
+                                    <label class="control-label col-md-3" for="">Role</label>
+                                    <div class="col-md-7">
+                                        <input type="text" ng-model="currentRoleName" class="form-control" disabled>
+                                    </div>
+                                </div> -->
+                                <div class="form-group required">
+                                    <label class="control-label col-md-3" for="">Branch</label>
+                                    <div class="col-md-7">
+                                        <select ng-model="roleBranchData.bBranchId" name="enquirybranch" class="form-control inputEle" ng-options="bran.bBranchId as bran.branchname for bran in Branch" ng-required="true">
+                                              <option value="">Select Branch</option>
+                                            </select>
+                                        <div class="clearfix"></div>
+                                        <p class="error" ng-show="rolebranchform.branchname.$invalid && rolebranchform.branchname.$touched">Please Select Branch</p>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="form-group">
+                                    <div class="col-md-12 text-center">
+                                        <button type="submit" ng-disabled="rolebranchform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Assign Branch</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="clearfix"></div>
+                        
+                    </div>
+                    </div>
+                </div>
+            </div>
+          <!--====  End of Add Role Window Modal  ====-->
+          
+          <!--========================================
+            =            Delete Role Window            =
+            =========================================-->
+            <div class="modal fade deleteroleBranch" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;
+                    </button>
+                    <h4 class="modal-title">Delete Branch
+                    </h4>
+                  </div>
+                  <div class="modal-body">
+                    <h4>Are you sure you want to delete 
+                      <strong>{{deleteroleBranchData.branchname}} ?
+                      </strong>
+                    </h4>
+                    <br>
+                    <a class="btn btn-danger btn-sm" ng-click="deleteRoleBranch(deleteroleBranchData.adWindowbranchId)" onclick="$('.modal').modal('hide')">
+                      <i class="fa fa-trash">
+                      </i>&nbsp;&nbsp;Delete
+                    </a>
+                    <a class="btn btn-default btn-sm" data-dismiss="modal">
+                      <i class="fa fa-trash">
+                      </i>&nbsp;&nbsp;Cancel
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+             <!--====  End of Delete Role Window  ====-->
+         
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- </div> -->
+
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Settings/role/rolebranchCtrl.js"></script>

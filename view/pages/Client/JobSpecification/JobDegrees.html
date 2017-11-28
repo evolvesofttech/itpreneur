@@ -1,0 +1,235 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div class="row no-margin" ng-controller="jobCtrl as Jobs">
+  <div class="col-md-12 no-padding">
+    <div class="panel panel-info">
+      <div class="panel-body">
+        
+        <!-- toaster message -->
+        <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+        <!-- toaster message -->
+
+        <div class="button-group">
+          <a data-toggle="modal" data-target=".addJobDegree" class="btn btn-default btn-labeled btn-sm" ng-click="addJobDegreeClick()">
+            <i class="fa fa-plus-circle">
+            </i>&nbsp;&nbsp;Add Required Qualification
+          </a>
+        </div>
+
+        <table ng-table="usersTable_JobDegree" show-filter="true" class="table table-bordered table-striped text-center">
+          <tbody>
+            <tr ng-repeat="deg in data_jobdegrees">
+              <td data-title="'Qualification'" filter="{'qualificationname': 'text'}" sortable="'qualificationname'">{{deg.qualificationname}}
+              </td>
+               <td data-title="'Degree'" filter="{'degreename': 'text'}" sortable="'degreename'">{{deg.degreename}}
+              </td>
+              <td data-title="'Specialization'" filter="{'degreespecificationname': 'text'}" sortable="'degreespecificationname'">{{deg.degreespecificationname}}
+              </td>
+              <td data-title="'Percentage'" filter="{'percentage': 'text'}" sortable="'percentage'">{{deg.percentage}}
+              </td>
+              <td data-title="'Year of Passing'" filter="{'yearofpassing': 'text'}" sortable="'yearofpassing'">{{deg.yearofpassing}}
+              </td>
+              
+              <td data-title="'Actions'" class="w150">
+                <button data-toggle="modal"  class="btn btn-success btn-xs" data-target=".addJobDegree" ng-click="editJobDegree(deg.clClientjobprofiledegreeId, data_jobdegrees)" tooltip-placement="top" uib-tooltip="Edit">
+                  <i class="fa fa-pencil-square-o"></i>
+                </button> 
+                <a data-toggle="modal" data-target=".viewJobDegree" class="btn btn-info btn-xs" ng-click="viewJobDegree(deg.clClientjobprofiledegreeId, data_jobdegrees)" tooltip-placement="top" uib-tooltip="View">
+                  <i class="fa fa-eye">
+                  </i>
+                </a>
+                <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletejobdegree" ng-click="delJobDegree(deg.clClientjobprofiledegreeId, data_jobdegrees)" tooltip-placement="top" uib-tooltip="Delete">
+                  <i class="fa fa-trash">
+                  </i>
+                </a>
+                
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <hr>
+        
+        <!-- start edit modal -->
+        <div class="modal fade addJobDegree" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="clearModalOnCloseJobDegrees()" data-dismiss="modal">&times;
+                </button>
+                <h4 class="modal-title" ng-show="add">Add Required Qualification
+                </h4>
+                <h4 class="modal-title" ng-show="edit">Edit Required Qualification
+                </h4>
+              </div>
+              <div class="modal-body">
+                
+              <form class="form-horizontal" name="jobDegreeForm" ng-submit="saveJobDegree(jobDegreeData)" novalidate>
+                  <input type="hidden" ng-model="jobDegreeData.clClientId" ng-init="jobDegreeData.clClientId = currentClientId">
+                  <input type="hidden" ng-model="jobDegreeData.clClientjobprofiledegreeId">
+                  
+                  <div class="form-group">
+                    <label class="control-label col-sm-4" for="">Qualification</label>
+                    <div class="col-sm-7">
+                        <select ng-model="jobDegreeData.cQualificationmasterId" class="form-control inputEle" ng-options="edu.cQualificationmasterId as edu.qualificationname for edu in Qualification"  ng-change="qualificationChange(jobDegreeData.cQualificationmasterId)"  ng-required="true" name="qua">
+                        <option value="">Select Qualification</option>
+                         </select> 
+                         <div class="clearfix"></div>
+                        <p class="error" ng-show="jobDegreeForm.qua.$invalid && jobDegreeForm.qua.$touched">please Select Round</p>
+                    </div>   
+                  </div>
+
+                  <div class="form-group required">
+                    <label class="control-label col-md-4" for="">Degree</label>
+                    <div class="col-md-7">
+                       <select name="degree" ng-model="jobDegreeData.cDegreeId" class="form-control inputEle" ng-options="deg.cDegreeId as deg.degreename for deg in Degree" ng-required="true" ng-change="degreeChange(jobDegreeData.cDegreeId, Degree)" ng-disabled="disableDegree">
+                        <!-- <option value="">select Education Stream</option> -->
+                      </select> 
+                      <div class="clearfix"></div>
+                      <p class="error" ng-show="jobDegreeForm.degree.$invalid && jobDegreeForm.degree.$touched">Please Select Degree</p>
+                    </div>
+                  </div>
+
+                  <div class="form-group required">
+                    <label class="control-label col-md-4" for="">Specialization</label>
+                    <div class="col-md-7">
+                       <select name="specialization" ng-model="jobDegreeData.cDegreespecificationId" class="form-control inputEle" ng-options="deg.cDegreespecificationId as deg.degreespecificationname for deg in DegreeSpecialization" ng-required="true" ng-disabled="disableSpecialization">
+                        <!-- <option value="">select Education Stream</option> -->
+                      </select> 
+                      <div class="clearfix"></div>
+                      <p class="error" ng-show="jobDegreeForm.specialization.$invalid && jobDegreeForm.specialization.$touched">Please Select Specializaton</p>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                     <label class="control-label col-md-4" for="">Year of Passing</label>
+                    <div class="col-md-7">
+                       <input type="number" name="yearofpassingname" class="form-control inputEle" ng-model="jobDegreeData.yearofpassing" placeholder="Enter Year of Passing">
+                    </div>
+                  </div>
+
+                  <div class="form-group required">
+                     <label class="control-label col-md-4" for="">Passing Percentage</label>
+                    <div class="col-md-7">
+                       <input type="number" name="passingpercentage" class="form-control inputEle" ng-model="jobDegreeData.percentage" placeholder="Enter Passing Percentage e. g. 77">
+                    </div>
+                  </div>
+
+                  <br>
+                  <div class="clearfix"></div>
+                  <div class="form-group">
+                    <div class="col-md-12 text-center">
+                      <button type="submit" ng-disabled="jobDegreeForm.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                      </button>
+                       <!-- ng-disabled="clientDataform.$invalid" -->
+                    </div>
+                  </div>
+                  <br>
+              </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end edit modal  -->
+
+
+        <!-- start view modal -->
+        <div class="modal fade viewJobDegree" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="clearModalOnCloseJobDegrees()" data-dismiss="modal">&times;
+                </button>
+                <h4 class="modal-title">View Required Qualification
+                </h4>
+              </div>
+              <div class="modal-body">
+                
+                <!-- form -->
+                 <form>
+                  
+                  <div class="form-group ">
+                    <label class="control-label col-sm-5" for="" style="text-align: right;">Qualification</label>
+                    <label class="control-label col-sm-7" for="" style="text-align: left;">{{viewDegreeData.qualificationname}}</label>
+                  </div>
+                  <div class="clearfix"></div>
+                  <hr>
+                  <div class="form-group ">
+                    <label class="control-label col-sm-5" for="" style="text-align: right;">Degree</label>
+                    <label class="control-label col-sm-7" for="" style="text-align: left;">{{viewDegreeData.degreename}}</label>
+                  </div>
+                  <div class="clearfix"></div>
+                  <hr>
+                  <div class="form-group ">
+                    <label class="control-label col-sm-5" for="" style="text-align: right;">Specialization</label>
+                    <label class="control-label col-sm-7" for="" style="text-align: left;">{{viewDegreeData.degreespecificationname}}</label>
+                  </div>
+                  <div class="clearfix"></div>
+                  <hr>
+                  <div class="form-group ">
+                    <label class="control-label col-sm-5" for="" style="text-align: right;">Percentage</label>
+                    <label class="control-label col-sm-7" for="" style="text-align: left;">{{viewDegreeData.percentage}}</label>
+                  </div>
+                  <div class="clearfix"></div>
+                  <hr>
+                  <div class="form-group ">
+                    <label class="control-label col-sm-5" for="" style="text-align: right;">Year of Passing</label>
+                    <label class="control-label col-sm-7" for="" style="text-align: left;">{{viewDegreeData.yearofpassing}}</label>
+                  </div>
+                  <div class="clearfix"></div>
+                  <br>
+                  
+              </form>
+                <!-- form -->
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end view modal -->
+
+        <!-- start delete modal -->
+        <div class="modal fade deletejobdegree" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;
+                  </button>
+                  <h4 class="modal-title">Delete Required Qualification
+                  </h4>
+                </div>
+                <div class="modal-body">
+                  <h4>Are you sure you want to delete following degree
+                    <strong>{{deleteJobDegreeData.degreename}}?
+                    </strong>
+                  </h4>
+                  <br>
+                  <a class="btn btn-danger btn-sm" ng-click="deleteJobDegree(deleteJobDegreeData.clClientjobprofiledegreeId)" onclick="$('.modal').modal('hide')">
+                    <i class="fa fa-trash">
+                    </i>&nbsp;&nbsp;Delete
+                  </a>
+                  <a class="btn btn-default btn-sm" data-dismiss="modal">
+                    <i class="fa fa-trash">
+                    </i>&nbsp;&nbsp;Cancel
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        <!-- end delete modal -->
+       
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--====  End of Controller  ====-->
+
+ <script src="view/pages/Client/JobSpecification/JobSpecificationCtrl.js"></script>
+
+
+    
+
+   

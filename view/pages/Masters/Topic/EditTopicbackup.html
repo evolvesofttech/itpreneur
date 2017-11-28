@@ -1,0 +1,138 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+
+
+<div class="page-content" sidebar-directive="state" >
+    <div class="container-fluid">
+        <div class="row no-margin" ng-controller="EditTopicCtrl as Inst">
+         
+            <div class="col-md-12 no-padding">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Edit Topic</h3>
+                    </div>
+                    <div class="panel-body">
+
+
+                        <!-- toaster message -->
+                          <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+                        <!-- toaster message -->
+                        
+                        <!-- form -->
+                        <form class="form-horizontal mb40" name="topicform" ng-submit="saveTopic(EditTopicData)" novalidate>
+
+                            <div class="button-group">
+                                <a href="#/Topic" class="btn btn-default btn-labeled btn-sm">
+                                    <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back</a>
+                                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</a>
+                            
+                                <button type="submit" class="btn btn-success btn-labeled btn-sm" ng-disabled="topicform.$invalid">
+                                <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Update</button>
+                            </div>
+                            <hr>
+                            <input type="hidden" ng-model="EditTopicData.cTopicId">
+                            <div class="form-group required">
+                              <label class="control-label col-md-3" for="">Course
+                              </label>
+                              <div class="col-md-7">
+                                <select ng-model="EditTopicData.cCourseId" name="cou" class="form-control inputEle" ng-options="cour.cCourseId as cour.coursename for cour in Courses" ng-required="true" ng-change="courseChange(EditTopicData.cCourseId)">
+                                  <!-- <option value="">Select Course</option> -->
+                                </select>
+                                <div class="clearfix"></div>
+                                <p class="error" ng-show="topicform.cou.$invalid && topicform.cou.$touched">Please Select Course</p>
+                              </div>
+                            </div><!-- form-group -->
+
+                            <div class="form-group required">
+                              <label class="control-label col-md-3" for="">Technology
+                              </label>
+                              <div class="col-md-7">
+                                <select ng-model="EditTopicData.cTechnologyMasterId" name="technologyname" class="form-control inputEle" ng-options="tech.cTechnologyMasterId as tech.technologyname for tech in Technologies" ng-required="true">
+                                  <!-- <option value="">Select Technology</option> -->
+                                </select>
+                                <div class="clearfix"></div>
+                                <p class="error" ng-show="topicform.technologyname.$invalid && topicform.technologyname.$touched">Please Select Technology</p>
+                              </div>
+                            </div><!-- form-group -->
+
+                            <div class="form-group required">
+                              <label class="control-label col-md-3" for="">Topic
+                              </label>
+                              <div class="col-md-7">
+                                <input type="text" class="form-control" name="topicname" ng-model="EditTopicData.topicname" ng-required="true">
+                                <div class="clearfix"></div>
+                                <p class="error" ng-show="topicform.topicname.$invalid && topicform.topicname.$touched">Please Enter Topic Name</p>
+                              </div>
+                            </div><!-- form-group -->
+                            <br>
+
+                        </form>
+                        <!-- form -->
+
+                        <!-- tab starts -->
+                        <div id="exTab2">
+                            <ul class="nav nav-tabs">
+                                <li ng-class="{active:Inst.isSet(1)}">
+                                    <a ng-click="Inst.setTab(1)">Notes</a>
+                                </li>
+                                <li ng-class="{active:Inst.isSet(2)}">
+                                    <a ng-click="Inst.setTab(2)">Videos</a>
+                                </li>
+                                 <li ng-class="{active:Inst.isSet(3)}">
+                                    <a ng-click="Inst.setTab(3)">Test</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <!--===========================
+                                =            Tab 1            =
+                                ============================-->
+                                <div class="tab-pane active" ng-show="Inst.isSet(1)">
+
+                                    <!-- <div ng-if="Inst.isSet(1)" ng-include="'view/pages/Masters/Topic/Notes/NotesTab.html'"></div> -->
+                                     
+                                </div>
+                                <!--====  End of Tab 1  ====-->
+
+                                <!--===========================
+                                =            Tab 2            =
+                                ============================-->
+                                
+                                <div class="tab-pane active" ng-show="Inst.isSet(2)">
+                                     
+                                    <!-- <div ng-if="Inst.isSet(2)" ng-include="'view/pages/Masters/Courses/FeeTab.html'"></div> -->
+
+                                </div>
+                                
+                                <!--====  End of Tab 2  ====-->
+
+                                <!--===========================
+                                =            Tab 3            =
+                                ============================-->
+                                
+                                <div class="tab-pane active" ng-show="Inst.isSet(3)">
+                                     
+                                    <!-- <div ng-if="Inst.isSet(3)" ng-include="'view/pages/Masters/Courses/DiscountTab.html'"></div> -->
+
+                                </div>
+                                
+                                <!--====  End of Tab 3  ====-->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- end controller div -->
+    </div>
+
+
+</div>
+
+
+<script src="view/pages/Masters/Topic/EditTopicCtrl.js"></script>

@@ -1,0 +1,171 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+    	<div class="row no-margin" ng-controller="AdmissionReportsCtrl">
+    		<div class="col-md-12 no-padding">
+	          <div class="panel panel-info">
+	            <div class="panel-heading">
+	              <h3 class="panel-title">Admission Report Executivewise</h3>
+	            </div> <!--heading-->
+	            <div class="panel-body">
+	              <!-- toaster message -->
+	              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+	              <!-- toaster message -->
+
+	              <!--=============================
+	              =            Buttons            =
+	              ==============================-->
+	              <div class="button-group">
+	                <!-- <a data-toggle="modal" data-target=".addboard" class="btn btn-default btn-labeled btn-sm" ng-disabled="exportCSVButton">
+	                  <i class="fa fa-file-excel-o">
+	                  </i>&nbsp;&nbsp;Export to CSV
+	                </a> -->
+	                <div class="dropdown" style="display: inline-block;">
+					  <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" ng-disabled="data_admissionreport.length == 0">Export&nbsp;&nbsp;&nbsp;<span class="caret"></span></button>
+					  <ul class="dropdown-menu">
+					    <li ng-click="exportAction('csv','Admission Report Executivewise')"><a href=""><i class="fa fa-table"></i>&nbsp;&nbsp;&nbsp;CSV</a></li>
+					    <li ng-click="exportAction('excel','Admission Report Executivewise')"><a href=""><i class="fa fa-file-excel-o"></i>&nbsp;&nbsp;&nbsp;Excel</a></li>
+					    <li ng-click="exportAction('doc','Admission Report Executivewise')"><a href=""><i class="fa fa-file-word-o"></i>&nbsp;&nbsp;&nbsp;DOC</a></li>
+					    <li ng-click="exportAction('pdf','Admission Report Executivewise')"><a href=""><i class="fa fa-file-pdf-o"></i>&nbsp;&nbsp;&nbsp;PDF</a></li>
+					    <!-- <li ng-click="exportAction('png','Teacher Reports')"><a href=""><i class="fa fa-picture-o"></i>&nbsp;&nbsp;&nbsp;PNG</a></li> -->
+					  </ul>
+					</div>
+	                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+	                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+	                </a>
+	              </div>
+	              <!--====  End of Buttons  ====-->
+
+	              <!--===============================
+	              =            Dropdowns            =
+	              ================================-->
+	              <div class="row report-row">
+	              	<div class="col-md-12">
+	              	<form class="form-horizontal" ng-submit="generateReport(AdmissionReportData)">
+	              		<div class="form-group">
+
+	              			<div class="col-md-3" ng-if="fullAccess">
+                             <label class="control-label" for="">Branch</label>
+                             <select name="bran" ng-model="AdmissionReportData.bBranchId" class="form-control" ng-options="bran.bBranchId as bran.branchname for bran in BranchData" ng-change="branchChange(AdmissionReportData.bBranchId, BranchData)">
+                                  <option value="">Select Branch</option>
+                                </select>
+                          	</div> <!--Branch ends-->
+
+                          	<div class="col-md-3" ng-if="!fullAccess">
+                             <label class="control-label" for="">Branch</label>
+                             <select name="bran" ng-model="AdmissionReportData.bBranchId" class="form-control" ng-options="bran.bBranchId as bran.branchname for bran in currentRoleBranches1" ng-change="branchChange(AdmissionReportData.bBranchId, currentRoleBranches1)">
+                                  <option value="">Select Branch</option>
+                                </select>
+                          	</div> <!--Branch ends-->
+
+                          	<div class="col-md-3" ng-if="fullAccess">
+                             <label class="control-label" for="">Executives</label>
+                             <select ng-model="AdmissionReportData.adUserId" class="form-control inputEle" ng-options="stf.adUserId as stf.executivename for stf in AllExecutives"  ng-change="executiveChange(AdmissionReportData.adUserId, AllExecutives)" ng-disabled="disableExecutive">
+                              <option value="">Select Sales Executive</option>
+                              <!--  -->
+                            </select>
+                          	</div> <!--Executives ends-->
+
+                          	<div class="col-md-3">
+                             <label class="control-label" for="">From Date</label>
+                             <datepicker date-format="yyyy-MM-dd">
+	                              <input type="text" name="dat" ng-model="AdmissionReportData.fromdate" placeholder="Enter Date" class="form-control" restrict-to="[0-9]" ng-change="fromChange(AdmissionReportData.fromdate)" ng-disabled="disableFromDate" />
+	                           </datepicker>
+                          	</div> <!--From Date ends-->
+
+                          	<div class="col-md-3">
+                             <label class="control-label" for="">To Date</label>
+                             <datepicker date-format="yyyy-MM-dd">
+	                              <input type="text" name="dat" ng-model="AdmissionReportData.todate" placeholder="Enter Date" class="form-control" restrict-to="[0-9]" ng-change="toChange(AdmissionReportData.todate)" ng-disabled="disableToDate" />
+	                           </datepicker>
+                          	</div> <!--To Date ends-->
+
+                          	<div class="clearfix"></div>
+                          	<hr>
+                          	<div class="form-group text-center">
+                          		<button type="submit" class="btn btn-success btn-md">Generate</button>
+                          	</div>
+
+	              		</div>
+	              		</form>
+	              	</div>
+	              </div> <!--row ends-->
+	              <!--====  End of Dropdowns  ====-->
+
+	              <!--===========================
+	              =            Table            =
+	              ============================-->
+	              	<div class="col-md-12">
+		              <table ng-table="usersTable_admissionreport"  id="exportable" show-filter="true" class="table table-bordered table-responsive table-striped text-center export-table">
+		              	  
+		              	  <!--================================
+		              	  =            Table Head            =
+		              	  =================================-->
+		              	  <thead>
+		              	  	<tr>
+		              	  		<th class="big" colspan="2">Branch: {{brName}}</th>
+		              	  		<th class="big">Executives: {{exeName}}</th>
+		              	  		<th class="big">Date: from - {{fromDateValue}} To - {{toDateValue}}</th>
+		              	  	</tr>
+		              	  	<tr>
+		              	  		<th>Sr. No</th>
+		              	  		<th>Branch</th>
+		              	  		<th>Executive Name</th>
+		              	  		<th>No. of Admissions</th>
+
+		              	  	</tr>
+		              	  </thead>
+		              	  <!--====  End of Table Head  ====-->
+
+				          <tbody>
+
+				          	<!--================================
+				          	=            Table Data            =
+				          	=================================-->
+				          	<tr ng-repeat="sch in data_admissionreport">
+				              	
+				              	<!-- index -->
+				              	<td>{{$index + 1}}</td>
+
+				              	<!-- Branch -->
+				                <td>{{sch.branchname}}</td>
+
+				                <!-- Name -->
+				                <td>{{sch.executivename}}</td>
+
+				                <!-- Admission count -->
+				                <td ng-init="usersTable_admissionreport.total.noofadmissions = usersTable_admissionreport.total.noofadmissions + sch.noofadmissions">{{sch.noofadmissions}}</td>
+
+				            </tr>
+				            <!--====  End of Table Data  ====-->
+
+				            <!--=================================
+				            =            Table Total            =
+				            ==================================-->
+				            <tr>
+				            	<td><b>Total</b></td>
+				            	<td><b></b></td>
+				            	<td><b></b></td>
+				            	<td><b>{{usersTable_admissionreport.total.noofadmissions}}</b></td>
+				            	
+				            </tr>
+				            <!--====  End of Table Total  ====-->
+
+				          </tbody>
+				        </table>
+			         </div>
+	               <!--====  End of Table  ====-->
+
+	             </div> <!--panel body-->
+	           </div> <!--panel-->
+            </div>
+    	</div><!--row-->
+   </div>
+</div> <!--page content-->
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Reports/Sales/Admission/Admission Executive/AdmissionReportsCtrl.js"></script>

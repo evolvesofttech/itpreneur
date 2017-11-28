@@ -1,0 +1,285 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="VendorCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Vendor
+              <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{vendor.length}}</span></span>
+              </h3>
+            </div>
+            <div class="panel-body">
+
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+              
+              <div class="button-group">
+                <a data-toggle="modal" data-target=".addvendor" ng-click="addvendorclick()" class="btn btn-default btn-labeled btn-sm">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp;Add Vendor
+                </a>
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+              </div>
+              <table ng-table="usersTable_Vendor" show-filter="true" class="table table-bordered table-striped text-center">
+                <tbody>
+                  <tr ng-repeat="bo in data_Vendor">
+                    <td data-title="'Vendor Name'" filter="{'vendorname': 'text'}" sortable="'vendorname'">{{bo.vendorname}}
+                    </td>
+                    <td data-title="'Email Id'" filter="{'emailid': 'text'}" sortable="'emailid'">{{bo.emailid}}
+                    </td>
+                    <td data-title="'Contact No'" filter="{'contactno': 'text'}" sortable="'contactno'">{{bo.contactno}}
+                    </td>
+                   <!--  <td data-title="'Pan No'" filter="{'Pan No': 'text'}" sortable="'Pan No'">{{bo.}}
+                    </td>
+                    <td data-title="'CST No'" filter="{'CST No': 'text'}" sortable="'CST No'">{{bo.}}
+                    </td>
+                    <td data-title="'TIN No'" filter="{'TIN No': 'text'}" sortable="'TIN No'">{{bo.}}
+                    </td>
+                    <td data-title="'VAT No'" filter="{''VAT No': 'text'}" sortable="''VAT No'">{{bo.}}
+                    </td> -->
+                    <td data-title="'Actions'">
+                      <a data-toggle="modal" data-target=".addvendor" class="btn btn-success btn-xs" ng-click="editVendor(bo.cVendorId)" tooltip-placement="top" uib-tooltip="Edit">
+                        <i class="fa fa-pencil-square-o">
+                        </i>
+                      </a> 
+                      <a data-toggle="modal" data-target=".viewvendor" class="btn btn-info btn-xs" ng-click="viewVendor(bo.cVendorId, data_Vendor)" tooltip-placement="top" uib-tooltip="View">
+                        <i class="fa fa-eye">
+                        </i>
+                      </a>
+                      <a data-toggle="modal" data-target=".deletevendor1" class="btn btn-danger btn-xs" ng-click="delVendor(bo.cVendorId, data_Vendor)" tooltip-placement="top" uib-tooltip="Delete">
+                        <i class="fa fa-trash"></i>
+                      </a>
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <hr>
+              
+              <!--start edit modal -->
+               <div class="modal fade addvendor" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content" sc_school_id>
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                        <!-- <h4 class="modal-title">Add User Address</h4> -->
+                        <h4 class="modal-title" ng-init="headingMessage ='Add Vendor Details'">{{headingMessage}}</h4>
+                        
+                          </div>
+                          <div class="modal-body">
+                              <form class="form-horizontal" name="vendorform" ng-submit="saveVendor(vendorDataAdd)" novalidate>
+
+                                  <input type="hidden" ng-model="vendorDataAdd.adUseraddressdetailId">
+                                  <!-- address 1 starts -->
+                                  <div>
+
+                                      <div class="form-group required">
+                                        <label class="control-label col-md-2" for=""> Vendor Name </label>
+                                        <div class="col-md-4">
+                                          <input type="text" name="vendor" class="form-control" ng-model="vendorDataAdd.vendorname" placeholder="Enter Name " ng-disabled="disableField" ng-required="true"/>
+                                           <div class="clearfix"></div>
+                                            <p class="error" ng-show="vendorform.vendor.$invalid && vendorform.vendor.$touched"> Enter  Vendor Name</p>
+                                        </div>
+                                      </div>
+                                      
+                                      <div class="form-group">
+                                        <label class="control-label col-sm-2" for="">Address</label>
+                                        <div class="col-sm-10">
+                                          <textarea class="form-control inputEle" name="addr" ng-model="vendorDataAdd.address" placeholder="Enter Permenant Address"> </textarea>
+                                            <!-- <div class="clearfix"></div>
+                                            <p class="error" ng-show="vendorform.addr.$invalid && vendorform.addr.$touched"> Enter Address</p>   -->
+                                        </div>
+                                      </div>
+                                             
+                                      <div class="form-group required">
+                                        <label class="control-label col-md-2" for="">Email Id</label>
+                                          <div class="col-md-4">
+                                              <input type="email" name="mail" class="form-control inputEle" ng-model="vendorDataAdd.emailid" placeholder="Enter Email Id" ng-required="true"  ng-pattern="/^[a-zA-Z]+[a-zA-Z0-9._]+@[a-zA-Z]+\.[a-zA-Z.]{2,5}$/">
+                                               <div class="clearfix"></div>
+                                            <p class="error" ng-show="vendorform.mail.$invalid && vendorform.mail.$touched"> Enter Email Id</p>
+                                          </div>
+                                    
+                                      
+                                        <label class="control-label col-md-2" for="">Contact No.</label>
+                                         <div class="col-md-4">
+                                            <input type="number" name="cont" class="form-control inputEle" ng-model="vendorDataAdd.contactno" placeholder="Enter Contact Number" ng-required="true" maxlength="10" minlength="10" required restrict-to="[0-9]">
+                                          <div class="clearfix"></div>
+                                             <p class="error" ng-show="vendorform.cont.$error.required">Please Enter Valid Contact Number</p>
+                                             <p class="error" ng-show="vendorform.cont.$error.maxlength">Please Enter 10 digits Number</p>
+                                             <p class="error" ng-show="vendorform.cont.$error.minlength">Too Short Number !!!</p>
+                                          </div>
+                                      </div>
+                                      <div class="form-group ">
+                                        <label class="control-label col-md-2" for="">PAN No</label>
+                                          <div class="col-md-4">
+                                              <input type="text" name="pan" class="form-control inputEle" ng-model="vendorDataAdd.panno" placeholder="Enter Pan No"  maxlength="10" style="text-transform: uppercase;">
+                                               <!-- <div class="clearfix"></div>
+                                            <p class="error" ng-show="vendorform.pan.$invalid && vendorform.pan.$touched"> Enter PAN No</p> -->
+                                          </div>
+                                     
+                                     
+                                          <label class="control-label col-md-2" for="">CST No
+                                          </label>
+                                          <div class="col-md-4">
+                                            <input type="number" name="cst" class="form-control inputEle" ng-model="vendorDataAdd.cstno" placeholder="Enter CST No">
+                                             <!-- <div class="clearfix"></div>
+                                            <p class="error" ng-show="vendorform.cst.$invalid && vendorform.cst.$touched"> Enter CST No</p> -->
+                                          </div>
+                                      </div>
+                                      <div class="form-group">
+                                          <label class="control-label col-md-2" for="">TIN No
+                                          </label>
+                                          <div class="col-md-4">
+                                            <input type="number" name="tin" class="form-control inputEle" ng-model="vendorDataAdd.tinno" placeholder="Enter Number " restrict-to="[0-9]" maxlength="11" >
+                                            <!--  <div class="clearfix"></div>
+                                            <p class="error" ng-show="vendorform.tin.$invalid && vendorform.tin.$touched"> Enter TIN No</p>  -->
+                                          </div>
+                                       
+                                        
+                                          <label class="control-label col-md-2">VAT No</label>
+                                          <div class="col-md-4">
+                                            <input type="number" name="vat" class="form-control inputEle" ng-model="vendorDataAdd.vatno" placeholder="Enter Number " restrict-to="[0-9]">
+                                            <!--  <div class="clearfix"></div>
+                                            <p class="error" ng-show="vendorform.vat.$invalid && vendorform.vat.$touched"> Enter VAT No</p>  -->
+                                          </div>
+                                      </div>
+                                      <br>
+                                      <div class="form-group">
+                                          <div class="col-md-12 text-center">
+                                              <button type="submit" ng-disabled="vendorform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')" ng-disabled="disableField">Save</button>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div>
+                                  </div>
+                              </form>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <!--====  End edit Modal  ====-->
+              <!--==========================================
+              =            View model           =
+              ===========================================-->
+              <div class="modal fade viewvendor" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog modal-lg" role="document">
+                      <div class="modal-content" sc_school_id>
+                          <div class="modal-header">
+                              <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                            
+                              <h4 class="modal-title">View Vendor Details</h4>
+                          </div>
+                          <div class="modal-body">
+                              <form class="form-horizontal" novalidate>
+                                  <!-- address 1 starts -->
+                                  
+                                      <div class="form-group ">
+                                          <label class="control-label col-md-2" for="">Vendor Name :</label>
+                                          <div class="col-md-4">
+                                            <label class="control-label col-md-2">{{viewvendorData.vendorname}}</label>
+                                          </div>   
+                                      
+                                       <label class="control-label col-md-2" for="">Address :</label>
+                                          <div class="col-md-4">
+                                            <label class="control-label col-md-2">{{viewvendorData.address}}</label>
+                                          </div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                      <hr>
+
+                                      <div class="form-group ">
+                                         <label class="control-label col-md-2" for="">Email :</label>
+                                          <div class="col-md-4">
+                                              <label class="control-label col-md-2">{{viewvendorData.emailid}}</label>
+                                          </div>
+
+                                          <label class="control-label col-md-2" for="">Contact No :</label>
+                                          <div class="col-md-4">
+                                              <label class="control-label col-md-2">{{viewvendorData.contactno}}</label>
+                                          </div>
+                                      </div>
+                                      <div class="clearfix"></div>
+                                      <hr>
+
+                                      <div class="form-group ">
+                                          <label class="control-label col-md-2" for="">PAN No :</label>
+                                          <div class="col-md-4">
+                                            <label class="control-label col-md-2">{{viewvendorData.panno}}</label>
+                                          </div> 
+
+                                          <label class="control-label col-md-2" for="">VAT No :</label>
+                                          <div class="col-md-4">
+                                            <label class="control-label col-md-2">{{viewvendorData.vatno}}</label>
+                                          </div>   
+                                      </div>
+                                      <div class="clearfix"></div>
+                                      <hr>
+
+                                       <div class="form-group">
+                                          <label class="control-label col-md-2" for="">CST No :</label>
+                                          <div class="col-md-4">
+                                            <label class="control-label col-md-2">{{viewvendorData.cstno}}</label>
+                                          </div>
+
+                                          <label class="control-label col-md-2" for="">TIN No :</label>
+                                          <div class="col-md-4">
+                                              <label class="control-label col-md-2">{{viewvendorData.tinno}}</label>
+                                          </div>
+                                      </div>
+                                      <div class="clearfix"></div>
+                                      <br>
+                                  
+                              </form>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <!--====  End of View model  ====-->
+              <!-- start delete modal -->
+              <div class="modal fade deletevendor1" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Delete Vendor Details
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Are you sure you want to delete 
+                          <strong>{{deletevendorData.vendorname}}?
+                          </strong>
+                        </h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="deleteVendor(deletevendorData.cVendorId)" onclick="$('.modal').modal('hide')">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Delete
+                        </a>
+                        <a class="btn btn-default btn-sm" data-dismiss="modal">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Cancel
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!-- end delete modal -->
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Masters/Vendor/VendorMasterCtrl.js"></script>
+

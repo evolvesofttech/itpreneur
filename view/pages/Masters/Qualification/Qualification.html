@@ -1,0 +1,155 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="qualificationCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Qualification
+              <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{Qualification.length}}</span></span>
+              </h3>
+            </div>
+            <div class="panel-body">
+            
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+
+              <div class="button-group">
+                <a data-toggle="modal" data-target=".addqualification" ng-click="addqualification()" class="btn btn-default btn-labeled btn-sm">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp;Add Qualification
+                </a>
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+              </div>
+              <table ng-table="usersTable" show-filter="true" class="table table-bordered table-striped text-center">
+                <tbody>
+                  <tr ng-repeat="qual in data">
+                    <td data-title="'Qualification'" filter="{'sourcename': 'text'}" sortable="'sourcename'">{{qual.qualificationname}}
+                    </td>
+                    <td data-title="'Actions'">
+                      <a data-toggle="modal" data-target=".addqualification" class="btn btn-success btn-xs" ng-click="editQualification(qual.cQualificationmasterId)" tooltip-placement="top" uib-tooltip="Edit">
+                        <i class="fa fa-pencil-square-o">
+                        </i>
+                      </a> 
+                       <a data-toggle="modal" data-target=".viewqualification" class="btn btn-info btn-xs" ng-click="viewQualification(qual.cQualificationmasterId, data)" tooltip-placement="top" uib-tooltip="View">
+                        <i class="fa fa-eye">
+                        </i>
+                      </a>
+                      <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletequalification" ng-click="delQualification(qual.cQualificationmasterId, data)" tooltip-placement="top" uib-tooltip="Delete">
+                        <i class="fa fa-trash">
+                        </i>
+                      </a>
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <hr>
+              <!-- start edit modal -->
+              <div class="modal fade addqualification" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title" ng-init="headingMessage = 'Add Qualification'">{{headingMessage}}</h4>
+                    </div>
+                    <div class="modal-body">
+                      <form class="form-horizontal" name="qualificationForm" ng-submit="save(qualificationData)" novalidate>
+                        <div class="form-group required">
+                          <label class="control-label col-md-3" for="">Qualification
+                          </label>
+                          <div class="col-md-7">
+                            <input type="text" name="qualification" class="form-control inputEle" ng-model="qualificationData.qualificationname" placeholder="Enter Qualification Name" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="qualificationForm.qualification.$invalid && qualificationForm.qualification.$touched">Please Enter Qualification Name</p>
+                          </div>
+                        </div>
+                        <br>
+                        <div class="form-group">
+                          <div class="col-md-12 text-center">
+                            <button type="submit" ng-disabled="qualificationForm.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                            </button>
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end edit modal  -->
+
+              <!-- start view modal -->
+              <div class="modal fade viewqualification" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">View Qualification
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">Qualification :
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewqualificationData.qualificationname}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <!-- <br> -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end view modal -->
+
+              <!-- start delete modal -->
+              <div class="modal fade deletequalification" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Delete Qualification
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Are you sure you want to delete 
+                          <strong>{{deletequalificationData.qualificationname}}?
+                          </strong>
+                        </h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="delete(deletequalificationData.cQualificationmasterId)" onclick="$('.modal').modal('hide')">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Delete
+                        </a>
+                        <a class="btn btn-default btn-sm" data-dismiss="modal">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Cancel
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!-- end delete modal -->
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Masters/Qualification/QualificationCtrl.js"></script>
+

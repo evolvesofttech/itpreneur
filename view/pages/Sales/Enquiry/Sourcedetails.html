@@ -1,0 +1,150 @@
+<!--================================
+=            Controller            =
+=================================-->
+  <div class="row no-margin" ng-controller="sourceCtrl">
+    <div class="col-md-12 no-padding">
+      <div class="panel panel-info">
+       
+        <div class="panel-body">
+
+           <!-- toaster message -->
+           <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+           <!-- toaster message -->
+
+          <div class="button-group">
+            <a data-toggle="modal" data-target=".addsource" class="btn btn-default btn-labeled btn-sm">
+              <i class="fa fa-plus-circle">
+              </i>&nbsp;&nbsp;Add Source
+            </a>
+            <!-- <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+              <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+            </a> -->
+          </div>
+          <table ng-table="usersTable_Source" show-filter="true" class="table table-bordered table-striped text-center">
+            <tbody>
+              <tr ng-repeat="bo in data_source">
+                <td data-title="'Hear About Us'" filter="{'sourcename': 'text'}" sortable="'sourcename'">{{bo.sourcename}}
+                </td>
+                <td data-title="'Actions'">
+                  <a data-toggle="modal" data-target=".addsource" class="btn btn-success btn-xs" ng-click="editEnquirySource(bo.eEnquiryAboutUsId)" tooltip-placement="top" uib-tooltip="Edit">
+                    <i class="fa fa-pencil-square-o">
+                    </i>
+                  </a> 
+                <a data-toggle="modal" data-target=".viewsource" class="btn btn-info btn-xs" ng-click="viewEnquirySource(bo.eEnquiryAboutUsId, data_source)" tooltip-placement="top" uib-tooltip="View">
+                    <i class="fa fa-eye">
+                    </i>
+                  </a>
+                  <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletesource" ng-click="delEnquirySource(bo.eEnquiryAboutUsId, data_source)" tooltip-placement="top" uib-tooltip="Delete">
+                    <i class="fa fa-trash">
+                    </i>
+                  </a>
+                  
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <hr>
+          <!-- start edit modal -->
+          <div class="modal fade addsource" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                  </button>
+                  <h4 class="modal-title">Select Source
+                  </h4>
+                </div>
+                <div class="modal-body">
+                  <form class="form-horizontal" name="technologyDataform" ng-submit="saveSource(enquirysourceData)" novalidate>
+                  <input type="hidden" ng-model="enquirysourceData.eEnquiryAboutUsId">
+                  <div class="form-group  required">
+                      <label class="control-label col-sm-4" for="">Hear About Us</label>
+                        <div class="col-sm-7">
+                            <select ng-model="enquirysourceData.cSourceId" class="form-control inputEle" ng-options="enq.cSourceId as enq.sourcename for enq in Source" ng-required="true">
+                              <!-- <option value="">Select Source Name</option> -->
+                            </select>
+                        </div>
+                    </div>
+                   <br>
+                   <div class="form-group">
+                          <div class="col-md-offset-4 col-md-3">
+                            <button type="submit"  class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                            </button>
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- end edit modal  -->
+          <!-- start view modal -->
+          <div class="modal fade viewsource" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                  </button>
+                  <h4 class="modal-title">Source
+                  </h4>
+                </div>
+                <div class="modal-body">
+                  <div class="form-group">
+                    <label class="control-label col-md-offset-3 col-md-3" for="">Source Name:
+                    </label>
+                    <label class="control-label col-md-3" for="">{{viewsourceData.sourcename}}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- end view modal -->
+          <!-- start delete modal -->
+          <div class="modal fade deletesource" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;
+                    </button>
+                    <h4 class="modal-title">Delete Source
+                    </h4>
+                  </div>
+                  <div class="modal-body">
+                    <h4>Are you sure you want to delete 
+                      <strong>{{deletesourceData.sourcename}}?
+                      </strong>
+                    </h4>
+                    <br>
+                    <a class="btn btn-danger btn-sm" ng-click="deleteSource(deletesourceData.eEnquiryAboutUsId)" onclick="$('.modal').modal('hide')">
+                      <i class="fa fa-trash">
+                      </i>&nbsp;&nbsp;Delete
+                    </a>
+                    <a class="btn btn-default btn-sm" data-dismiss="modal">
+                      <i class="fa fa-trash">
+                      </i>&nbsp;&nbsp;Cancel
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <!-- end delete modal -->
+         
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- </div> -->
+
+<!--====  End of Controller  ====-->
+
+  <script src="view/pages/Sales/Enquiry/SourcedetailsCtrl.js"></script>
+
+
+
+
+    
+
+   
+                                           

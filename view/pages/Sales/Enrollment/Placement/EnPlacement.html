@@ -1,0 +1,36 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div class="row no-margin" ng-controller="placementCtrl">
+  <div class="col-md-12 no-padding">
+    <div class="panel panel-info">
+      <div class="panel-body">
+        
+        <!-- toaster message -->
+        <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+        <!-- toaster message -->
+        
+        <table ng-table="usersTable_placement" show-filter="true" class="table table-bordered table-striped text-center">
+          <tbody>
+            <tr ng-repeat="bo in data_placement">
+              <td data-title="'Company Name '" filter="{'companyname': 'text'}" sortable="'companyname'">{{bo.companyname}}
+              </td>
+              <td data-title="'Job Profile'" filter="{'jobprofile': 'text'}" sortable="'jobprofile'">{{bo.jobprofile}}
+              </td>
+               <td data-title="'Round'" filter="{'roundstatus': 'text'}" sortable="'roundstatus'">{{bo.roundstatus}}
+              </td>
+              <td data-title="'Status'" filter="{'status': 'text'}" sortable="'status'">{{bo.status}}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <hr>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  
+<!--====  End of Controller  ====-->
+ <script src="view/pages/Sales/Enrollment/Placement/EnPlacementCtrl.js"></script>
+

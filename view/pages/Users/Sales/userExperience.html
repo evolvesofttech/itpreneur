@@ -1,0 +1,234 @@
+<style type="text/css">
+    .view-label {
+        margin-top: 7px;
+    }
+</style>
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-controller="userExperienceCtrl">
+    <!-- toaster message -->
+    <toaster-container toaster-options="{'time-out': 3000}"></toaster-container>
+    <!-- toaster message -->
+
+	<a data-toggle="modal" data-target=".adduserExperience" class="btn btn-default btn-labeled btn-sm" ng-click="addExperienceClick()">
+    <i class="fa fa-map-marker"></i>&nbsp;&nbsp;Add User Experience</a>
+    <!-- table starts -->
+    <div class="clearifx"></div>
+    <br>
+    <table ng-table="usersTable_Experience" show-filter="true" class="table table-bordered table-striped text-center">
+        <tbody>
+            <tr ng-repeat="exp in data_Experience">
+                <td data-title="'Company Name'" filter="{ 'companyname': 'text' }">{{exp.companyname}}</td>
+
+                <td data-title="'Job Title'" filter="{ 'jobtitle': 'text' }">{{exp.jobtitle}}</td>
+
+                <td data-title="'Work Area'" filter="{ 'workarea': 'text' }">{{exp.workarea}}</td>
+
+                <td data-title="'Start Date'" filter="{ 'startdate': 'text' }">{{exp.startdate}}</td>
+
+                <td data-title="'End Date'" filter="{ 'enddate': 'text' }">{{exp.enddate}}</td>
+
+                <td data-title="'Description'" filter="{ 'description': 'text' }">{{exp.description}}</td>
+
+                <td data-title="'Actions'" class="w150 text-center">
+                    <a class="btn btn-success btn-xs" ng-click="editExperience(exp.adUserprofessionalexperienceId)" data-toggle="modal" data-target=".adduserExperience" tooltip-placement="top" uib-tooltip="Edit">
+                    <i class="fa fa-edit"></i>
+                    </a>
+
+                    <a href="" class="btn btn-info btn-xs" ng-click="viewExperience(exp.adUserprofessionalexperienceId, data_Experience)" data-toggle="modal" data-target=".viewuseraddress" tooltip-placement="top" uib-tooltip="View">
+                    <i class="fa fa-eye"></i>
+                    </a>
+
+                    <a class="btn btn-xs btn-danger" data-toggle="modal" data-target=".deleteExperience" ng-click="delExperience(exp.adUserprofessionalexperienceId, data_Experience)" tooltip-placement="top" uib-tooltip="Delete">
+                    <i class="fa fa-trash"></i>
+                    </a>
+
+                    <a href="" class="btn btn-primary btn-xs" disabled><i class="fa fa-plus"></i></a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <!-- table ends -->
+
+    <!--===========================================
+    =            Address Details Modal            =
+    ============================================-->
+    <div class="modal fade adduserExperience" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" sc_school_id>
+                <div class="modal-header">
+                    <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                    <!-- <h4 class="modal-title">Add User Experience</h4> -->
+                    <h4 class="modal-title" ng-init="headingMessage='Add User Experience'">{{headingMessage}}</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" name="addexperience" ng-submit="saveexperience(userexperienceDataAdd)" novalidate>
+                        <!-- Experience 1 starts -->
+                        <div class="Experience1">
+                            
+                            <div class="form-group required">
+                                <label class="control-label col-md-2" for="">Company Name </label>
+                                <div class="col-md-10">
+                                    <input type="text" name="comp" class="form-control" ng-model="userexperienceDataAdd.companyname" placeholder="Enter Company Name" ng-disabled="disableField" ng-required="true"/>
+                                    <div class="clearfix"></div>
+                                      <p class="error" ng-show="addexperience.comp.$invalid && addexperience.comp.$touched">Please Enter Company Name</p>
+                                </div>
+                            </div>
+                            <div class="form-group required">
+                                <label class="control-label col-md-2" for="">Job Title </label>
+                                <div class="col-md-4">
+                                    <input type="text" name="job" class="form-control" ng-model="userexperienceDataAdd.jobtitle" placeholder="Enter Job Title" ng-disabled="disableField" ng-required="true"/>
+                                    <div class="clearfix"></div>
+                                      <p class="error" ng-show="addexperience.job.$invalid && addexperience.job.$touched">Please Enter Job Title</p>
+                                </div>
+                                <label class="control-label col-md-2" for="">Work Area</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="work" class="form-control" ng-model="userexperienceDataAdd.workarea" placeholder="Enter Work Area"  ng-required="true"/>
+                                    <div class="clearfix"></div>
+                                      <p class="error" ng-show="addexperience.work.$invalid && addexperience.work.$touched">Please Enter Work Area</p>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group required">
+                                <label class="control-label col-sm-2" for="">Start Date</label>
+                                <div class="col-sm-4">
+                                 <datepicker date-format="yyyy-MM-dd">
+                                    <input name="startd" ng-model="userexperienceDataAdd.startdate" placeholder="Enter Date" class="form-control" type="text" restrict-to="[0-9]" ng-required="true"/>
+                                 </datepicker>
+                                 <div class="clearfix"></div>
+                                    <p class="error" ng-show="addexperience.startd.$invalid && addexperience.startd.$touched">Please Enter Start Date</p>
+                                </div>
+
+                                <label class="control-label col-sm-2" for="">End Date</label>
+                                <div class="col-sm-4">
+                                 <datepicker date-format="yyyy-MM-dd">
+                                    <input name="endd" ng-model="userexperienceDataAdd.enddate" placeholder="Enter Date" class="form-control" type="text" restrict-to="[0-9]" ng-required="true"/>
+                                 </datepicker>
+                                 <div class="clearfix"></div>
+                                    <p class="error" ng-show="addexperience.endd.$invalid && addexperience.endd.$touched">Please Enter End Date</p>
+                                </div>
+                            </div>
+                           
+                            <div class="form-group">
+                                <label class="control-label col-md-2" for="">Description </label>
+                                <div class="col-md-10">
+                                    <input type="text" name="desc" class="form-control" ng-model="userexperienceDataAdd.description" placeholder="Enter Description" ng-disabled="disableField" />
+                                    <div class="clearfix"></div>
+                                    <!-- <p class="error" ng-show="addexperience.desc.$invalid && addexperience.desc.$touched">Please Enter Description</p> -->
+                                </div>
+                            </div>
+                          
+                            <br>
+                            <div class="form-group">
+                                <div class="col-md-12 text-center">
+                                    <button type="submit" ng-disabled="addexperience.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')" ng-disabled="disableField">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--====  End of Experience Details Modal  ====-->
+
+    <!--==========================================
+    =            View Experience Details            =
+    ===========================================-->
+    <div class="modal fade viewuseraddress" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" sc_school_id>
+                <div class="modal-header">
+                    <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                    <!-- <h4 class="modal-title">Add Institute Experience Details</h4> -->
+                    <h4 class="modal-title">View Experience Details</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" novalidate>
+                        <!-- Experience 1 starts -->
+                        <div class="Experience1">
+                            <div class="form-group ">
+                                <input type="hidden" value="{{intituteIdLabel}}">
+                                <label class="control-label col-md-2" for="">Company Name:</label>
+                                <div class="col-md-4">
+                                    <label class="control-label col-md-2">{{viewExperienceData.companyname}}</label>
+                                </div> 
+                                <label class="control-label col-md-2" for="">Description</label>
+                                <div class="col-md-4">
+                                    <label class="control-label col-md-2">{{viewExperienceData.description}}</label>
+                                </div>      
+                            </div>
+                           <hr>
+                            <div class="form-group ">
+                                <label class="control-label col-md-2" for="">Job Title</label>
+                                <div class="col-md-4">
+                                  <label class="control-label col-md-2">{{viewExperienceData.jobtitle}}</label>
+                                </div>
+                                <label class="control-label col-md-2" for="">Work  Area</label>
+                                <div class="col-md-4">
+                                    <label class="control-label col-md-2">{{viewExperienceData.workarea}}</label>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="form-group ">
+                                <label class="control-label col-md-2" for="">Start Date</label>
+                                <div class="col-md-4">
+                                    <label class="control-label col-md-4">{{viewExperienceData.startdate}}</label>
+                                </div>
+                                <label class="control-label col-md-2" for="">End Date</label>
+                                <div class="col-md-4">
+                                    <label class="control-label col-md-4">{{viewExperienceData.enddate}}</label>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <br>
+                        </div>
+                        <div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--====  End of View Experience Details  ====-->
+    
+
+    <!--=====================================
+    =            Delete Experience            =
+    ======================================-->
+    <div class="modal fade deleteExperience" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;
+            </button>
+            <h4 class="modal-title">Delete Experience
+            </h4>
+          </div>
+          <div class="modal-body">
+            <h4>Are you sure you want to delete 
+              <strong>{{deleteuserexperienceData.companyname}}?
+              </strong>
+            </h4>
+            <br>
+            <a class="btn btn-danger btn-sm" ng-click="delete(deleteuserexperienceData.adUserprofessionalexperienceId)" onclick="$('.modal').modal('hide')">
+              <i class="fa fa-trash">
+              </i>&nbsp;&nbsp;Delete
+            </a>
+            <a class="btn btn-default btn-sm" data-dismiss="modal">
+              <i class="fa fa-trash">
+              </i>&nbsp;&nbsp;Cancel
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--====  End of Delete Experience  ====-->
+
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Users/Sales/userExperienceCtrl.js"></script>

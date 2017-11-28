@@ -1,0 +1,175 @@
+<!--================================
+=            Controller            =
+=================================-->
+
+
+
+  <div class="row no-margin" ng-controller="technologiesCtrl">
+    <div class="col-md-12 no-padding">
+      <div class="panel panel-info">
+        <!-- <div class="panel-heading">
+          <h3 class="panel-title">Technologies
+          <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{technologies.length}}</span></span>
+          </h3>
+        </div> -->
+        <div class="panel-body">
+
+          <!-- toaster message -->
+          <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+          <!-- toaster message -->
+          
+          <div class="button-group">
+            <a data-toggle="modal" data-target=".addtechnologies" class="btn btn-default btn-labeled btn-sm">
+              <i class="fa fa-plus-circle">
+              </i>&nbsp;&nbsp;Add Technologies
+            </a>
+            <!-- <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+              <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+            </a> -->
+          </div>
+          <table ng-table="usersTable_technologies" show-filter="true" class="table table-bordered table-striped text-center">
+            <tbody>
+              <tr ng-repeat="bo in data_technologies">
+                <td data-title="'Technologies'" filter="{'technologyname': 'text'}" sortable="'technologyname'">{{bo.coursename}}
+                </td>
+                <td data-title="'Actions'">
+                  <a data-toggle="modal" data-target=".addtechnologies" class="btn btn-success btn-xs" ng-click="editTechnologies(bo.eTechnologyId)" tooltip-placement="top" uib-tooltip="Edit">
+                    <i class="fa fa-pencil-square-o" disabled>
+                    </i>
+                  </a> 
+                <a data-toggle="modal" data-target=".viewtechnologies" class="btn btn-info btn-xs" ng-click="viewTechnologies(bo.eTechnologyId, data_technologies)" tooltip-placement="top" uib-tooltip="View">
+                    <i class="fa fa-eye">
+                    </i>
+                  </a>
+                  <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletetechnologies" ng-click="delTechnologies(bo.eTechnologyId, data_technologies)" tooltip-placement="top" uib-tooltip="Delete">
+                    <i class="fa fa-trash">
+                    </i>
+                  </a>
+                  
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <hr>
+          
+          <!-- start edit modal -->
+          <div class="modal fade addtechnologies" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                  </button>
+                  <h4 class="modal-title">Add Technologies
+                  </h4>
+                </div>
+                <div class="modal-body">
+                  <form class="form-horizontal" ng-submit="savetechnology(technologyData1)" name="technologyDataform"  novalidate ng-init="technologyData1.eTechnologyId = 1">
+                  <!-- <input type="hidden" ng-model="technologyData1.eTechnologyId"> -->
+
+                   <div class="form-group required">
+                      <label class="control-label col-md-3" for="">Student</label>
+                      <div class="col-sm-9">
+                          <input ng-model="fullName" class="form-control inputEle" disabled>    
+                      </div> 
+                    </div>  
+
+                   <div class="form-group">
+                      <label class="control-label col-md-3" for="">Technologies</label>
+                      <div class="col-md-9">
+                        <span ng-repeat="sch in courses" style="margin-left: 10px;display: inline-block;">
+                          <label class="checkbox" style="margin-right: 10px;min-width: 90px;line-height: 21px;">
+                            <input type="checkbox" checklist-model="user.cCourseId" checklist-value="sch.cCourseId" ng-click="checkboxCoursesClick(user.cCourseId)"> {{sch.coursename}}
+                          </label>
+                        </span>
+                      </div>
+                    </div>
+
+                   
+                   <br>
+                    <div class="form-group">
+                      <div class="col-md-offset-4 col-md-3">
+                        <button type="submit"  class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                        </button>
+                      </div>
+                    </div>
+                    <div class="clearfix"></div>
+
+                   
+
+                   </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- end edit modal  -->
+
+
+          <!-- start view modal -->
+          <div class="modal fade viewtechnologies" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                  </button>
+                  <h4 class="modal-title">Technologies
+                  </h4>
+                </div>
+                <div class="modal-body">
+                <div class="form-group">
+                    <label class="control-label col-md-offset-2 col-md-3" for="">Student:
+                    </label>
+                    <label class="control-label col-md-3" for="">{{fullName}}
+                    </label> 
+                  </div>
+                   <div class="clearfix"></div>
+                   <hr>
+                  <div class="form-group">
+                    <label class="control-label col-md-offset-2 col-md-3" for="">Technologies:
+                    </label>
+                    <label class="control-label col-md-3" for="">{{viewtechnologiesData.technologyname}}
+                    </label> 
+                  </div>
+                   <div class="clearfix"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- end view modal -->
+          <!-- start delete modal -->
+          <div class="modal fade deletetechnologies" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;
+                    </button>
+                    <h4 class="modal-title">Delete Technologies
+                    </h4>
+                  </div>
+                  <div class="modal-body">
+                    <h4>Are you sure you want to delete 
+                      <strong>{{deletetechnologiesData.coursename}}?
+                      </strong>
+                    </h4>
+                    <br>
+                    <a class="btn btn-danger btn-sm" ng-click="deleteTechnology(deletetechnologiesData.eTechnologyId)" onclick="$('.modal').modal('hide')">
+                      <i class="fa fa-trash">
+                      </i>&nbsp;&nbsp;Delete
+                    </a>
+                    <a class="btn btn-default btn-sm" data-dismiss="modal">
+                      <i class="fa fa-trash">
+                      </i>&nbsp;&nbsp;Cancel
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <!-- end delete modal -->
+         
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!--====  End of Controller  ====-->
+
+ <script src="view/pages/Sales/Registration/ReTechnologiesCtrl.js"></script>

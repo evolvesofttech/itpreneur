@@ -1,0 +1,695 @@
+<!--================================
+=            Controller            =
+=================================-->
+<style type="text/css">
+  .progress {
+    display: inline-block;
+    width: 100px;
+    border: 3px groove #CCC;
+}
+
+.progress div {
+    font-size: smaller;
+    background: orange;
+    width: 0;
+}
+</style>
+  <div class="row no-margin" ng-controller="documentCtrl">
+    <div class="col-md-12 no-padding">
+      <div class="panel panel-info">
+        <!-- <div class="panel-heading">
+          <h3 class="panel-title">Technologies
+          <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{technologies.length}}</span></span>
+          </h3>
+        </div> -->
+        <div class="panel-body">
+
+          <!-- toaster message -->
+          <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+          <!-- toaster message -->
+          
+          <div class="button-group">
+            <a data-toggle="modal" data-target=".addDocuments" class="btn btn-default btn-sm btn-labeled" ng-click="addDocClick()">
+              <i class="fa fa-plus-circle">
+              </i>&nbsp;&nbsp;Add New
+            </a>
+            <!-- <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+              <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+            </a> -->
+          </div>
+          <table ng-table="usersTable_Document" show-filter="true" class="table table-bordered table-striped text-center">
+            <tbody>
+              <tr ng-repeat="bo in data_Documents">
+                <!-- <td data-title="'Image'">
+                  <img src="{{bo.path}}" data-toggle="modal" data-target=".viewDoc" ng-click="viewDocument(bo.eDocumentId, bo.path, data_Documents)" class="img-responsive" style="height: 100px;margin: 0 auto;cursor: pointer;">
+                </td> -->
+                <td data-title="'Name'" filter="{'documentname': 'text'}" sortable="'documentname'">{{bo.documentname}}</td>
+                <td data-title="'Type'" filter="{'documenttype': 'text'}" sortable="'documenttype'">{{bo.documenttype}}</td>
+                <td data-title="'Actions'">
+                  <a class="btn btn-success btn-xs" disabled>
+                    <i class="fa fa-pencil-square-o">
+                    </i>
+                  </a> 
+                 <button class="btn btn-info btn-xs" data-toggle="modal" data-target=".viewDoc" ng-click="viewDocument(bo.eDocumentId, bo.path, data_Documents)" ng-disabled="bo.documenttype == 'Hardcopy'">
+                    <i class="fa fa-eye">
+                    </i>
+                  </button>
+                  <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletedocument" ng-click="delDocument(bo.eDocumentId, data_Documents)" tooltip-placement="top" uib-tooltip="Delete">
+                    <i class="fa fa-trash">
+                    </i>
+                  </a>
+                  
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <hr>
+          
+          <!--==================================
+          =            Add Document            =
+          ===================================-->
+          <div class="modal fade addDocuments" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+           <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                 <div class="modal-header">
+                    <button type="button" class="close" ng-click="clearModalOnCloseDocument()" data-dismiss="modal">&times;
+                    </button>
+                    <h4 class="modal-title">Documents
+                    </h4>
+                 </div>
+                 <div class="modal-body">
+                    <div class="clearfix"></div>
+                    <br>
+                    <!-- form starts -->
+                    <div class="form-group">
+                       <label class="control-label col-sm-2" for="">Student</label>
+                       <div class="col-sm-4">
+                          <input ng-model="fullName" class="form-control inputEle" disabled>    
+                       </div>
+                    </div>
+                    <br>
+                    <div class="clearfix"></div>
+                    <hr>
+                    <div class="form-group">
+                       <label class="control-label col-sm-2" for="">Hardcopy</label>
+                       <div class="col-sm-1">
+                          Document
+                       </div>
+                       <div class="col-sm-3">
+                       </div>
+                       <div class="col-sm-3">
+                          Action
+                       </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    <hr>
+                      
+                      <!--=========================
+                      =            SSC            =
+                      ==========================-->
+                       <div class="form-group" ng-hide="hideSSC">
+                          <div class="col-sm-1">
+                             <input type="checkbox" ng-model="value" value="checked" ng-click="checkSSC(value)">
+                          </div>
+
+
+                          <form ng-submit="saveSSC(SSCDocumentData, picFile)" name="sscform" enctype="multipart/form-data" ng-hide="value" novalidate>
+                          <label class="control-label col-sm-2" for="">SSC Marksheet</label>
+                          
+                          <div class="col-sm-3">
+                             <input type="file" class="form-control" ngf-select ng-model="picFile" name="filessc" ngf-accept="'image/*'" required>
+                             <div class="clearfix"></div>
+                             <p class="error" ng-show="sscform.filessc.$invalid && sscform.filessc.$touched">Please Browse File</p> 
+                          </div>
+                          <div class="col-sm-1">
+                             <button type="submit"  ng-disabled="sscform.$invalid" class="btn btn-success btn-labeled btn-sm">
+                             <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Upload</button>
+                          </div>
+                          <div class="col-md-1">
+                            <img ngf-src="picFile" class="img-responsive thumb">
+                          </div>
+                          <div class="col-md-2">
+                             
+                          <span class="progress" ng-show="picFile.progress >= 0">
+                            <div style="width:{{picFile.progress}}%" ng-bind="picFile.progress + '%'"></div>
+                          </span>
+                              
+                          </div>
+                          <div class="col-md-2">
+                            <span ng-show="picFile.result" style="color: green;">Uploaded</span>
+                          </div>
+                          </form>
+
+                          <form ng-submit="saveSSCHardcopy('Hardcopy')" ng-hide="!value" style="margin-bottom: 10px;">
+                            <label class="control-label col-sm-2" for="">SSC Marksheet</label>
+                            <div class="col-sm-3">
+                               <button type="submit" class="btn btn-success btn-labeled btn-sm" onclick="$('.modal').modal('hide')">
+                               <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Upload</button>
+                            </div>
+                          </form>
+
+                       </div>
+                       <!--====  End of SSC  ====-->
+
+                    <div class="clearfix"></div><br>
+
+                    <!--=========================
+                    =            HSC            =
+                    ==========================-->
+                   <div class="form-group" ng-hide="hideHSC">
+                          <div class="col-sm-1">
+                             <input type="checkbox" ng-model="value1" value="checked" ng-click="checkHSC(value1)">
+                          </div>
+
+
+                          <form ng-submit="saveHSC(HSCDocumentData, picFile1)" name="hscform" enctype="multipart/form-data" ng-hide="value1" novalidate>
+                          <label class="control-label col-sm-2" for="">HSC Marksheet</label>
+                          
+                          <div class="col-sm-3">
+                             <!-- <input type="file" class="form-control" file-model="myFile1" required> -->
+                             <input type="file" class="form-control" ngf-select ng-model="picFile1" name="file1" ngf-accept="'image/*'" required>
+                             <div class="clearfix"></div>
+                             <p class="error" ng-show="hscform.file1.$invalid && hscform.file1.$touched">Please Browse File</p> 
+                             <!-- ng-disabled="value" --> 
+                          </div>
+                          <div class="col-sm-1">
+                             <button type="submit"  ng-disabled="hscform.$invalid" class="btn btn-success btn-labeled btn-sm">
+                             <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Upload</button>
+                          </div>
+                          <div class="col-md-1">
+                            <img ngf-src="picFile1" class="img-responsive thumb">
+                          </div>
+                          <div class="col-md-2">
+                             
+                              <span class="progress" ng-show="picFile1.progress >= 0">
+                                  <div style="width:{{picFile1.progress}}%" ng-bind="picFile1.progress + '%'"></div>
+                              </span>
+                              
+                          </div>
+                          <div class="col-md-2">
+                            <span ng-show="picFile1.result" style="color: green;">Uploaded</span>
+                          </div>
+                          </form>
+
+                          <form ng-submit="saveHSCHardcopy('Hardcopy')" ng-hide="!value1">
+                            <label class="control-label col-sm-2" for="">HSC Marksheet</label>
+                            <div class="col-sm-3">
+                               <button type="submit" class="btn btn-success btn-labeled btn-sm" onclick="$('.modal').modal('hide')">
+                               <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Upload</button>
+                            </div>
+                          </form>
+
+                       </div>
+                       <!--====  End of HSC  ====-->
+
+
+                    <div class="clearfix"></div><br>
+
+                    <!--==========================================
+                    =            Graduation Marksheet            =
+                    ===========================================-->
+                   <div class="form-group" ng-hide="hideGraduation">
+                          <div class="col-sm-1">
+                             <input type="checkbox" ng-model="value7" value="checked" ng-click="checkGraduation(value7)">
+                          </div>
+
+
+                          <form ng-submit="saveGraduation(GraduationDocumentData, picFile2)" enctype="multipart/form-data" ng-hide="value7" name="graduationform" novalidate>
+                          <label class="control-label col-sm-2" for="">Graduation Marksheet</label>
+                          
+                          <div class="col-sm-3">
+                             <!-- <input type="file" class="form-control" file-model="myFile7" required> -->
+                             <input type="file" class="form-control" ngf-select ng-model="picFile2" name="file2" ngf-accept="'image/*'" required>
+                             <div class="clearfix"></div>
+                             <p class="error" ng-show="graduationform.file2.$invalid && graduationform.file2.$touched">Please Browse File</p> 
+                             <!-- ng-disabled="value" --> 
+                          </div>
+                          <div class="col-sm-1">
+                             <button type="submit" ng-disabled="graduationform.$invalid" class="btn btn-success btn-labeled btn-sm">
+                             <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Upload</button>
+                          </div>
+                          <div class="col-md-1">
+                            <img ngf-src="picFile2" class="img-responsive thumb">
+                          </div>
+                          <div class="col-md-2">
+                             
+                          <span class="progress" ng-show="picFile2.progress >= 0">
+                              <div style="width:{{picFile2.progress}}%" ng-bind="picFile2.progress + '%'"></div>
+                          </span>
+                              
+                          </div>
+                          <div class="col-md-2">
+                            <span ng-show="picFile2.result" style="color: green;">Uploaded</span>
+                          </div>
+                          </form>
+
+                          <form ng-submit="saveGraduationHardcopy('Hardcopy')" ng-hide="!value7">
+                            <label class="control-label col-sm-2" for="">Graduation Marksheet</label>
+                            <div class="col-sm-3">
+                               <button type="submit" class="btn btn-success btn-labeled btn-sm" onclick="$('.modal').modal('hide')">
+                               <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Upload</button>
+                            </div>
+                          </form>
+
+                       </div>
+                       <!--====  End of Graduation Marksheet  ====-->
+
+                    <div class="clearfix"></div><br>
+
+                    <!--===============================================
+                    =            Post Graduation Marksheet            =
+                    ================================================-->
+                    <div class="form-group" ng-hide="hidePostGraduation">
+                          <div class="col-sm-1">
+                             <input type="checkbox" ng-model="value8" value="checked" ng-click="checkPostGraduation(value8)">
+                          </div>
+
+
+                          <form ng-submit="savePostGraduation(PostGraduationDocumentData, picFile3)" enctype="multipart/form-data" ng-hide="value8" name="pgform" novalidate>
+                          <label class="control-label col-sm-2" for="">Post Graduation Marksheet</label>
+                          
+                          <div class="col-sm-3">
+                             <!-- <input type="file" class="form-control" file-model="myFile8" required> -->
+                             <input type="file" class="form-control" ngf-select ng-model="picFile3" name="file3" ngf-accept="'image/*'" required>
+                             <div class="clearfix"></div>
+                             <p class="error" ng-show="pgform.file3.$invalid && pgform.file3.$touched">Please Browse File</p> 
+                             <!-- ng-disabled="value" --> 
+                          </div>
+                          <div class="col-sm-1">
+                             <button type="submit" ng-disabled="pgform.$invalid" class="btn btn-success btn-labeled btn-sm">
+                             <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Upload</button>
+                          </div>
+                          <div class="col-md-1">
+                            <img ngf-src="picFile3" class="img-responsive thumb">
+                          </div>
+                          <div class="col-md-2">
+                             
+                              <span class="progress" ng-show="picFile3.progress >= 0">
+                                  <div style="width:{{picFile3.progress}}%" ng-bind="picFile3.progress + '%'"></div>
+                              </span>
+                              
+                          </div>
+                          <div class="col-md-2">
+                            <span ng-show="picFile3.result" style="color: green;">Uploaded</span>
+                          </div>
+                          </form>
+
+                          <form ng-submit="savePostGraduationHardcopy('Hardcopy')" ng-hide="!value8">
+                            <label class="control-label col-sm-2" for="">Post Graduation Marksheet</label>
+                            <div class="col-sm-3">
+                               <button type="submit" class="btn btn-success btn-labeled btn-sm" onclick="$('.modal').modal('hide')">
+                               <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Upload</button>
+                            </div>
+                          </form>
+
+                       </div>
+                      <!--====  End of Post Graduation Marksheet  ====-->
+
+                    <div class="clearfix"></div><br>
+
+                    <!--=======================================
+                    =            Diploma Marksheet            =
+                    ========================================-->
+                    <div class="form-group" ng-hide="hideDiploma">
+                          <div class="col-sm-1">
+                             <input type="checkbox" ng-model="value9" value="checked" ng-click="checkDiploma(value9)">
+                          </div>
+
+
+                          <form ng-submit="saveDiploma(DiplomaDocumentData, picFile4)" enctype="multipart/form-data" ng-hide="value9" novalidate>
+                          <label class="control-label col-sm-2" for="">Diploma Marksheet</label>
+                          
+                          <div class="col-sm-3">
+                             <!-- <input type="file" class="form-control" file-model="myFile8" required> -->
+                             <input type="file" class="form-control" ngf-select ng-model="picFile4" name="file1" ngf-accept="'image/*'" required>
+                             <!-- ng-disabled="value" --> 
+                          </div>
+                          <div class="col-sm-1">
+                             <button type="submit" class="btn btn-success btn-labeled btn-sm">
+                             <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Upload</button>
+                          </div>
+                          <div class="col-md-1">
+                            <img ngf-src="picFile4" class="img-responsive thumb">
+                          </div>
+                          <div class="col-md-2">
+                             
+                              <span class="progress" ng-show="picFile4.progress >= 0">
+                                  <div style="width:{{picFile4.progress}}%" ng-bind="picFile4.progress + '%'"></div>
+                              </span>
+                              
+                          </div>
+                          <div class="col-md-2">
+                            <span ng-show="picFile4.result" style="color: green;">Uploaded</span>
+                          </div>
+                          </form>
+
+                          <form ng-submit="saveDiplomaHardcopy('Hardcopy')" ng-hide="!value9">
+                            <label class="control-label col-sm-2" for="">Diploma Marksheet</label>
+                            <div class="col-sm-3">
+                               <button type="submit" class="btn btn-success btn-labeled btn-sm" onclick="$('.modal').modal('hide')">
+                               <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Upload</button>
+                            </div>
+                          </form>
+
+                       </div>
+                    <!--====  End of Diploma Marksheet  ====-->
+
+                    <div class="clearfix"></div><br>
+                    <hr>
+                    <!--===========================
+                    =            Photo            =
+                    ============================-->
+                   <div class="form-group" ng-hide="hidePhoto">
+                          <div class="col-sm-1">
+                             <input type="checkbox" ng-model="value6" value="checked" ng-click="checkPhoto(value6)">
+                          </div>
+
+
+                          <form ng-submit="savePhoto(PhotoDocumentData, picFile5)" name="photoform" enctype="multipart/form-data" ng-hide="value6" novalidate>
+                            <label class="control-label col-sm-2" for="">Photo</label>
+                            
+                            <div class="col-sm-3">
+                               <!-- <input type="file" class="form-control" file-model="myFile6" required> -->
+                               <input type="file" class="form-control" ngf-select ng-model="picFile5" name="filephoto" ngf-accept="'image/*'" required>
+                               <div class="clearfix"></div>
+                             <p class="error" ng-show="photoform.filephoto.$invalid && photoform.filephoto.$touched">Please Browse Photo from gallery</p> 
+                               <!-- ng-disabled="value" --> 
+                            </div>
+                            <div class="col-sm-1">
+                               <button type="submit" ng-disabled="photoform.$invalid" class="btn btn-success btn-labeled btn-sm">
+                               <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Upload</button>
+                            </div>
+                            <div class="col-md-1">
+                              <img ngf-src="picFile5" class="img-responsive thumb">
+                            </div>
+                            <div class="col-md-2">
+                               
+                                <span class="progress" ng-show="picFile5.progress >= 0">
+                                    <div style="width:{{picFile5.progress}}%" ng-bind="picFile5.progress + '%'"></div>
+                                </span>
+                                
+                            </div>
+                            <div class="col-md-2">
+                              <span ng-show="picFile5.result" style="color: green;">Uploaded</span>
+                            </div>
+                          </form>
+
+                          <form ng-submit="savePhotoHardcopy('Hardcopy')" ng-hide="!value6">
+                            <label class="control-label col-sm-2" for="">Photo</label>
+                            <div class="col-sm-3">
+                               <button type="submit" class="btn btn-success btn-labeled btn-sm" onclick="$('.modal').modal('hide')">
+                               <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Upload</button>
+                            </div>
+                          </form>
+
+                       </div>
+                       <!--====  End of Photo  ====-->
+
+
+                    <div class="clearfix"></div><br>
+
+                    <!--==============================
+                    =            ID Proof            =
+                    ===============================-->
+                    <div class="form-group" ng-hide="hideIDP">
+                          <div class="col-sm-1">
+                             <input type="checkbox" ng-model="value2" value="checked" ng-click="checkHSC(value2)">
+                          </div>
+
+
+                          <form ng-submit="saveID(IDDocumentData, picFile6)" name="idform" enctype="multipart/form-data" ng-hide="value2" novalidate>
+                          <label class="control-label col-sm-2" for="">ID Proof</label>
+                          
+                          <div class="col-sm-3">
+                             <!-- <input type="file" class="form-control" file-model="myFile2" required> -->
+                             <input type="file" class="form-control" ngf-select ng-model="picFile6" name="fileid" ngf-accept="'image/*'" required>
+                             <div class="clearfix"></div>
+                             <p class="error" ng-show="idform.fileid.$invalid && idform.fileid.$touched">Please Browse File</p> 
+                             <!-- ng-disabled="value" --> 
+                          </div>
+                          <div class="col-sm-1">
+                               <button type="submit" ng-disabled="idform.$invalid" class="btn btn-success btn-labeled btn-sm">
+                               <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Upload</button>
+                            </div>
+                            <div class="col-md-1">
+                              <img ngf-src="picFile6" class="img-responsive thumb">
+                            </div>
+                            <div class="col-md-2">
+                               
+                                <span class="progress" ng-show="picFile6.progress >= 0">
+                                    <div style="width:{{picFile6.progress}}%" ng-bind="picFile6.progress + '%'"></div>
+                                </span>
+                                
+                            </div>
+                            <div class="col-md-2">
+                              <span ng-show="picFile6.result" style="color: green;">Uploaded</span>
+                            </div>
+                          </form>
+
+                          <form ng-submit="saveIDHardcopy('Hardcopy')" ng-hide="!value2">
+                            <label class="control-label col-sm-2" for="">ID Proof</label>
+                            <div class="col-sm-3">
+                               <button type="submit" class="btn btn-success btn-labeled btn-sm" onclick="$('.modal').modal('hide')">
+                               <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Upload</button>
+                            </div>
+                          </form>
+
+                       </div>
+                       <!--====  End of ID Proof  ====-->
+
+                    <div class="clearfix"></div><br>
+
+                    <!--===================================
+                    =            Address Proof            =
+                    ====================================-->
+                    <div class="form-group" ng-hide="hideAdd">
+                          <div class="col-sm-1">
+                             <input type="checkbox" ng-model="value3" value="checked" ng-click="checkHSC(value3)">
+                          </div>
+
+
+                          <form ng-submit="saveAddress(AddressDocumentData, picFile7)" name="addform" enctype="multipart/form-data" ng-hide="value3" novalidate>
+                          <label class="control-label col-sm-2" for="">Address Proof</label>
+                          
+                          <div class="col-sm-3">
+                             <!-- <input type="file" class="form-control" file-model="myFile3" required> -->
+                             <input type="file" class="form-control" ngf-select ng-model="picFile7" name="fileaddr" ngf-accept="'image/*'" required>
+                             <div class="clearfix"></div>
+                             <p class="error" ng-show="addform.fileaddr.$invalid && addform.fileaddr.$touched">Please Browse File</p> 
+                             <!-- ng-disabled="value" --> 
+                          </div>
+                          <div class="col-sm-1">
+                               <button type="submit" ng-disabled="addform.$invalid" class="btn btn-success btn-labeled btn-sm">
+                               <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Upload</button>
+                            </div>
+                            <div class="col-md-1">
+                              <img ngf-src="picFile7" class="img-responsive thumb">
+                            </div>
+                            <div class="col-md-2">
+                               
+                                <span class="progress" ng-show="picFile7.progress >= 0">
+                                    <div style="width:{{picFile7.progress}}%" ng-bind="picFile7.progress + '%'"></div>
+                                </span>
+                                
+                            </div>
+                            <div class="col-md-2">
+                              <span ng-show="picFile7.result" style="color: green;">Uploaded</span>
+                            </div>
+                          </form>
+
+                          <form ng-submit="saveAddressHardcopy('Hardcopy')" ng-hide="!value3">
+                            <label class="control-label col-sm-2" for="">Address Proof</label>
+                            <div class="col-sm-3">
+                               <button type="submit" class="btn btn-success btn-labeled btn-sm" onclick="$('.modal').modal('hide')">
+                               <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Upload</button>
+                            </div>
+                          </form>
+
+                       </div>
+                       <!--====  End of Address Proof  ====-->
+
+                    <div class="clearfix"></div><br>
+
+                    <!--============================
+                    =            Resume            =
+                    =============================-->
+                    <div class="form-group" ng-hide="hideRes">
+                          <div class="col-sm-1">
+                             <input type="checkbox" ng-model="value4" value="checked" ng-click="checkHSC(value4)">
+                          </div>
+
+
+                          <form ng-submit="saveResume(ResumeDocumentData, picFile8)" name="resumeform" enctype="multipart/form-data" ng-hide="value4" novalidate>
+                          <label class="control-label col-sm-2" for="">Resume</label>
+                          
+                          <div class="col-sm-3">
+                             <!-- <input type="file" class="form-control" file-model="myFile4" required> -->
+                             <input type="file" class="form-control" ngf-select ng-model="picFile8" name="file8" ngf-accept="'image/*'" required>
+                             <div class="clearfix"></div>
+                             <p class="error" ng-show="resumeform.file8.$invalid && resumeform.file8.$touched">Please Browse File</p> 
+                             <!-- ng-disabled="value" --> 
+                          </div>
+                          <div class="col-sm-1">
+                               <button type="submit" ng-disabled="resumeform.$invalid" class="btn btn-success btn-labeled btn-sm">
+                               <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Upload</button>
+                            </div>
+                            <div class="col-md-1">
+                              <img ngf-src="picFile8" class="img-responsive thumb">
+                            </div>
+                            <div class="col-md-2">
+                               
+                                <span class="progress" ng-show="picFile8.progress >= 0">
+                                    <div style="width:{{picFile8.progress}}%" ng-bind="picFile8.progress + '%'"></div>
+                                </span>
+                                
+                            </div>
+                            <div class="col-md-2">
+                              <span ng-show="picFile8.result" style="color: green;">Uploaded</span>
+                            </div>
+                          </form>
+
+                          <form ng-submit="saveResumeHardcopy('Hardcopy')" ng-hide="!value4">
+                            <label class="control-label col-sm-2" for="">Resume</label>
+                            <div class="col-sm-3">
+                               <button type="submit" class="btn btn-success btn-labeled btn-sm" onclick="$('.modal').modal('hide')">
+                               <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Upload</button>
+                            </div>
+                          </form>
+
+                       </div>
+                       <!--====  End of Resume  ====-->
+
+                    <div class="clearfix"></div><br>
+
+                    <!--================================
+                    =            Experience            =
+                    =================================-->
+                    <div class="form-group" ng-hide="hideExp">
+                          <div class="col-sm-1">
+                             <input type="checkbox" ng-model="value5" value="checked" ng-click="checkHSC(value5)">
+                          </div>
+
+
+                          <form ng-submit="saveExp(ExpDocumentData, picFile9)" enctype="multipart/form-data" ng-hide="value5" novalidate>
+                          <label class="control-label col-sm-2" for="">Experience</label>
+                          
+                          <div class="col-sm-3">
+                             <!-- <input type="file" class="form-control" file-model="myFile5" required> -->
+                             <input type="file" class="form-control" ngf-select ng-model="picFile9" name="file8" ngf-accept="'image/*'" required>
+                             <!-- ng-disabled="value" --> 
+                          </div>
+                          <div class="col-sm-1">
+                               <button type="submit" class="btn btn-success btn-labeled btn-sm">
+                               <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Upload</button>
+                            </div>
+                            <div class="col-md-1">
+                              <img ngf-src="picFile9" class="img-responsive thumb">
+                            </div>
+                            <div class="col-md-2">
+                               
+                                <span class="progress" ng-show="picFile9.progress >= 0">
+                                    <div style="width:{{picFile9.progress}}%" ng-bind="picFile9.progress + '%'"></div>
+                                </span>
+                                
+                            </div>
+                            <div class="col-md-2">
+                              <span ng-show="picFile9.result" style="color: green;">Uploaded</span>
+                            </div>
+                          </form>
+
+                          <form ng-submit="saveExpHardcopy('Hardcopy')" ng-hide="!value5">
+                            <label class="control-label col-sm-2" for="">Experience</label>
+                            <div class="col-sm-3">
+                               <button type="submit" class="btn btn-success btn-labeled btn-sm" onclick="$('.modal').modal('hide')">
+                               <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Upload</button>
+                            </div>
+                          </form>
+
+                       </div>
+                       <!--====  End of Experience  ====-->
+
+                    <div class="clearfix"></div>
+                    <br>
+
+
+                 </div>
+              </div>
+           </div>
+        </div>
+        <!--====  End of Add Document  ====-->
+
+
+          <!-- start view modal -->
+          <div class="modal fade viewDoc" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" ng-click="clearModalOnCloseDocument()" data-dismiss="modal">&times;
+                  </button>
+                  <h4 class="modal-title">{{viewSelectedDocumentData.documentname}}
+                  </h4>
+                </div>
+                <div class="modal-body">
+                  <div ng-if="fileExtension == 'png' || fileExtension == 'jpg' || fileExtension == 'jpeg' || fileExtension == 'gif'">
+                    <img src="{{selectedImagePath | trusted}}" class="img-responsive thumbnail" style="margin: 0 auto;">
+                  </div>
+
+                  <div ng-if="fileExtension == 'doc' || fileExtension == 'docx'">
+                     <iframe ng-src='{{DocUrl | trusted}}' style="position: relative;width:100%; height: 100%;min-height: 700px;"></iframe>
+                   </div>
+
+                   <div ng-if="fileExtension == 'pdf'">
+                     <!-- <pdf-viewer 
+                    delegate-handle="relativity-special-general-theory"
+                    url="urlFIle"
+                    scale="1"
+                    show-toolbar="true"></pdf-viewer> -->
+                    <embed src="{{urlFIle | trusted}}" style="width: 100%;height: 100%;min-height: 700px;"></embed>
+                   </div>
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- end view modal -->
+
+          <!-- start delete modal -->
+          <div class="modal fade deletedocument" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;
+                    </button>
+                    <h4 class="modal-title">Delete Document
+                    </h4>
+                  </div>
+                  <div class="modal-body">
+                    <h4>Are you sure you want to delete following document? <br>
+                      <strong>{{deleteDocumentData.documentname}}?
+                      </strong>
+                    </h4>
+                    
+                    <br>
+                    <a class="btn btn-danger btn-sm" ng-click="deleteDocument(deleteDocumentData.eDocumentId, deleteDocumentData.documentname)" onclick="$('.modal').modal('hide')">
+                      <i class="fa fa-trash">
+                      </i>&nbsp;&nbsp;Delete
+                    </a>
+                    <a class="btn btn-default btn-sm" data-dismiss="modal">
+                      <i class="fa fa-trash">
+                      </i>&nbsp;&nbsp;Cancel
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <!-- end delete modal -->
+         
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!--====  End of Controller  ====-->
+
+ <script src="view/pages/Sales/Enrollment/Documents/EnDocumentsCtrl.js"></script>

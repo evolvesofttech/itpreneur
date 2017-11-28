@@ -1,0 +1,252 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="bankCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Bank
+              <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{bank.length}}</span></span>
+              </h3>
+            </div>
+            <div class="panel-body">
+              
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+              
+              <div class="button-group">
+                <a data-toggle="modal" data-target=".addbank" ng-click="addbankclick()" class="btn btn-default btn-labeled btn-sm">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp;Add Bank
+                </a>
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+              </div>
+              <table ng-table="usersTable_bank" show-filter="true" class="table table-bordered table-striped text-center">
+                <tbody>
+                  <tr ng-repeat="bo in data_bank">
+                    <td data-title="'Bank '" filter="{'bankname': 'text'}" sortable="'bankname'">{{bo.bankname}}
+                    </td>
+                     <td data-title="'Branch '" filter="{'branchname': 'text'}" sortable="'branchname'">{{bo.branchname}}
+                    </td>
+                     <td data-title="'Account No.'" filter="{'accountno': 'text'}" sortable="'accountno'">{{bo.accountno}}
+                    </td>
+                     <td data-title="'IFSC Code '" filter="{'ifsccode': 'text'}" sortable="'ifsccode'">{{bo.ifsccode}}
+                    </td>
+                     <td data-title="'MICR Code '" filter="{'micrcode': 'text'}" sortable="'micrcode'">{{bo.micrcode}}
+                    </td>
+                   
+                    <td data-title="'Actions'" class="w150">
+                      <a data-toggle="modal" data-target=".addbank" class="btn btn-success btn-xs" ng-click="editBank(bo.cBankdetailId)" tooltip-placement="top" uib-tooltip="Edit">
+                        <i class="fa fa-pencil-square-o">
+                        </i>
+                      </a> 
+                      <a data-toggle="modal" data-target=".viewbank" class="btn btn-info btn-xs" ng-click="viewBank(bo.cBankdetailId, data_bank)" tooltip-placement="top" uib-tooltip="View">
+                        <i class="fa fa-eye">
+                        </i>
+                      </a>
+                      <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletebank" ng-click="delBank(bo.cBankdetailId, data_bank)" tooltip-placement="top" uib-tooltip="Delete">
+                        <i class="fa fa-trash">
+                        </i>
+                      </a>
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <hr>
+              <!-- start edit modal -->
+              <div class="modal fade addbank" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title" ng-init="headingMessage ='Add Bank'">{{headingMessage}}</h4>
+                    </div>
+                    <div class="modal-body">
+                      <form class="form-horizontal" name="bankform" ng-submit="saveBank(bankData)" novalidate>
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Bank Name</label>
+                          <div class="col-md-4">
+                            <input type="text" name="bank" class="form-control inputEle" ng-model="bankData.bankname" placeholder="Enter Bank Name" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="bankform.bank.$invalid && bankform.bank.$touched"> Enter Bank Name</p>
+                          </div>
+
+                          <label class="control-label col-md-2" for="">Branch Name</label>
+                          <div class="col-md-4">
+                            <input type="text" name="br" class="form-control inputEle" ng-model="bankData.branchname" placeholder="Enter Branch" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="bankform.br.$invalid && bankform.br.$touched"> Enter Branch Name</p>
+                          </div>
+                          </div>
+
+
+                           <div class="form-group">
+                          <label class="control-label col-md-2 mandatory" for="">Account No.</label>
+                          <div class="col-md-4">
+                            <input type="number" name="acc" class="form-control inputEle" ng-model="bankData.accountno" placeholder="Enter Account No." ng-required="true" restrict-to="[0-9]" maxlength="15">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="bankform.acc.$invalid && bankform.acc.$touched"> Enter Account No.</p>
+                          </div>
+
+                          <label class="control-label col-md-2" for="">IFSC Code</label>
+                          <div class="col-md-4">
+                            <input type="text" name="ifsc" class="form-control inputEle" ng-model="bankData.ifsccode" placeholder="Enter IFSC Code" maxlength="11" style="text-transform: uppercase;">
+                          <!--   <div class="clearfix"></div>
+                            <p class="error" ng-show="bankform.ifsc.$invalid && bankform.ifsc.$touched"> Enter IFSC Code</p> -->
+                          </div>
+                          </div>
+
+                           <div class="form-group ">
+                          <label class="control-label col-md-2" for="">MICR Code</label>
+                          <div class="col-md-4">
+                            <input type="text" name="micr" class="form-control inputEle" ng-model="bankData.micrcode" placeholder="Enter MICR Code" maxlength="10"  maxlength="9" style="text-transform: uppercase;">
+                           <!--  <div class="clearfix"></div>
+                            <p class="error" ng-show="bankform.micr.$invalid && bankform.micr.$touched"> Enter MICR Code</p> -->
+                          </div>
+
+                          <label class="control-label col-md-2" for="">Address</label>
+                          <div class="col-md-4">
+                            <input type="text" name="addr" class="form-control inputEle" ng-model="bankData.address" placeholder="Enter Address" >
+                           <!--  <div class="clearfix"></div>
+                            <p class="error" ng-show="bankform.addr.$invalid && bankform.addr.$touched"> Enter Address</p> -->
+                          </div>
+                          </div>
+                          <br>
+                        <div class="form-group">
+                         <div class="col-md-12 text-center">
+                            <button type="submit" ng-disabled="bankform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                            </button>
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end edit modal  -->
+              <!-- start view modal -->
+              <div class="modal fade viewbank" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">View Bank
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">Bank:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewbankData.bankname}}
+                        </label>
+                      </div>
+                    
+                    <div class="clearfix"></div>
+                    <hr>
+                    
+                      <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">Branch:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewbankData.branchname}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                    <hr>
+
+                      <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">Account No:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewbankData.accountno}}
+                        </label>
+                      </div>
+                    
+                    <div class="clearfix"></div>
+                    <hr>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">IFSC Code:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewbankData.ifsccode}}
+                        </label>
+                      </div>
+                    
+                    <div class="clearfix"></div>
+                    <hr>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">MICR Code:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewbankData.micrcode}}
+                        </label>
+                      </div>
+                    
+                    <div class="clearfix"></div>
+                    <hr>
+
+
+                    <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">Address:
+                        </label>
+                        <label class="control-label col-md-3" for="">{{viewbankData.address}}
+                        </label>
+                      </div>
+                    
+                       <div class="clearfix"></div>
+                       <br>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end view modal -->
+              <!-- start delete modal -->
+              <div class="modal fade deletebank" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Delete Bank
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Are you sure you want to delete 
+                          <strong>{{deletebankData.bankname}}?
+                          </strong>
+                        </h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="delete(deletebankData.cBankdetailId)" onclick="$('.modal').modal('hide')">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Delete
+                        </a>
+                        <a class="btn btn-default btn-sm" data-dismiss="modal">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Cancel
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!-- end delete modal -->
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Masters/Bank/BankCtrl.js"></script>
+

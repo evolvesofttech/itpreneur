@@ -1,0 +1,537 @@
+  <!--================================
+=            Controller            =
+=================================-->
+<style type="text/css">
+  .studentlist {
+    line-height: 30px;
+  }
+  .no-border {
+    border: none;
+    background: #eee;
+    box-shadow: none;
+  }
+</style>
+
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state" >
+   <div class="container-fluid">
+      <div class="row no-margin" ng-controller="InterviewScheduleCtrl">
+         <div class="col-md-12 no-padding">
+            <div class="panel panel-info">
+               <div class="panel-heading">
+                  <h3 class="panel-title">Interview Schedule
+                     <span class="pull-right"><small>Total: </small><span class="badge" ng-init="StudentList.length = '0'">{{StudentList.length}}</span></span>
+                  </h3>
+               </div>
+               <div class="panel-body">
+                  <!-- toaster message -->
+                  <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+                  <!-- toaster message -->
+                  <form class="form-horizontal">
+                     <div class="form-group required">
+                        <label class="control-label col-sm-2" for="">Company</label>
+                        <div class="col-sm-3">
+                           <select ng-model="InterviewScheduleData.clClientId"  class="form-control inputEle" ng-options="com.clClientId as com.companyname for com in Company"  ng-change="companyChange(InterviewScheduleData.clClientId)" ng-required="true">
+                              <option value="">Select Company</option>
+                           </select>
+                        </div>
+                        <label class="control-label col-sm-2" for="">Jobs</label>
+                        <div class="col-sm-3">
+                           <select ng-model="InterviewScheduleData.clClientjobprofileId"  class="form-control inputEle" ng-options="job.clClientjobprofileId as job.jobprofile for job in Job"  ng-change="jobChange(InterviewScheduleData.clClientjobprofileId)" ng-required="true" ng-disabled="disableJobs">
+                              <option value="">Select Job</option>
+                           </select>
+                        </div>
+                     </div>
+                     <div class="form-group required">
+                        <label class="control-label col-sm-2" for="">Round</label>
+                        <div class="col-sm-3">
+                           <select ng-model="InterviewScheduleData.status" class="form-control " ng-required="true" ng-change="InterviewScheduleChange(InterviewScheduleData.status)" ng-disabled="disableRounds">
+                              <!-- <option value="Interested">Interested</option> -->
+                              <option value="firstround">1st Round</option>
+                              <option value="secondround">2nd Round</option>
+                              <option value="thirdround">3rd Round</option>
+                              <option value="fourthround">4th Round</option>
+                              <option value="fifthround">5th Round</option>
+                           </select>
+                        </div>
+                        <div class="col-sm-7">
+
+                          <div class="btn-group pull-right" uib-dropdown>
+                            <button type="button" data-toggle="modal" data-target=".emailModal" class="btn btn-primary btn-sm" ng-click="emailClickFunction(InterviewScheduleData.clClientId, InterviewScheduleData.clClientjobprofileId)" ng-disabled="disableEmail">
+                              Email
+                            </button>
+                            <!-- <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+                              <li role="menuitem" ng-click="emailClicked('Send Invitation')" data-toggle="modal" data-target=".emailModal"><a href="">Send Invitation</a></li>
+                              <li role="menuitem" ng-click="emailClicked('Interview Scheduled')" data-toggle="modal" data-target=".emailModal"><a href="">Interview Scheduled</a></li>
+                              <li role="menuitem" ng-click="emailClicked('Interview Rescheduled')" data-toggle="modal" data-target=".emailModal"><a href="">Interview Rescheduled</a></li>
+                              <li role="menuitem" ng-click="emailClicked('Interview Cancelled')" data-toggle="modal" data-target=".emailModal"><a href="">Interview Cancelled</a></li>
+                              <li role="menuitem" ng-click="emailClicked('Feedback Email')" data-toggle="modal" data-target=".emailModal"><a href="">Feedback Email</a></li>
+                              <li role="menuitem" ng-click="emailClicked('Roundwise Selection')" data-toggle="modal" data-target=".emailModal"><a href="">Roundwise Selection</a></li>
+                              <li role="menuitem" ng-click="emailClicked('Blacklisted')" data-toggle="modal" data-target=".emailModal"><a href="">Blacklisted</a></li>
+                            </ul> -->
+                          </div>
+
+                          <div class="btn-group pull-right" uib-dropdown>
+                            <button type="button" class="btn btn-primary btn-sm" ng-click="messageClicked()" data-toggle="modal" data-target=".messageModal" ng-disabled="disableEmail">Message</button>
+                          </div>
+
+                          <div class="btn-group pull-right" uib-dropdown>
+                            <button type="button" data-toggle="modal" data-target=".statusModal" class="btn btn-primary btn-sm" ng-disabled="disableEmail">Change Status</span></button>
+                            <!-- <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+                              <li role="menuitem" ng-click="statusClicked('Interested')" data-toggle="modal" data-target=".statusModal"><a href="">Interested</a></li>
+                              <li role="menuitem" ng-click="statusClicked('Scheduled')" data-toggle="modal" data-target=".statusModal"><a href="">Scheduled</a></li>
+                              <li role="menuitem" ng-click="statusClicked('Attended')" data-toggle="modal" data-target=".statusModal"><a href="">Attended</a></li>
+                              <li role="menuitem" ng-click="statusClicked('Not Attended')" data-toggle="modal" data-target=".statusModal"><a href="">Not Attended</a></li>
+                              <li role="menuitem" ng-click="statusClicked('Cleared')" data-toggle="modal" data-target=".statusModal"><a href="">Cleared</a></li>
+                              <li role="menuitem" ng-click="statusClicked('Not Cleared')" data-toggle="modal" data-target=".statusModal"><a href="">Not Cleared</a></li>
+                              <li role="menuitem" ng-click="statusClicked('On Hold')" data-toggle="modal" data-target=".statusModal"><a href="">On Hold</a></li>
+                              <li role="menuitem" ng-click="statusClicked('Final Selection')" data-toggle="modal" data-target=".statusModal"><a href="">Final Selection</a></li>
+                            </ul> -->
+                          </div>
+
+
+                        </div>
+                     </div>
+                  </form>
+                  
+                  <table ng-table="usersTable_InterviewSchedule" show-filter="true" class="table table-bordered table-striped text-center">
+                     <tbody>
+                        <tr ng-repeat="IntSch in data_InterviewSchedule" ng-hide=" ">
+                           <!-- <td data-title="'Sr No.'">
+                              <input type="checkbox" checklist-model="user.eEnquiryformId" checklist-value="IntSch.eEnquiryformId" ng-change="check(IntSch.eEnquiryformId, checked, IntSch.email)">
+                           </td>
+                           <td data-title="'Sr No.'">{{$index+1}}</td> -->
+                         <!--   <td data-title="'enquiryFormNo'" filter="{ 'enquiryFormNo': 'text' }">{{IntSch.enquiryFormNo}}</td> -->
+                          <td data-title="''">
+                              <input type="checkbox" checklist-model="user.eEnquiryformId" checklist-value="IntSch.eEnquiryformId" ng-change="check(IntSch.eEnquiryformId, checked, IntSch.email, IntSch.studentname)">
+                           </td>
+                           <td data-title="'Student Name'" filter="{ 'studentname': 'text' }">{{IntSch.studentname}}</td>
+                           <td data-title="'Branch'" filter="{ 'branchName': 'text' }">{{IntSch.branchName}}</td>
+                           <td data-title="'Batch'" filter="{ 'batchName': 'text' }">{{IntSch.batchName}}</td>
+                           <td data-title="'Year of Passing'" filter="{ 'yearofpassing': 'text' }">{{IntSch.yearofpassing}}</span>
+                           </td>
+                           <td data-title="'Status'" filter="{ 'status': 'text' }">{{IntSch.status}}</span>
+                           </td>
+                           <!-- <td data-title="'Sub Status'" filter="{ 'status': 'text' }">{{IntSch.substatus}}</span>
+                           </td> -->
+                           <td data-title="'Actions'">
+                             <button class="btn btn-success btn-xs" data-toggle="modal" data-target=".moveStudent" ng-click="mToNext(IntSch.eEnquiryformId, data_InterviewSchedule)" ng-hide="finalRound" ng-disabled="IntSch.status == 'Completed' || IntSch.status == 'Final Selection'">Next</button>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+                  <hr>
+
+
+
+                   <!--============================================
+                    =            Advance search Modal            =
+                    =============================================-->
+                    <div class="modal fade advancesearch" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                    <div class="modal-dialog modal-lg" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Advance filter</h4>
+                        </div>
+                          <div class="modal-body">
+
+                            <form class="form-horizontal" name="advancesearchform" ng-submit="sendadvanceData(AdvanceData)" novalidate>
+                              <div class="form-group required">
+                                <label class="control-label col-sm-2" for="">Trainer Feedback</label>
+                                <div class="col-sm-4">
+                                   <select ng-model="AdvanceData.eTrainerfeedbackId" class="form-control " ng-options="tf.eTrainerfeedbackId as tf.status for tf in trainer" ng-required="true" ng-change="trainerChange(AdvanceData.eTrainerfeedbackId)">
+                                      <option value="">Select Trainer Feedback</option>
+                                   </select>
+                                </div>
+                                <label class="control-label col-sm-2" for="">Fee Paid</label>
+                                <div class="col-sm-4">
+                                   <select ng-model="AdvanceData.clClientjobroundId" class="form-control " ng-options="ro.clClientjobroundId as ro.round for ro in Round" ng-required="true" ng-change="roundChange(AdvanceData.clClientjobroundId)">
+                                      <option value="">Select Fee Paid</option>
+                                   </select>
+                                </div>
+                             </div>
+                             <div class="form-group required">
+                                <label class="control-label col-sm-2" for="">Post dated Cheque received</label>
+                                <div class="col-sm-4">
+                                   <select ng-model="AdvanceData.clClientjobroundId" class="form-control " ng-options="ro.clClientjobroundId as ro.round for ro in Round" ng-required="true" ng-change="roundChange(AdvanceData.clClientjobroundId)">
+                                      <option value="">Select Post dated Cheque received</option>
+                                   </select>
+                                </div>
+                                <label class="control-label col-sm-2" for="">Technologies</label>
+                                <div class="col-sm-4">
+                                   <select ng-model="AdvanceData.cTechnologyMasterId" class="form-control " ng-options="te.cTechnologyMasterId as te.technologyname for te in Technologies" ng-required="true" ng-change="technoChange(AdvanceData.cTechnologyMasterId)">
+                                      <option value="">Select Technologies</option>
+                                   </select>
+                                </div>
+                             </div>
+                             <div class="form-group required">
+                                <label class="control-label col-sm-2" for="">Batch</label>
+                                <div class="col-sm-4">
+                                   <select ng-model="AdvanceData.cBatchId" class="form-control " ng-options="ba.cBatchId as ba.batchname for ba in batch" ng-required="true" ng-change="batchChange(AdvanceData.cBatchId)">
+                                      <option value="">Select Batch</option>
+                                   </select>
+                                </div>
+                                <label class="control-label col-sm-2" for="">Cource</label>
+                                <div class="col-sm-4">
+                                   <select ng-model="AdvanceData.cCourseId" class="form-control " ng-options="co.cCourseId as co.coursename for co in Course" ng-required="true" ng-change="courseChange(AdvanceData.cCourseId)">
+                                      <option value="">Select Cource</option>
+                                   </select>
+                                </div>
+                             </div>
+                             <div class="form-group required">
+                                <label class="control-label col-sm-2" for="">Status</label>
+                                <div class="col-sm-4">
+                                   <select ng-model="AdvanceData.cStatusId" class="form-control " ng-options="ro.cStatusId as ro.statusname for ro in EnquiryStatus" ng-required="true" ng-change="statusChange(AdvanceData.cStatusId)">
+                                      <option value="">Select Status</option>
+                                   </select>
+                                </div>
+                                <label class="control-label col-sm-2" for="">Experience</label>
+                                <div class="col-sm-4">
+                                   <select ng-model="AdvanceData.Experience" class="form-control ">
+                                      <option value="">Select Experience</option>
+                                      <option value="1">1</option>
+                                      <option value="2">2</option>
+                                      <option value="3">3</option>
+                                      <option value="4">4</option>
+                                      <option value="5">5</option>
+                                      <option value="6">6</option>
+                                   </select>
+                                </div>
+                             </div>
+                             <div class="form-group required">
+                                <label class="control-label col-sm-2" for="">Attendance</label>
+                                <div class="col-sm-4">
+                                   <select ng-model="AdvanceData.clClientjobroundId" class="form-control " ng-options="ro.clClientjobroundId as ro.round for ro in Round" ng-required="true" ng-change="roundChange(AdvanceData.clClientjobroundId)">
+                                      <option value="">Select Attendance</option>
+                                   </select>
+                                </div>
+                                <label class="control-label col-sm-2" for="">Document</label>
+                                <div class="col-sm-4">
+                                   <select ng-model="AdvanceData.eDocumentId" class="form-control " ng-options="do.eDocumentId as do.documentname for do in dacument" ng-required="true" ng-change="dacumentChange(AdvanceData.eDocumentId)">
+                                      <option value="">Select Document</option>
+                                   </select>
+                                </div>
+                             </div>
+                             <div class="form-group required">
+                                <label class="control-label col-sm-2" for="">Qualification/post graduation</label>
+                                <div class="col-sm-4">
+                                   <select ng-model="AdvanceData.cEducationrequiredId" class="form-control " ng-options="qu.cEducationrequiredId as qu.educationname for qu in Qualification" ng-required="true" ng-change="roundChange(AdvanceData.cEducationrequiredId)">
+                                      <option value="">Select Qualification</option>
+                                   </select>
+                                </div>
+                                <label class="control-label col-sm-2" for="">Year of Passing</label>
+                                <div class="col-sm-4">
+                                   <select ng-model="AdvanceData.year" class="form-control ">
+                                      <option value="">Select year</option>
+                                      <option value="1990">1990</option>
+                                      <option value="1991">1991</option>
+                                      <option value="1992">1992</option>
+                                      <option value="1993">1993</option>
+                                      <option value="1994">1994</option>
+                                      <option value="1995">1995</option>
+                                      <option value="1996">1996</option>
+                                      <option value="1997">1997</option>
+                                      <option value="1998">1998</option>
+                                      <option value="1999">1999</option>
+                                      <option value="2000">2000</option>
+                                      <option value="2001">2001</option>
+                                      <option value="2002">2002</option>
+                                      <option value="2003">2003</option>
+                                      <option value="2004">2004</option>
+                                      <option value="2005">2005</option>
+                                      <option value="2006">2006</option>
+                                      <option value="20027">2007</option>
+                                      <option value="2008">2008</option>
+                                      <option value="2009">2009</option>
+                                      <option value="2010">2010</option>
+                                      <option value="2011">2011</option>
+                                      <option value="2012">2012</option>
+                                      <option value="2013">2013</option>
+                                      <option value="2014">2014</option>
+                                      <option value="2015">2015</option>
+                                      <option value="2016">2016</option>
+                                      <option value="2017">2017</option>
+                                      <option value="2018">2018</option>
+                                   </select>
+                                </div>
+                             </div>
+
+                             
+                            <div class="clearfix"></div>
+                            <br>
+                            <div class="form-group">
+                              <div class="col-md-12 text-center">
+                                <button type="submit" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                                </button>
+                              </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <br>
+                          </form>
+                          
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!--====  End of Advance search  Modal  ====-->
+
+                <!--============================================
+                =            Move Enquiry Modal            =
+                =============================================-->
+                <div class="modal fade moveStudent" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Move {{viewMoveData.studentname}} To Next Round</h4>
+                        </div>
+                        <div class="modal-body">
+                            <h4>Are you sure you want to Move <strong>{{viewMoveData.studentname}}</strong> to next round?</h4>
+                            <br>
+                            <a class="btn btn-success btn-sm" ng-click="moveToNext(viewMoveData.eEnquiryformId, viewMoveData.status)" onclick="$('.modal').modal('hide')"><i class="fa fa-icon-move"></i>Move</a>
+
+                            <a class="btn btn-default btn-sm" data-dismiss="modal"><i class="fa icon-remove-sign"></i>Cancel</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--====  End of Move enquiry Modal  ====-->
+
+                <!--==================================
+                =            Status Modal            =
+                ===================================-->
+                <div class="modal fade statusModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Change Status</h4>
+                        </div>
+                        <div class="modal-body">
+                            
+                            <form class="form-horizontal" name="statusform" ng-submit="sendStatusData(statusData)" novalidate>
+                              <div class="form-group">
+                                  <label class="control-label col-md-3" for="">Round:</label>
+                                  <div class="col-md-7">
+                                    <input type="text" ng-model="roundStatus" class="form-control" disabled>
+                                  </div>
+                              </div>
+                              <div class="form-group">
+                                <label class="control-label col-md-3" for="">Email:</label>
+                                <div class="col-md-9">
+                                  <span class="studentlist" ng-repeat="nam in studentNameArray track by $index">[ {{nam}} ]&nbsp;&nbsp;</span>
+                                </div>
+                                
+                              </div>
+                              
+                                <div class="form-group required">
+                                  <label class="control-label col-md-3" for="">Status:</label>
+                                  <div class="col-md-7">
+                                    <select ng-model="statusData.roundstatusone" class="form-control " ng-required="true">
+                                      <option value="Interested">Interested</option>
+                                      <option value="Scheduled">Scheduled</option>
+                                      <option value="Attended">Attended</option>
+                                      <option value="Not Attended">Not Attended</option>
+                                      <option value="Cleared">Cleared</option>
+                                      <option value="Not Cleared">Not Cleared</option>
+                                      <option value="On Hold">On Hold</option>
+                                      <option value="Final Selection">Final Selection</option>
+                                   </select>
+                                  </div>
+                                </div>
+
+                                <div class="form-group">
+                                  <label class="control-label col-md-3" for="">Description:</label>
+                                  <div class="col-md-7">
+                                    <textarea class="form-control" rows="4" ng-model="statusData.descriptionroundone"></textarea>
+                                  </div>
+                                </div>
+                                <div class="clearfix"></div>
+                                <br>
+                                <div class="form-group">
+                                  <div class="col-md-12 text-center">
+                                    <button type="submit" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                                    </button>
+                                  </div>
+                                </div>
+                                <div class="clearfix"></div>
+                                <br>
+                              </form>
+
+                        </div>
+                      </div>
+                  </div>
+                </div>
+                <!--====  End of Status Modal  ====-->
+
+                <!--===================================
+                =            Message Modal            =
+                ====================================-->
+                <div class="modal fade messageModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Send Message</h4>
+                        </div>
+                        <div class="modal-body">
+                            
+                            <form class="form-horizontal" name="sendmessagedataform" ng-submit="sendMessageData(messageData)" novalidate>
+                              <div class="form-group">
+                                <label class="control-label col-md-3" for="">Email:</label>
+                                <div class="col-md-9">
+                                  <span class="studentlist" ng-repeat="nam in studentNameArray track by $index">[ {{nam}} ]&nbsp;&nbsp;</span>
+                                </div>
+                                
+                              </div>
+                              
+                                <div class="form-group required">
+                                  <label class="control-label col-md-3" for="">Message:</label>
+                                  <div class="col-md-7">
+                                    <textarea class="form-control" rows="4" ng-model="messageData.message"></textarea>
+                                  </div>
+                                </div>
+                                <div class="clearfix"></div>
+                                <br>
+                                <div class="form-group">
+                                  <div class="col-md-12 text-center">
+                                    <button type="submit" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                                    </button>
+                                  </div>
+                                </div>
+                                <div class="clearfix"></div>
+                                <br>
+                              </form>
+
+                        </div>
+                      </div>
+                  </div>
+                </div>
+                <!--====  End of Message Modal  ====-->
+
+                <!--=================================
+                =            Email Modal            =
+                ==================================-->
+                <div class="modal fade emailModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Send Email - {{eml}}</h4>
+                        </div>
+                        <div class="modal-body">
+                            
+                            <form class="form-horizontal" name="sendemaildataform" ng-submit="saveEmailData(sendEmailData, bodytext)" novalidate>
+                              <div class="form-group">
+                                <label class="control-label col-md-3" for="">Email:</label>
+                                <div class="col-md-9">
+                                  <span class="studentlist" ng-repeat="nam in studentNameArray track by $index">[ {{nam}} ]&nbsp;&nbsp;</span>
+                                </div>
+                                
+                              </div>
+
+                              <div class="form-group required">
+                                  <label class="control-label col-md-3" for="">Template:</label>
+                                  <div class="col-md-7">
+                                    <select ng-model="sendEmailData.eEmailtemplateId"  class="form-control inputEle" ng-options="eml.eEmailtemplateId as eml.title for eml in EmailTemplate"  ng-change="emailTemplateChange(sendEmailData.eEmailtemplateId, EmailTemplate)">
+                                      <option value="">Select Email Template</option>
+                                   </select>
+                                  </div>
+                                </div>
+                              
+                                <div class="form-group">
+                                  <label class="control-label col-md-3" for="">Template Body
+                                  </label>
+                                  <div class="col-md-9">
+                                    <!-- style="padding: 30px;background: #eee;" -->
+                                      <!-- <label class="control-label col-md-3" for="">Job Title
+                                      </label>
+                                      <div class="col-md-9">
+                                        <input type="text" ng-model="templateData.jobtitle" class="form-control no-border">
+                                      </div>
+                                      <div class="clearfix"></div>
+                                      <label class="control-label col-md-3" for="">Company Name
+                                      </label>
+                                      <div class="col-md-9">
+                                        <input type="text" ng-model="templateData.companyname" class="form-control no-border">
+                                      </div>
+                                      <div class="clearfix"></div>
+                                      <label class="control-label col-md-3" for="">Job Location
+                                      </label>
+                                      <div class="col-md-9">
+                                        <input type="text" ng-model="templateData.joblocation" class="form-control no-border">
+                                      </div> -->
+                                    
+                                      <!-- <div text-angular ng-model="bodytext" name="demo-editor" ta-text-editor-class="clearfix border-around" ta-html-editor-class="border-around"></div> -->
+                                      <span ng-repeat="std in studentnames">Dear {{std}},</span>
+                                      <div class="clearfix"></div>
+                                      <textarea class="form-control" rows="10" ng-model="bodytext" ></textarea>
+                                  </div>
+                                </div>
+                                <div class="clearfix"></div>
+                                <br>
+                                <div class="form-group">
+                                  <div class="col-md-12 text-center">
+                                    <!-- <a class="btn btn-primary" ng-click="previewClicked(sendEmailData, templateData)">Save
+                                    </a> -->
+                                    <button class="btn btn-primary" type="submit">Save</button>
+                                    <!-- onclick="$('.modal').modal('hide')" -->
+                                  </div>
+                                </div>
+                                <div class="clearfix"></div>
+                                <!-- <div class="form-group" ng-show="previewClick">
+                                  <div class="col-md-offset-2 col-md-8" style="background-color: #eee; padding: 30px;">
+                                    <span>Dear Student, <br>
+                                    Your resume has been shortlisted for following job: <br>
+                                    </span>
+                                    <div class="clearfix"></div>
+                                    <br>
+                                    <span ng-bind-html="EData"></span>
+                                    <div class="clearfix"></div>
+                                    <br>
+                                    <span>Thanks &amp; Regards, <br>
+                                    ITPreneur Placement Team
+                                    </span>
+                                  </div>
+                                  <div class="clearfix"></div>
+                                  <br>
+                                  <div class="text-center">
+                                  <button type="submit" class="btn btn-success btn-lg">Save</button>
+                                  </div>
+                                </div> -->
+                                <br>
+                              </form>
+
+                        </div>
+                      </div>
+                  </div>
+                </div>
+                <!--====  End of Email Modal  ====-->
+                
+              </div>
+            </div>
+         </div>
+      </div>
+  </div>
+
+
+   
+</div>
+           
+       <!--  </div> --> <!-- controller ends -->
+    
+    
+<!-- </div>
+</div> -->
+<!--====  End of Controller  ====-->
+
+
+
+
+
+
+<script src="view/pages/Placement Activity/InterviewScheduleCtrl.js"></script>
+

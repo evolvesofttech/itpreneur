@@ -1,0 +1,163 @@
+<style type="text/css">
+    /*#side-menu {
+        height: 1000px;
+    }*/
+    .dropdown-menu1 {
+        position: static !important;
+        top: 100%;
+        left: 0;
+        z-index: 1000;
+        display: none;
+        float: none;
+        min-width: 100%;
+        padding: 0;
+        margin: 0;
+        font-size: 14px;
+        text-align: left;
+        list-style: none;
+        -webkit-background-clip: padding-box;
+        background-clip: padding-box;
+        border: none;
+        border-radius: 0;
+        -webkit-box-shadow: none;
+    }
+</style>
+
+<!--================================
+=            Top Header            =
+=================================-->
+<div class="header-wrapper" ng-controller="headerCtrl">
+    <div class="container-fluid prpl15">
+        <div class="row">
+            <div class="col-md-9">
+                <div class="logo-container" ng-controller="toggleCtrl">
+                    <h2>ITPreneur</h2>
+                    <!-- <img src="assets/images/logo.png" class="logoimg"> -->
+                    <i class="fa fa-bars menu-bar" ng-click="toggleState()"></i>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <ul class="nav navbar-nav navbar-right user-navbar">
+                  <li><a href="" ngsf-toggle-fullscreen><i class="material-icons" style="line-height: 70px">fullscreen</i></a></li>
+                  <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href=""><span style="display: inline-block;position: relative;top: -6px;">{{username}}</span>&nbsp;&nbsp;<i class="material-icons" style="line-height: 70px;">person</i></a>
+                    <ul class="dropdown-menu user-dropdown-menu no-padding" ng-click="$event.stopPropagation()">
+                        <li>
+                        <div class="col-md-12 text-center username-dropdown-block">
+                            <img ng-src="data:image/png;charset=utf-8;base64,{{imageBase64}}" style="height: 60px;width: 60px;margin: 0 auto;" class="img-responsive img-circle">
+                            <div class="clearfix"></div>
+                            <span>User:&nbsp;&nbsp;{{username}}</span>
+                            
+                            <div class="clearfix"></div>
+                            <span>Role:&nbsp;&nbsp;{{role}}</span>
+
+                            <div class="clearfix"></div>
+                            <span>Branches:&nbsp;&nbsp;
+                            <div class="clearfix"></div>
+                            <span ng-repeat="bnch in userCurrentBranch">{{bnch.branchname}}&nbsp;&nbsp;</span></span>
+                        </div>
+                        <div class="col-md-12 setting-dropdown-block">
+                            <a href="#/usersetting" class="btn btn-default btn-xs pull-left"><i class="fa fa-cog"></i>&nbsp;&nbsp;Settings</a>
+                            <a class="btn btn-default btn-xs pull-right" ng-click="logout()"><i class="fa fa-power-off"></i>&nbsp;&nbsp;Logout</a>
+                        </div></li>
+                        <!-- <li><a href="#/usersetting">Settings</a></li>
+                        <li><a href="" ng-click="logout()">Logout</a></li> -->
+                    </ul>
+                  </li>
+
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!--====  End of Top Header  ====-->
+
+<!--=============================
+=            Sidebar            =
+==============================-->
+<div class="navbar-default sidebar" role="navigation" visible="visible" sidebar-directive="state" alignment="left">
+    <div class="sidebar-nav navbar-collapse" ng-scrollbars>
+        <ul class="nav in" id="side-menu">
+
+            <!-- dashboard -->
+            <li>
+                <a href="#/dashboard" class="list-group-item" data-toggle="collapse" ng-click="menuitem1=='true' ? menuitem1='false' : menuitem1='true'" class="sidebar-link"><i class="fa fa-tachometer"></i>&nbsp;&nbsp;Dashboard</a>
+            </li>
+
+            <!-- Account -->
+            <li ng-repeat="menu in menuData">
+                <a class="dropdown-toggle list-group-item" data-toggle="collapse"  class="sidebar-link" ng-click="row.booleanVal = !row.booleanVal">
+                <!-- data-toggle="dropdown"  -->
+                <!-- ng-click="menuClick(menu.menuName,menu.ad_menu_id)" -->
+				<i ng-class="{'fa fa-star':menu.menuName=='Account',
+							    'fa fa-tasks':menu.menuName=='Master',
+							    'fa fa-database':menu.menuName=='Content',
+								'fa fa-globe':menu.menuName=='Placement',
+								'fa fa-newspaper-o':menu.menuName=='Sales',
+								'fa fa-cog':menu.menuName=='Settings',
+                                'fa fa-user':menu.menuName=='User', 
+                                'fa fa-bar-chart':menu.menuName=='Reports',
+                                'fa fa-bar-tasks':menu.menuName=='Activity',
+                                'fa fa-users':menu.menuName=='Users',
+                                'fa fa-calendar':menu.menuName=='Activity',
+                                'fa fa-map-marker':menu.menuName=='Region Settings',
+                                'fa fa-comments-o':menu.menuName=='Trainer Feedback',
+                                'fa fa-user-plus':menu.menuName=='Client',
+                                'fa fa-money':menu.menuName=='Payment',
+                                'fa fa-user-circle-o':menu.menuName=='Vendor',
+                                'fa fa-check-square':menu.menuName=='Attendance',
+                                'fa fa-building-o':menu.menuName=='Institute',
+                                'fa fa-calendar':menu.menuName=='Schedule',
+
+                              }"></i>&nbsp;&nbsp;{{menu.menuName}}<i class="caret pull-right" style="margin-top: 8px;"></i></a>
+                <div class="sidebar-dropdown" ng-repeat="win in menu.window | orderBy:orderIndex('Board')" ng-show="row.booleanVal">
+                <!-- ng-show="win.menuName===windowName" -->
+                 <!-- dropdown-menu1 -->
+                  <a href="#/{{win.windowName}}" class="list-group-item" >{{win.windowName}}</a>
+                 
+                </div>
+            </li>
+            
+        </ul>
+    </div>
+    <!-- /.sidebar-collapse -->
+</div>
+<!--====  End of Sidebar  ====-->
+
+<script>
+/*==================================
+=            Controller            =
+==================================*/
+angular.module('theGuru')
+.controller('headerCtrl', function($scope,$location,$http, CRUD_SERVICE, baseUrlSrvc, $filter,$sessionStorage,hideHeader, $timeout, $route) {
+
+    $scope.username=$sessionStorage.userData1[0].listUser.username;
+    
+    $scope.hideheader1 =hideHeader.getHeader();
+
+    /*=================================
+      =            Get Image            =
+      =================================*/
+      if ($scope.role != "Admin") {
+          var userImageListUrl = baseUrlSrvc.baseUrl + 'listProfileImageByadUserId/' + $sessionStorage.adUserId;
+            GetImage(userImageListUrl);
+
+            //To Get All Records
+            function GetImage(url) {
+              var promiseUserImageGet = CRUD_SERVICE.getAllData(url);
+              promiseUserImageGet.then(function(pl) {
+                  $scope.UserImage = pl.data;
+                  $scope.imageBase64 = $scope.UserImage[0].data;
+                  //console.log("$scope.UserImage",$scope.UserImage);
+              },
+              function(errorPl) {
+                  $log.error('Some Error in Getting Records.', errorPl);
+            });
+          }
+      }
+      /*=====  End of Get Image  ======*/
+
+});
+/*=====  End of Controller  ======*/
+</script>

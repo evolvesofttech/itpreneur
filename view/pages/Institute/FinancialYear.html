@@ -1,0 +1,165 @@
+<style type="text/css">
+    
+</style>
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-controller="academicYearCtrl">
+
+<!-- toaster message -->
+<toaster-container toaster-options="{'time-out': 3000}"></toaster-container>
+<!-- toaster message -->
+
+<button data-toggle="modal" data-target=".addyear" ng-click="addYearClick()" ng-hide="hideBtn" class="btn btn-default btn-labeled btn-sm"><i class="fa fa-address-book-o"></i>&nbsp;&nbsp;Add Financial Year
+</button>
+<!-- table starts -->
+<div class="clearfix"></div>
+<br>
+<table ng-table="usersTable_year" show-filter="true" class="table table-bordered table-striped text-center">
+    <tbody>
+        <tr ng-repeat="year in data_year">
+            <td data-title="'Year From'" filter="{ 'frommonthyear': 'text' }">{{year.frommonthyear | date}}</td>
+            <td data-title="'Year To'" filter="{ 'tomonthyear': 'text' }">{{year.tomonthyear | date}}</td>
+        
+            <td data-title="'Actions'" class="w150 text-center">
+                <a class="btn btn-success btn-xs" ng-click="editYear(year.inInstituteacademicyearId)" data-toggle="modal" data-target=".addyear" tooltip-placement="top" uib-tooltip="Edit"><i class="fa fa-edit"></i>
+                </a>
+
+                <a class="btn btn-info btn-xs" ng-click="viewYear(year.inInstituteacademicyearId, data_year)" data-toggle="modal" data-target=".viewyear" tooltip-placement="top" uib-tooltip="View">
+                <i class="fa fa-eye"></i>
+                </a>
+
+                <a class="btn btn-danger btn-xs" ng-click="delYear(year.inInstituteacademicyearId, data_year)" data-toggle="modal" data-target=".deleteyear" tooltip-placement="top" uib-tooltip="Delete"><i class="fa fa-trash"></i></a>
+
+                <a href="" class="btn btn-primary btn-xs" disabled><i class="fa fa-plus"></i></a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<!-- table ends -->
+
+<!--==========================================
+=            Contact Person Modal            =
+===========================================-->
+<div class="modal fade addyear" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="clearModalOnCloseYear()" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" ng-init="headingMessage='Add Financial Year'">{{headingMessage}}</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" name="schoolacademicyear" ng-submit="saveYear(instDataYear)" novalidate>
+                    <div class="row">
+                        <!-- <div class="col-md-6"> -->
+                            <!-- <input type="text" ng-model="instDataYear.inInstituteId"> -->
+                           
+                            <div class="form-group required">
+                                <label class="control-label col-md-4" for=""> Year From</label>
+                                <div class="col-md-6">
+                                   <datepicker date-format="yyyy-MM-dd">
+                                      <input name="yearfrom" ng-model="instDataYear.frommonthyear" class="form-control" restrict-to="[0-9]" type="text" ng-required="true" >
+                                      <!-- ng-change="dateClick(instDataYear.frommonthyear)" -->
+                                   </datepicker>
+                                    <div class="clearfix"></div>
+                                    <p class="error" ng-show="schoolacademicyear.yearfrom.$invalid && schoolacademicyear.yearfrom.$touched">Please Enter Year</p>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group required">
+                                <label class="control-label col-md-4" for="">Year To</label>
+                                <div class="col-md-6">
+                                <datepicker date-format="yyyy-MM-dd">
+                                      <input name="yearto" ng-model="instDataYear.tomonthyear" class="form-control" restrict-to="[0-9]" type="text" ng-required="true" >
+                                   </datepicker>
+                                   <!-- ng-change="todateClick(instDataYear.tomonthyear)" -->
+                                     <div class="clearfix"></div>
+                                    <p class="error" ng-show="schoolacademicyear.yearto.$invalid && schoolacademicyear.yearto.$touched">Please Enter Year</p>
+                                </div>
+                            </div>
+                        <!-- </div> -->
+                    </div>
+                    <div class="clearfix"></div><hr>
+                    <div class="form-group">
+                        <div class="col-md-12 text-center">
+                            <button type="submit" ng-disabled="schoolacademicyear.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!--====  End of Contact Person Modal  ====-->
+
+<!--========================================
+=            View Contact Modal            =
+=========================================-->
+<div class="modal fade viewyear" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="clearModalOnCloseYear()" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">View Academic Year</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal viewform" novalidate>                 
+                    <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">Year From</label>
+                        <div class="col-md-5">
+                            <p>{{viewyeardata.frommonthyear | date}}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-offset-3 col-md-3" for="">Year To</label>
+                        <div class="col-md-5">
+                            <p>{{viewyeardata.tomonthyear | date}}</p>
+                        </div>
+                    </div> 
+                        
+                    <br>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!--====  End of View Contact Modal  ====-->
+
+<!--=================================================
+=            Delete Contact Person Modal            =
+==================================================-->
+<div class="modal fade deleteyear" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;
+        </button>
+        <h4 class="modal-title">Delete Acdemic Year
+        </h4>
+      </div>
+      <div class="modal-body">
+        <h4>Are you sure you want to delete 
+          <strong>{{deleteyearData.frommonthyear  | date}}  {{deleteyearData.tomonthyear  | date}}?
+          </strong>
+        </h4>
+        <br>
+        <a class="btn btn-danger btn-sm" ng-click="deleteYear(deleteyearData.inInstituteacademicyearId)" onclick="$('.modal').modal('hide')">
+          <i class="fa fa-trash">
+          </i>&nbsp;&nbsp;Delete
+        </a>
+        <a class="btn btn-default btn-sm" data-dismiss="modal">
+          <i class="fa fa-trash">
+          </i>&nbsp;&nbsp;Cancel
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+<!--====  End of Delete Contact Person Modal  ====-->
+</div>
+<!--====  End of Controller  ====-->
+
+<!-- contact controller -->
+<script src="view/pages/Institute/FinancialYearCtrl.js"></script>
+

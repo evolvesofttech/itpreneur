@@ -1,0 +1,152 @@
+<!--================================
+=            Controller            =
+=================================-->
+  <div class="row no-margin" ng-controller="EditScheduleCtrl">
+    <div class="col-md-12 no-padding">
+      <div class="panel panel-info">
+       
+        <div class="panel-body">
+
+           <!-- toaster message -->
+           <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+           <!-- toaster message -->
+
+          <div class="button-group">
+            <a data-toggle="modal" data-target=".addtopic" ng-click="addtechno()" class="btn btn-default btn-labeled btn-sm">
+              <i class="fa fa-plus-circle">
+              </i>&nbsp;&nbsp;Add Topic
+            </a>
+          </div>
+
+          <!--===========================
+          =            Table            =
+          ============================-->
+          <table ng-table="usersTable_topics" show-filter="true" class="table table-bordered table-striped text-center">
+              <tbody>
+                  <tr ng-repeat="rw in data_scheduletopic">
+                      <td data-title="'Topic'" filter="{ 'topicname': 'text' }">{{rw.topicname}}</td>
+                      <td data-title="'Actions'" class="w150">
+                          <a data-toggle="modal" data-target=".addtopic" ng-click="editTopic(rw)" class="btn btn-success btn-xs" tooltip-placement="top" uib-tooltip="Edit"><i class="fa fa-pencil-square-o"></i></a>
+
+                           <a data-toggle="modal" data-target=".viewcoursetechnology" class="btn btn-info btn-xs" ng-click="viewTopic(rw)" tooltip-placement="top" uib-tooltip="View">
+                            <i class="fa fa-eye"></i>
+                           </a> 
+
+                          <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deltopic" ng-click="delTopic(rw)" tooltip-placement="top" uib-tooltip="Delete"><i class="fa fa-trash"></i>
+                          </a>
+
+                         <!--  <a class="btn btn-primary btn-xs" disabled>
+                            <i class="fa fa-plus">
+                            </i>
+                          </a> -->
+                      </td>
+                  </tr>
+              </tbody>
+            </table>
+          <!--====  End of Table  ====-->
+          <hr>
+
+          <!--===========================================
+          =            Add Role Technology Modal            =
+          ============================================-->
+          <div class="modal fade addtopic" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title" ng-init="headingMessage = 'Add Topic'">{{headingMessage}}</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal login-form" name="topicform" ng-submit="saveTopic(TopicData)">
+                            <input type="hidden" ng-model="TopicData.conScheduletopicId">
+                            <div class="form-group required">
+                                <label class="control-label col-md-3" for="">Topic</label>
+                                <div class="col-md-7">
+                                    <select ng-model="TopicData.cTopicId" name="topicname" class="form-control inputEle" ng-options="bran.cTopicId as bran.topicname for bran in Topics" ng-required="true">
+                                          <option value="">Select Topic</option>
+                                        </select>
+                                    <div class="clearfix"></div>
+                                    <p class="error" ng-show="topicform.topicname.$invalid && topicform.topicname.$touched">Please Select Topic</p>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="form-group">
+                                <div class="col-md-12 text-center">
+                                    <button type="submit" ng-disabled="topicform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Add</button>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="clearfix"></div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+          <!--====  End of Add Role Technology Modal  ====-->
+
+           <!-- start view modal -->
+              <div class="modal fade viewcoursetechnology" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">View Topic
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label class="control-label col-md-3" for="">Topic:
+                        </label>
+                        <label class="control-label col-md-9" for="">{{viewTopicData.topicname}}
+                        </label>
+                      </div>
+                       <div class="clearfix"></div>
+                       <br>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end view modal -->
+          
+          <!--========================================
+            =            Delete Role Technology            =
+            =========================================-->
+            <div class="modal fade deltopic" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;
+                    </button>
+                    <h4 class="modal-title">Delete Topic
+                    </h4>
+                  </div>
+                  <div class="modal-body">
+                    <h4>Are you sure you want to delete 
+                      <strong>{{deleteTopicData.topicname}} ?
+                      </strong>
+                    </h4>
+                    <br>
+                    <a class="btn btn-danger btn-sm" ng-click="deleteTopic(deleteTopicData.conScheduletopicId)" onclick="$('.modal').modal('hide')">
+                      <i class="fa fa-trash">
+                      </i>&nbsp;&nbsp;Delete
+                    </a>
+                    <a class="btn btn-default btn-sm" data-dismiss="modal">
+                      <i class="fa fa-trash">
+                      </i>&nbsp;&nbsp;Cancel
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+             <!--====  End of Delete Role Technology  ====-->
+         
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- </div> -->
+
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Schedule/EditScheduleCtrl.js"></script>

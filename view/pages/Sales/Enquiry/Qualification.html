@@ -1,0 +1,490 @@
+<div ng-controller="QualificationCtrl as QuaCtrl">
+
+<!-- toaster message -->
+<toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+<!-- toaster message -->
+  
+
+  <div id="exTab3">
+      <ul class="nav nav-tabs">
+          
+          <li ng-class="{active:QuaCtrl.isSet(1)}" >
+              <a ng-click="QuaCtrl.setTab(1)">Qualification</a>
+          </li>
+          <li ng-class="{active:QuaCtrl.isSet(2)}" >
+              <a ng-click="QuaCtrl.setTab(2)">Gap &amp; Other Information</a>
+          </li>
+      </ul>
+      <div class="tab-content">
+          
+          <!--===========================
+          =            Tab 1            =
+          ============================-->
+          <div class="tab-pane active" ng-show="QuaCtrl.isSet(1)">
+
+              <br>
+              <a data-toggle="modal" data-target=".addqualificationmodal" class="btn btn-default btn-labeled btn-sm" ng-click="addQualificationClick()"><i class="fa fa-address-book-o"></i>&nbsp;&nbsp;Add Qualification Details</a>
+              <div class="clearfix"></div>
+              <br>
+              <table ng-table="usersTable_qualification" show-filter="true" class="table table-bordered table-striped text-center">
+                  <tbody>
+                    <tr ng-repeat="qual in data_qualification">
+                      <td data-title="'Qualification'" filter="{ 'qualificationname': 'text' }">{{qual.qualificationname}}</td>
+
+                      <td data-title="'Degree'" filter="{ 'degreename': 'text' }">{{qual.degreename}}</td>
+
+                      <td data-title="'Specialisation'" filter="{ 'degreespecificationname': 'text' }">{{qual.degreespecificationname}}</td>
+
+                       <td data-title="'Highest'" filter="{ 'highestqualification': 'text' }">{{qual.highestqualification}}</td>
+
+                      <td data-title="'College'" filter="{ 'collegename': 'text' }">{{qual.collegename}}</td>
+
+                      <td data-title="'University'" filter="{ 'universityname': 'text' }">{{qual.universityname}}</td>
+
+                      <td data-title="'Year of Passing'" filter="{ 'yearofpassing': 'text' }">{{qual.yearofpassing}}</td>
+
+                      <td data-title="'Percentage'" filter="{ 'percentage': 'text' }">{{qual.percentage}}</td>
+                      <td data-title="'Actions'" class="w150 text-center">
+                          <a class="btn btn-success btn-xs" ng-click="editQualification(qual.eQualificationId)" data-toggle="modal" data-target=".addqualificationmodal" tooltip-placement="top" uib-tooltip="Edit"><i class="fa fa-edit"></i>
+                          </a>
+
+                          <a class="btn btn-info btn-xs"  ng-click="viewQualification(qual.eQualificationId, data_qualification)" data-toggle="modal" data-target=".viewqualification" tooltip-placement="top" uib-tooltip="View">
+                          <i class="fa fa-eye"></i>
+                          </a>
+
+                          <a class="btn btn-danger btn-xs" ng-click="delQualification(qual.eQualificationId, data_qualification)" data-toggle="modal" data-target=".deletequalification" tooltip-placement="top" uib-tooltip="Delete">
+                          <i class="fa fa-trash"></i></a>     
+                      </td>
+                    </tr>
+                  </tbody>
+              </table>
+              <!-- table ends -->
+
+              <!--=============================================
+              =            Add Qualification Modal            =
+              ==============================================-->
+              <div class="modal fade addqualificationmodal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" ng-click="clearModalOnCloseQ()" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title" ng-init="headingMessage='Add Qualification Details'">{{headingMessage}}</h4>
+                        </div>
+                        <div class="modal-body">
+                          <form class="form-horizontal" name="addqualificationform" ng-submit="saveQualification(enquiryQualificationData)" novalidate>
+                          <input type="hidden" ng-model="enquiryQualificationData.bBranchId">
+                          <div class="form-group">
+                           <label class="control-label col-md-4" for="">Student</label>
+                            <div class="col-sm-7">
+                                <input ng-model="fullName" class="form-control inputEle" disabled>    
+                            </div> 
+                          </div>
+ 
+                          <div class="form-group required">
+                            <label class="control-label col-sm-4" for="">Qualification</label>
+                              <div class="col-sm-7">
+                              <select name="Stream" ng-model="enquiryQualificationData.cQualificationmasterId" class="form-control inputEle" ng-options="qualify.cQualificationmasterId as qualify.qualificationname for qualify in Qualification1" ng-change="streamChange(enquiryQualificationData.cQualificationmasterId, Qualification1)" ng-required="true" ng-disabled="disableField">
+                              </select> 
+                              <div class="clearfix"></div>
+                              <p class="error" ng-show="addqualificationform.Stream.$invalid && addqualificationform.Stream.$touched">Please Enter Qualification</p>
+                              </div>
+                           </div>
+
+                            <div class="form-group required">
+                              <label class="control-label col-md-4" for="">Degree</label>
+                              <div class="col-md-7">
+                                 <select name="degree" ng-model="enquiryQualificationData.cDegreeId" class="form-control inputEle" ng-options="deg.cDegreeId as deg.degreename for deg in Degree" ng-change="degreeChange(enquiryQualificationData.cDegreeId, Degree)" ng-focus="degreeFocus()" ng-required="true" >
+                                </select> 
+                                <div class="clearfix"></div>
+                                <p class="error" ng-show="addqualificationform.degree.$invalid && addqualificationform.degree.$touched">Please Enter Degree</p>
+                              </div>
+                            </div>
+
+                            <div class="form-group ">
+                              <label class="control-label col-md-4" for="">Degree Specialisation</label>
+                              <div class="col-md-7">
+                               <select name="degreesp" ng-model="enquiryQualificationData.cDegreespecificationId" class="form-control inputEle" ng-options="degspecify.cDegreespecificationId as degspecify.degreespecificationname for degspecify in DegreeSpecialisation" ng-focus="degreespecifyFocus()">
+                              </select>  
+                             <!--  <div class="clearfix"></div>
+                              <p class="error" ng-show="addqualificationform.degreesp.$invalid && addqualificationform.degreesp.$touched">Please Enter Degree Specialisation</p> -->
+                              </div>
+                            </div>
+                             <div class="form-group ">
+                             <label class="control-label col-md-4" for="">Highest Qualification?</label>
+                              <div class="col-md-7" >
+                                <select name="highqualify" ng-model="enquiryQualificationData.highestqualification" class="form-control inputEle" ng-required="true" >
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option> 
+                                  </select>
+                                  <div class="clearfix"></div>
+                                  <p class="error" ng-show="addqualificationform.highqualify.$invalid && addqualificationform.highqualify.$touched">Please mention: Is this your Highest Qualification?</p>
+                              </div> 
+                              </div>
+
+                              <div class="form-group">
+                                 <label class="control-label col-md-4" for="">College</label>
+                                <div class="col-md-7">
+                                   <input type="text" name="collegename" class="form-control inputEle" ng-model="enquiryQualificationData.collegename" placeholder="Enter College" >
+                                   <!-- <div class="clearfix"></div>
+                                    <p class="error" ng-show="addqualificationform.collegename.$invalid && addqualificationform.collegename.$touched">Enter College</p> -->
+                                </div>
+                              </div>
+
+                              <div class="form-group required">
+                                 <label class="control-label col-md-4" for="">University</label>
+                                <div class="col-md-7">
+                                   <input type="text" name="universityname" class="form-control inputEle" ng-model="enquiryQualificationData.universityname" placeholder="Enter University" ng-required="true">
+                                   <div class="clearfix"></div>
+                                    <p class="error" ng-show="addqualificationform.universityname.$invalid && addqualificationform.universityname.$touched">Enter University</p>
+                                </div>
+                              </div>
+
+                              <div class="form-group required">
+                                 <label class="control-label col-md-4" for="">Year of Passing</label>
+                                <div class="col-md-7">
+                                   <input type="number" name="yearofpassingname" class="form-control inputEle" ng-model="enquiryQualificationData.yearofpassing" placeholder="Enter Year of Passing" ng-required="true">
+                                   <div class="clearfix"></div>
+                                    <p class="error" ng-show="addqualificationform.yearofpassingname.$invalid && addqualificationform.yearofpassingname.$touched">Enter Year of Passing</p>
+                                </div>
+                              </div>
+
+                              <div class="form-group required">
+                                 <label class="control-label col-md-4" for="">Passing Percentage</label>
+                                <div class="col-md-7">
+                                   <input type="number" name="passingpercentage" class="form-control inputEle" ng-model="enquiryQualificationData.percentage" placeholder="Enter Passing Percentage e. g. 77" ng-required="true">
+                                   <div class="clearfix"></div>
+                                    <p class="error" ng-show="addqualificationform.passingpercentage.$invalid && addqualificationform.passingpercentage.$touched">Enter Passing Percentage</p>
+                                </div>
+                              </div>
+
+                              <br>
+
+                              <div class="form-group">
+                                <div class="col-md-12 text-center">
+                                  <button type="submit" ng-disabled="addqualificationform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                                  </button>
+                                </div>
+                              </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+              </div>
+              <!--====  End of Add Qualification Modal  ====-->
+
+               <!-- start view modal -->
+                <div class="modal fade viewqualification" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" ng-click="clearModalOnCloseQ()" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">View Qualification
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+
+                       <div class="form-group">
+                        <label class="control-label col-md-offset-2 col-md-4" for="">Student</label>
+                        <label class="control-label col-sm-3" style="text-align: left;" for="">{{fullName}}</label>
+                        </div>
+                        <div class="clearfix"></div>
+                         <hr>  
+
+                        <div class="form-group">
+                          <label class="control-label col-md-offset-2 col-md-4" for="">Qualification:
+                          </label>
+                          <label class="control-label col-md-3" for="">{{viewqualificationData.qualificationname}}
+                          </label> 
+                        </div>
+                         <div class="clearfix"></div>
+                         <hr>
+                          <div class="form-group">
+                          <label class="control-label col-md-offset-2 col-md-4" for="">Degree:
+                          </label>
+                          <label class="control-label col-md-3" for="">{{viewqualificationData.degreename}}
+                          </label> 
+                        </div>
+                         <div class="clearfix"></div>
+                         <hr>
+                          <div class="form-group">
+                          <label class="control-label col-md-offset-2 col-md-4" for="">Degree Specialisation:
+                          </label>
+                          <label class="control-label col-md-3" for="">{{viewqualificationData.degreespecificationname}}
+                          </label> 
+                        </div>
+                         <div class="clearfix"></div>
+                         <hr>
+                          <div class="form-group">
+                          <label class="control-label col-md-offset-2 col-md-4" for="">Highest Qualification:
+                          </label>
+                          <label class="control-label col-md-3" for="">{{viewqualificationData.highestqualification}}
+                          </label> 
+                        </div>
+                         <div class="clearfix"></div>
+                         <hr>
+                         <div class="form-group">
+                          <label class="control-label col-md-offset-2 col-md-4" for="">College:
+                          </label>
+                          <label class="control-label col-md-3" for="">{{viewqualificationData.collegename}}
+                          </label> 
+                        </div>
+                         <div class="clearfix"></div>
+                         <hr>
+                         <div class="form-group">
+                          <label class="control-label col-md-offset-2 col-md-4" for="">University:
+                          </label>
+                          <label class="control-label col-md-3" for="">{{viewqualificationData.universityname}}
+                          </label> 
+                        </div>
+                         <div class="clearfix"></div>
+                         <hr>
+                         <div class="form-group">
+                          <label class="control-label col-md-offset-2 col-md-4" for="">Year of Passing:
+                          </label>
+                          <label class="control-label col-md-3" for="">{{viewqualificationData.yearofpassing}}
+                          </label> 
+                        </div>
+                         <div class="clearfix"></div>
+                         <hr>
+                         <div class="form-group">
+                          <label class="control-label col-md-offset-2 col-md-4" for="">Passing percentage:
+                          </label>
+                          <label class="control-label col-md-3" for="">{{viewqualificationData.percentage}}
+                          </label> 
+                        </div>
+                         <div class="clearfix"></div>
+                         <br>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- end view modal -->
+
+              <!--==========================================
+              =            Delete Qualification            =
+              ===========================================-->
+              <div class="modal fade deletequalification" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">Delete Qualification
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <h4>Are you sure you want to delete 
+                        <strong>{{deletequalificationData.qualificationname}}?
+                        </strong>
+                      </h4>
+                      <br>
+                      <a class="btn btn-danger btn-sm" ng-click="deleteQualification(deletequalificationData.eQualificationId)" onclick="$('.modal').modal('hide')">
+                        <i class="fa fa-trash">
+                        </i>&nbsp;&nbsp;Delete
+                      </a>
+                      <a class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="fa fa-trash">
+                        </i>&nbsp;&nbsp;Cancel
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!--====  End of Delete Qualification  ====-->
+              
+               
+          </div>
+          <!--====  End of Tab 1  ====-->
+
+          <!--===========================
+          =            Tab 2            =
+          ============================-->
+          
+          <div class="tab-pane active" ng-show="QuaCtrl.isSet(2)">
+               
+              <br>
+              <a data-toggle="modal" data-target=".addgapnmodal" ng-click="addgap()" class="btn btn-default btn-labeled btn-sm"><i class="fa fa-address-book-o"></i>&nbsp;&nbsp;Add Gap &amp; Other Info</a>
+              <div class="clearfix"></div>
+              <br>
+
+              <div class="clearfix"></div>
+              <br>
+              <table ng-table="usersTable_gap" show-filter="true" class="table table-bordered table-striped text-center">
+                  <tbody>
+                      <tr ng-repeat="gap in data_gap">
+                          <td data-title="'Gap years'" filter="{ 'yeargap': 'text' }">{{gap.yeargap}}</td>
+                          
+                          <td data-title="'Activity during Gap'" filter="{ 'duringgap': 'text' }">{{gap.duringgap}}</td>
+
+                          <td data-title="'Training during Gap'" filter="{ 'tarainingundergone': 'text' }">{{gap.tarainingundergone}}</td>
+                          
+                          <td data-title="'Actions'" class="w150 text-center">
+                              <a class="btn btn-success btn-xs" ng-click="editGap(gap.eYearGapId)" data-toggle="modal" data-target=".addgapnmodal" tooltip-placement="top" uib-tooltip="Edit"><i class="fa fa-edit"></i>
+                              </a>
+
+                              <a class="btn btn-info btn-xs"  ng-click="viewGap(qual.eYearGapId, data_gap)" data-toggle="modal" data-target=".viewgap" tooltip-placement="top" uib-tooltip="View">
+                              <i class="fa fa-eye"></i>
+                              </a>
+
+                              <a class="btn btn-danger btn-xs" ng-click="delGap(gap.eYearGapId, data_gap)" data-toggle="modal" data-target=".deletegap" tooltip-placement="top" uib-tooltip="Delete"><i class="fa fa-trash"></i></a>
+
+                              <a href="" class="btn btn-primary btn-xs" disabled><i class="fa fa-plus"></i></a>
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
+              <!-- table ends -->
+
+              <!--=============================================
+              =            Add Gap Modal            =
+              ==============================================-->
+              <div class="modal fade addgapnmodal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" my-modal data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" ng-click="clearModalOnCloseQ()" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title" ng-init="headingMessage='Add Gap & Other Info'">{{headingMessage}}</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form class="form-horizontal" name="addgapform" ng-submit="saveGap(enquirygapData)" novalidate>
+
+                            <input type="hidden" ng-model="enquirygapData.eEnquiryFormId">
+
+
+                             <div class="form-group">
+                             <label class="control-label col-md-4" for="">Student</label>
+                              <div class="col-sm-7">
+                                  <input ng-model="fullName" class="form-control inputEle" disabled>    
+                              </div> 
+                              </div>
+
+                              <div class="form-group">
+                                 <label class="control-label col-md-4" for="">Gap in Years</label>
+                                <div class="col-md-7">
+                                   <input type="number" class="form-control inputEle" ng-model="enquirygapData.yeargap" placeholder="Enter Years" >  
+                                </div>
+                              </div>
+
+                              <div class="form-group">
+                                 <label class="control-label col-md-4" for="">Activity Under Taken During Gap</label>
+                                <div class="col-md-7">
+                                   <input type="textarea" class="form-control inputEle" ng-model="enquirygapData.duringgap" placeholder="Enter Activity" >  
+                                </div>
+                              </div>
+
+                              <div class="form-group">
+                                <label class="control-label col-md-4" for="">Training Undergone(if any)</label>
+                                 <div class="col-md-1">
+                                   <input type="checkbox" ng-model="checked">  
+                                </div>
+                                <div ng-show="checked">
+                                <div class="col-md-6">
+                                   <input type="text" class="form-control inputEle" ng-model="enquirygapData.tarainingundergone" placeholder="Enter Training" >  
+                                </div>
+                              </div>
+                              </div>
+                              <br>
+                              <div class="form-group">
+                                <div class="col-md-12 text-center">
+                                  <button type="submit" ng-disabled="addgapform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                                  </button>
+                                </div>
+                              </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+              </div>
+              <!--====  End of Add gap Modal  ====-->
+
+
+               <!-- start view modal -->
+                <div class="modal fade viewgap" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" ng-click="clearModalOnCloseQ()" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">View Gap
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+
+                      <div class="form-group">
+                        <label class="control-label col-md-offset-2 col-md-5" for="">Student</label>
+                        <label class="control-label col-sm-3" style="text-align: left;" for="">{{fullName}}</label>
+                     </div>
+                        <div class="clearfix"></div>
+                         <hr>
+
+                        <div class="form-group">
+                          <label class="control-label col-md-offset-2 col-md-5" for="">Gap in Years:
+                          </label>
+                          <label class="control-label col-md-3" for="">{{viewgapData.yeargap}}
+                          </label> 
+                        </div>
+                         <div class="clearfix"></div>
+                         <hr>
+                         <div class="form-group">
+                          <label class="control-label col-md-offset-2 col-md-5" for="">Activity Under Taken During Gap:
+                          </label>
+                          <label class="control-label col-md-3" for="">{{viewgapData.duringgap}}
+                          </label> 
+                        </div>
+                         <div class="clearfix"></div>
+                         <hr>
+                         <div class="form-group">
+                          <label class="control-label col-md-offset-2 col-md-5" for="">Training Undergone(if any):
+                          </label>
+                          <label class="control-label col-md-3" for="">{{viewgapData.tarainingundergone}}
+                          </label> 
+                        </div>
+                         <div class="clearfix"></div>
+                         <br>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- end view modal -->
+
+              <!--==========================================
+              =            Delete gap            =
+              ===========================================-->
+              <div class="modal fade deletegap" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">Delete gap
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <h4>Are you sure you want to delete 
+                        <strong>{{deletegapData.yeargap}}?
+                        </strong>
+                      </h4>
+                      <br>
+                      <a class="btn btn-danger btn-sm" ng-click="deleteGap(deletegapData.eYearGapId)" onclick="$('.modal').modal('hide')">
+                        <i class="fa fa-trash">
+                        </i>&nbsp;&nbsp;Delete
+                      </a>
+                      <a class="btn btn-default btn-sm" data-dismiss="modal">
+                        <i class="fa fa-trash">
+                        </i>&nbsp;&nbsp;Cancel
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!--====  End of Delete Qualification  ====-->
+
+          </div>
+      </div>
+  </div>
+</div>
+
+<script src="view/pages/Sales/Enquiry/QualificationCtrl.js"></script>

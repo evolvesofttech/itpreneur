@@ -1,0 +1,233 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+
+
+<div class="page-content" sidebar-directive="state" >
+    <div class="container-fluid">
+        <div class="row no-margin" ng-controller="leadinfoCtrl as Inst">
+         
+            <div class="col-md-12 no-padding">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Edit Lead Information</h3>
+                    </div>
+                    <div class="panel-body">
+                        <!-- alert messages -->
+                        <flash-message duration="5000" show-close="true" on-dismiss="myCallback(flash)">
+                        </flash-message>
+                        <!-- alert messages -->
+                        <form class="form-horizontal mb40" name="editleadinfoDataform" ng-submit="saveleadinfo(leadinfoData)" novalidate>
+
+                          <div class="button-group">
+                              <a href="#/Lead Form" class="btn btn-default btn-labeled btn-sm">
+                                  <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back</a>
+                              <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</a>                          
+                              <button type="submit" ng-disabled="editleadinfoDataform.$invalid" class="btn btn-success btn-labeled btn-sm">
+                              <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Update</button>
+
+                              <button type="button" data-toggle="modal" data-target=".emailModalSingle" class="btn btn-default btn-labeled btn-sm pull-right" ng-click="emailClickFunction(InterviewScheduleData.clClientId, InterviewScheduleData.clClientjobprofileId)"><i class="fa fa-envelope"></i>&nbsp;&nbsp; Send Email</button>
+                          </div>
+                          <hr>
+
+                        <input type="hidden" ng-model="leadinfoData.eLeadinformationId">
+                          <div class="form-group required">
+                           <label class="control-label col-sm-2" for="">First Name</label>
+                            <div class="col-sm-4">
+                             <input type="text" name="fname" class="form-control inputEle" ng-model="leadinfoData.firstname" placeholder="Enter First Name" ng-required="true">
+                             <div class="clearfix"></div>
+                              <p class="error" ng-show="editleadinfoDataform.fname.$invalid && editleadinfoDataform.fname.$touched">Please Enter First Name</p>
+                            </div>
+
+                            <label class="control-label col-sm-2" for="">Middle Name</label>
+                            <div class="col-sm-4">
+                              <input type="text" name="mname" class="form-control inputEle" ng-model="leadinfoData.middlename" placeholder="Enter Middle Name" ng-required="true">
+                              <div class="clearfix"></div>
+                              <p class="error" ng-show="editleadinfoDataform.mname.$invalid && editleadinfoDataform.mname.$touched">Please Enter Middle Name</p>
+                            </div>
+                           </div>
+                              
+                            <div class="form-group required">                                      
+                             <label class="control-label col-sm-2" for="">Last Name</label>
+                              <div class="col-sm-4">
+                               <input type="text" name="lname" class="form-control inputEle" ng-model="leadinfoData.lastname" placeholder="Enter Last Name" ng-required="true">
+                               <div class="clearfix"></div>
+                               <p class="error" ng-show="editleadinfoDataform.lname.$invalid && editleadinfoDataform.lname.$touched">Please Enter Last Name</p>
+                            </div>
+
+                             <label class="control-label col-sm-2" for="">Email Id</label>
+                              <div class="col-sm-4">
+                               <input type="email" name="mail" class="form-control inputEle" ng-model="leadinfoData.email" placeholder="Enter Email Id" ng-required="true"  ng-pattern="/^[a-zA-Z]+[a-zA-Z0-9._]+@[a-zA-Z]+\.[a-zA-Z.]{2,5}$/" >
+                               <div class="clearfix"></div>
+                                <p class="error" ng-show="editleadinfoDataform.mail.$invalid && editleadinfoDataform.mail.$touched">Please Enter Mail Id</p>
+                              </div>
+                            </div>
+
+                            <div class="form-group">
+                            <label class="control-label col-sm-2 mandatory" for="">Contact No.</label>
+                            <div class="col-sm-4">
+                               <input type="text" name="contact" class="form-control inputEle" ng-model="leadinfoData.contactno" placeholder="Enter Contact Number" ng-required="true" ng-required="true" maxlength="10" minlength="10" required>
+                               <div class="clearfix"></div>
+                               <p class="error" ng-show="editleadinfoDataform.contact.$invalid && editleadinfoDataform.contact.$touched">Please Enter Contact No</p> 
+                            </div>
+
+                            <label class="control-label col-sm-2" for="">Location</label>
+                            <div class="col-sm-4">
+                             <input type="text" name="loc" class="form-control inputEle"  ng-model="leadinfoData.location" placeholder="Enter Location" >
+                           </div>
+                           </div>
+
+                          <div class="form-group">  
+                          <label class="control-label col-sm-2 mandatory" for="">Source Of Lead</label>
+                            <div class="col-sm-4">
+                             <select name="source" ng-model="leadinfoData.cSourceofLeadId" class="form-control inputEle" ng-options="ls.cSourceofLeadId as ls.sourceofleadname for ls in Leadsource"  ng-required="true" ng-change="otherChange(leadinfoData.cSourceofLeadId, Leadsource)">
+                                <option value="">Select Source</option>
+                              </select> 
+                              <div class="clearfix"></div>
+                              <p class="error" ng-show="leadinfoDataform.source.$invalid && leadinfoDataform.source.$touched">Please Select Source</p>
+                            </div> 
+
+                            <div ng-show="showOther">
+                            <label class="control-label col-sm-2" for="">Description</label>
+                              <div class="col-sm-4">
+                                <input type="text" name="other" class="form-control inputEle" ng-model="leadinfoData.other" placeholder="Enter Other Source">
+                              </div>
+                            </div>     
+                          </div>
+                                 
+                          <div class="form-group required">
+                            <label class="control-label col-sm-2" for="">Lead Type</label>
+                            <div class="col-sm-4">
+                              <select name="type" ng-model="leadinfoData.leadtype " class="form-control "  ng-required="true">
+                                <option value="Hot">Hot</option>
+                                <option value="Cold">Cold</option>
+                                 <option value="Warm">Warm</option>
+                              </select>
+                              <div class="clearfix"></div>
+                              <p class="error" ng-show="editleadinfoDataform.type.$invalid && editleadinfoDataform.type.$touched">Please Select Lead Type</p>
+                            </div> 
+                          </div>
+
+                          <div class="form-group required">                                       
+                            <label class="control-label col-sm-2" for="">Assign Lead</label>
+                            <div class="col-sm-4">
+                              <select name="assign" ng-model="leadinfoData.assignuser" class="form-control inputEle" ng-options="so.assignuser as (so.lastnameuser + ' ' + so.firstnameuser + ' ' + so.middlenameuser) for so in UserDetails"  ng-required="true">
+                                <option value="">Select Lead</option>
+                              </select>
+                              <div class="clearfix"></div>
+                              <p class="error" ng-show="editleadinfoDataform.assign.$invalid && editleadinfoDataform.assign.$touched">Please Select Assign From</p> 
+                            </div>
+
+                            <label class="control-label col-sm-2" for="">Branch</label>
+                            <div class="col-sm-4">
+                              <select name="branch" ng-model="leadinfoData.bBranchId" name="enquirybranch" class="form-control inputEle" ng-options="bran.bBranchId as bran.branchname for bran in Branch" ng-required="true">
+                                <option value="">select Branch</option>
+                              </select>
+                              <div class="clearfix"></div>
+                              <p class="error" ng-show="editleadinfoDataform.branch.$invalid && editleadinfoDataform.branch.$touched">Please Select Branch</p> 
+                            </div> 
+                          </div>
+                         </form>
+                        <!-- tab starts -->
+                        <div id="exTab2">
+                            <ul class="nav nav-tabs">
+                                
+                                <li ng-class="{active:Inst.isSet(1)}">
+                                    <a ng-click="Inst.setTab(1)">Activity</a>
+                                </li>
+                                
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <!--===========================
+                                =            Tab 1            =
+                                ============================-->
+                                <div class="tab-pane active" ng-show="Inst.isSet(1)">
+
+                                    <div ng-if="Inst.isSet(1)" ng-include="'view/pages/Sales/Lead Form/Activity/LeadActivity.html'"></div>
+                                     
+                                </div>
+                                <!--====  End of Tab 1  ====-->
+
+                                
+                                
+                                <!--====  End of Tab 7  ====-->
+                                
+                            </div>
+                        </div>
+
+                        <!--=================================
+                        =            Email Modal            =
+                        ==================================-->
+                        <div class="modal fade emailModalSingle" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                          <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    <h4 class="modal-title">Lead - Send Email To&nbsp;{{leadinfoData.firstname}}&nbsp;{{leadinfoData.middlename}}&nbsp;{{leadinfoData.lastname}} </h4>
+                                </div>
+                                <div class="modal-body">
+                                    
+                                    <form class="form-horizontal" name="sendemaildataform" ng-submit="saveEmailDataSingle(sendEmailData, Inst.content, leadinfoData.email)" novalidate>
+                                    <!-- <form class="form-horizontal" name="sendemaildataform" ng-submit="saveEmailDataPreview(sendEmailData, vm.content)" novalidate> -->
+                                      <div class="form-group">
+                                        <label class="control-label col-md-3" for="">Email:</label>
+                                        <div class="col-md-9">
+                                          [ {{leadinfoData.email}} ]
+                                        </div>
+                                        
+                                      </div>
+
+                                      <div class="form-group required">
+                                          <label class="control-label col-md-3" for="">Template:</label>
+                                          <div class="col-md-5">
+                                            <select ng-model="sendEmailData.eEmailtemplateId" name="emailtemplate" class="form-control inputEle" ng-options="eml.eEmailtemplateId as eml.title for eml in EmailTemplate"  ng-change="emailTemplateChange(sendEmailData.eEmailtemplateId, EmailTemplate)" ng-required="true">
+                                              <option value="">Select Email Template</option>
+                                           </select>
+                                          </div>
+                                        </div>
+                                      
+                                        <div class="form-group">
+                                          <label class="control-label col-md-3" for="">Template Body
+                                          </label>
+                                          <div class="col-md-9">
+                                              Dear&nbsp;{{leadinfoData.firstname}}&nbsp;{{leadinfoData.middlename}}&nbsp;{{leadinfoData.lastname}}
+                                              <div class="clearfix"></div>
+                                              <text-angular ng-click="Inst.getCursorPosition()" id="editor1" name="editor1" ng-model="Inst.content">
+                                          </div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                        <br>
+                                        <div class="form-group">
+                                          <div class="col-md-12 text-center">
+                                            <!-- <a class="btn btn-primary" ng-click="previewClicked(sendEmailData, templateData)">Save
+                                            </a> -->
+                                            <button class="btn btn-primary" type="submit" onclick="$('.modal').modal('hide')">Send</button>
+                                            <!-- <button class="btn btn-primary" >Preview &amp; Send</button> -->
+                                            <!-- onclick="$('.modal').modal('hide')" -->
+                                          </div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                        <br>
+                                      </form>
+
+                                </div>
+                              </div>
+                          </div>
+                        </div>
+                        <!--====  End of Email Modal  ====-->
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- end controller div -->
+    </div>
+
+
+</div>
+
+
+<script src="view/pages/Sales/Lead Form/LeadinformationCtrl.js"></script>

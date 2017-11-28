@@ -1,0 +1,129 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+
+
+<div class="page-content" sidebar-directive="state" >
+    <div class="container-fluid">
+        <div class="row no-margin" ng-controller="roleCtrl as Inst">
+         
+            <div class="col-md-12 no-padding">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Edit Role</h3>
+                    </div>
+                    <div class="panel-body">
+                        <!-- alert messages -->
+                        <flash-message duration="5000" show-close="true" on-dismiss="myCallback(flash)">
+                        </flash-message>
+                        <!-- alert messages -->
+                        
+                        <!-- form -->
+                        <form class="form-horizontal mb40" name="enquiryform" ng-submit="saveRole(roleData)" novalidate>
+
+                            <div class="button-group">
+                                <a href="#/Role" class="btn btn-default btn-labeled btn-sm">
+                                    <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back</a>
+                                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</a>
+                            
+                                <button type="submit" class="btn btn-success btn-labeled btn-sm">
+                                <i class="fa fa-floppy-o"></i>&nbsp;&nbsp;Update</button>
+                            </div>
+                            <hr>
+
+                            <div class="form-group form-group required">
+                                <input type="hidden" ng-model="roleData.adRoleId">
+                                <label class="control-label col-md-4" for="">Role</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="rolenm" class="form-control inputEle" ng-model="roleData.roleName" placeholder="Enter Menu" ng-required="true" ng-disabled="role == 'Admin'">
+                                    <div class="clearfix"></div>
+                                    <p class="error" ng-show="roleform.rolenm.$invalid && roleform.rolenm.$touched">Please Enter Role</p>
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4 mandatory">Is Executive</label>
+                                <div class="col-md-4">
+                                    <select ng-model="roleData.isexecutive" name="isexe" class="form-control inputEle" ng-required="true" ng-disabled="role == 'Admin'">
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                    <div class="clearfix"></div>
+                                    <p class="error" ng-show="roleform.isexe.$invalid && roleform.isexe.$touched">Please Select Option</p>
+                                </div>
+                            </div>
+                            <br>
+
+                        </form>
+                        <!-- form -->
+
+                        <!-- tab starts -->
+                        <div id="exTab2">
+                            <ul class="nav nav-tabs">
+                                
+                                <li ng-class="{active:Inst.isSet(1)}">
+                                    <a ng-click="Inst.setTab(1)">Window</a>
+                                </li>
+                                <li ng-class="{active:Inst.isSet(2)}">
+                                    <a ng-click="Inst.setTab(2)">Branch</a>
+                                </li>
+                                <li ng-class="{active:Inst.isSet(3)}">
+                                    <a ng-click="Inst.setTab(3)">Widget</a>
+                                </li>
+                               <!--  <li ng-class="{active:Inst.isSet(4)}">
+                                    <a ng-click="Inst.setTab(4)">Office Use</a>
+                                </li> -->
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <!--===========================
+                                =            Tab 1            =
+                                ============================-->
+                                <div class="tab-pane active" ng-show="Inst.isSet(1)">
+
+                                    <div ng-if="Inst.isSet(1)" ng-include="'view/pages/Settings/role/rolewindow.html'"></div>
+                                     
+                                </div>
+                                <!--====  End of Tab 1  ====-->
+
+                                <!--===========================
+                                =            Tab 2            =
+                                ============================-->
+                                
+                                <div class="tab-pane active" ng-show="Inst.isSet(2)">
+                                     
+                                    <div ng-if="Inst.isSet(2)" ng-include="'view/pages/Settings/role/rolebranch.html'"></div>
+
+                                </div>
+                                
+                                <!--====  End of Tab 2  ====-->
+
+                                <!--===========================
+                                =            Tab 3            =
+                                ============================-->
+                                
+                                <div class="tab-pane active" ng-show="Inst.isSet(3)">
+                                     
+                                    <div ng-if="Inst.isSet(3)" ng-include="'view/pages/Settings/role/rolewidget.html'"></div>
+
+                                </div>
+                                
+                                <!--====  End of Tab 3  ====-->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- end controller div -->
+    </div>
+
+
+</div>
+
+
+<script src="view/pages/Settings/role/roleCtrl.js"></script>

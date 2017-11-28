@@ -1,0 +1,355 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="PaymentreconCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Payment Reconciliation
+              <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{paymentrecon.length}}</span></span>
+              </h3>
+            </div>
+            <div class="panel-body">
+
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+              
+              <div class="button-group">
+                <a data-toggle="modal" data-target=".addpaymentrecon" class="btn btn-default btn-labeled btn-sm">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp;Payment Recon
+                </a>
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+                <button ng-click="exportAction('excel','Payment Reconcillation')" class="btn btn-default btn-labeled btn-sm pull-right" ng-disabled="data_paymentrecon.length > 0 ? false : true">
+                  <i class="fa fa-file-excel-o"></i>&nbsp;&nbsp;Export to Excel</button>
+              </div>
+              <table ng-table="usersTable_paymentrecon" show-filter="true" class="table table-bordered table-striped text-center export-table">
+                <tbody>
+                  <tr ng-repeat="bo in data_paymentrecon">
+                  <td data-title="'Branch'" filter="{'branchname': 'text'}" sortable="'branchname'">{{bo.branchname}}
+                    </td>
+                    <td data-title="'Year - Month'" filter="{'monthyear': 'text'}" sortable="'monthyear'">{{bo.monthyear | limitTo:7}}
+                    </td>
+
+                    <td data-title="'Payment In'" filter="{'paymentin': 'text'}" sortable="'paymentin'">{{bo.paymentin}}
+                    </td>
+                    <td data-title="'Payment out'" filter="{'paymentout': 'text'}" sortable="'paymentout'">{{bo.paymentout}}
+                    </td>
+                    <td data-title="'Reconciliation/adjustment Amount'" filter="{'adjustmentamount': 'text'}" sortable="'adjustmentamount'">{{bo.adjustmentamount}}
+                    </td>
+                    <td data-title="'Status'" filter="{'status': 'text'}" sortable="'status'">{{bo.status}}
+                    </td>
+                    <!-- <td data-title="'Payment'" filter="{'CST No': 'text'}" sortable="'CST No'">{{bo.description}}
+                    </td> -->
+                    
+                    <td data-title="'Actions'" class="w150">
+                      <a href="#/Editpaymentreconciliation/{{bo.pPaymentreconciliationId}}" class="btn btn-success btn-xs"  tooltip-placement="top" uib-tooltip="Edit">
+                        <i class="fa fa-pencil-square-o">
+                        </i>
+                      </a> 
+                      <a data-toggle="modal" data-target=".viewpaymentrecon" class="btn btn-info btn-xs" ng-click="viewpaymentrecon1(bo.pPaymentreconciliationId, data_paymentrecon)" tooltip-placement="top" uib-tooltip="View">
+                        <i class="fa fa-eye">
+                        </i>
+                      </a>
+                      <button class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletepaymentrecon" ng-click="delpaymentrecon(bo.pPaymentreconciliationId, data_paymentrecon)" tooltip-placement="top" uib-tooltip="Delete">
+                        <i class="fa fa-trash">
+                        </i>
+                      </button>
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <hr>
+              <!-- start edit modal -->
+              <div class="modal fade addpaymentrecon" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">Payment Reconciliation
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <form class="form-horizontal" name="addreconciliation" ng-submit="save(paymentreconData)" novalidate>
+                      
+                      <div class="form-group">
+                          <label class="control-label col-sm-2" for="">Branch</label>
+                          <div class="col-sm-4">
+                              <select ng-model="paymentreconData.bBranchId" name="enquirybranch" class="form-control inputEle" ng-options="bran.bBranchId as bran.branchname for bran in currentRoleBranches1"  ng-change="branchChange(paymentreconData.bBranchId, currentRoleBranches1)" ng-required="true">
+                                <option value="">select Branch</option>
+                              </select> 
+                               <div class="clearfix"></div>
+                           <p class="error" ng-show="addreconciliation.enquirybranch.$invalid && addreconciliation.enquirybranch.$touched">Select Branch</p>
+                          </div>
+                        </div>
+
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Month/Year
+                          </label>
+                          <div class="col-md-4">
+                            <datepicker date-format="yyyy-MM" date-disabled-dates="{{disDates}}">
+                              <input name="month" ng-model="paymentreconData.monthyear" class="form-control" restrict-to="[0-9]" type="text" ng-required="true" ng-change="dateClick(paymentreconData.monthyear, paymentreconData.bBranchId)">
+                           </datepicker>
+                           <div class="clearfix"></div>
+                           <p class="error" ng-show="addreconciliation.month.$invalid && addreconciliation.month.$touched">Select Date</p>
+                            
+                          </div>
+                          <label class="control-label col-sm-2" for="">Status</label>
+                          <div class="col-sm-3">
+                            <select name="status" ng-model="paymentreconData.status" class="form-control "  ng-required="true" ng-init="paymentreconData.status = 'Draft'">
+                              <option value="Draft">Draft</option>
+                              <option value="Complete">Complete</option>
+                            </select>
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="addreconciliation.status.$invalid && addreconciliation.status.$touched">Select Status</p>
+                        </div>
+                        </div>
+                        <div class="form-group ">
+                          <label class="control-label col-md-2" for="">Description
+                          </label>
+                          <div class="col-md-10">
+                            <textarea name="desc" class="form-control inputEle" ng-model="paymentreconData.description" placeholder="Enter Description"> </textarea>
+                           <!--  <p class="error" ng-show="addreconciliation.desc.$invalid && addreconciliation.desc.$touched">Enter Description</p> -->
+                          </div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="control-label col-md-2 mandatory" for="">Payment In</label>
+                          <div class="col-md-4">
+                               <input type="number" name="paym" class="form-control inputEle" ng-model="paymentreconData.paymentin" placeholder="Enter Payment In " readonly ng-init="paymentreconData.paymentin = 0">
+                          </div>
+                          <label class="control-label col-md-2" for="">Payment Out</label>
+                          <div class="col-md-4">
+                               <input type="number" name="paymentout" class="form-control inputEle" ng-model="paymentreconData.paymentout" placeholder="Enter Payment Out"  readonly ng-init="paymentreconData.paymentout = 0">
+                             <!--   <div class="clearfix"></div>
+                               <p class="error" ng-show="addreconciliation.paymentout.$invalid && addreconciliation.paymentout.$touched">Enter Payment Outword</p> -->
+                          </div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Bank Opening</label>
+                          <div class="col-md-4">
+                              <input type="number" name="bankop" class="form-control inputEle" ng-model="paymentreconData.bankopening" placeholder="Enter Bank Opening " 
+                              readonly ng-init="paymentreconData.bankopening = 0">
+                              <!-- <div class="clearfix"></div>
+                              <p class="error" ng-show="addreconciliation.bankop.$invalid && addreconciliation.bankop.$touched">Enter Bank Opening</p>     -->
+                          </div>
+                          <label class="control-label col-md-2" for="">Bank Closing</label>
+                          <div class="col-md-4">
+                              <input type="number" name="bankclo" class="form-control inputEle" ng-model="paymentreconData.bankclosing" placeholder="Enter Bank Closing " readonly ng-init="paymentreconData.bankclosing = 0">
+                             <!--  <div class="clearfix"></div>
+                              <p class="error" ng-show="addreconciliation.bankclo.$invalid && addreconciliation.bankclo.$touched">Enter Bank Closing</p>   -->
+                          </div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Cash Opening</label>
+                          <div class="col-md-4">
+                              <input type="number" name="cashop" class="form-control inputEle" ng-model="paymentreconData.cashopening" placeholder="Enter Cash Opening "   readonly ng-init="paymentreconData.cashopening = 0">
+                              <!-- <div class="clearfix"></div>
+                              <p class="error" ng-show="addreconciliation.cashop.$invalid && addreconciliation.cashop.$touched">Enter Cash Opening</p>    -->
+                          </div>
+                          <label class="control-label col-md-2" for="">Cash Closing</label>
+                          <div class="col-md-4">
+                              <input type="number" name="cashclo" class="form-control inputEle" ng-model="paymentreconData.cashclosing" placeholder="Enter Cash Closing "  ng-required="true" ng-init="paymentreconData.cashclosing = 0" ng-blur="cashClosingBlur(paymentreconData.cashclosing, paymentreconData.adjustmentamount)">
+                              <div class="clearfix"></div>
+                              <p class="error" ng-show="addreconciliation.cashclo.$invalid && addreconciliation.cashclo.$touched">Enter Cash Closing</p>   
+                          </div>
+                          
+                        </div>
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Reconciliation/adjustment Amount</label>
+                          <div class="col-md-4">
+                            <input type="number" name="recon" class="form-control inputEle" ng-model="paymentreconData.adjustmentamount" ng-blur="adjustmentAmountBlur(paymentreconData.adjustmentamount)" placeholder="Enter Amount " ng-init="paymentreconData.adjustmentamount = 0">
+                           <!--  <div class="clearfix"></div>
+                            <p class="error" ng-show="addreconciliation.recon.$invalid && addreconciliation.recon.$touched">Enter Reconciliation/adjustment Amount</p> -->
+                          </div>
+                        </div>
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Description
+                          </label>
+                          <div class="col-md-10">
+                            <textarea class="form-control inputEle" name="descri" ng-model="paymentreconData.descriptionadjustmentamount" placeholder="Enter Description" ng-required="paymentreconData.adjustmentamount != 0"> </textarea>
+                           <!--  <p class="error" ng-show="addreconciliation.descri.$invalid && addreconciliation.descri.$touched">Enter Description</p> -->
+                          </div>
+                        </div>
+                        
+                        <div class="form-group required">
+                          <label class="control-label col-md-2" for="">Final Total</label>
+                          <div class="col-md-4">
+                              <input type="number" name="final" ng-model="paymentreconData.finalamount" class="form-control inputEle" placeholder="Enter Final Total" readonly>
+                             <!--  <div class="clearfix"></div>
+                              <p class="error" ng-show="addreconciliation.final.$invalid && addreconciliation.final.$touched">Enter Final Total</p>  -->
+                             <!--  ng-value="((paymentreconData.paymentout + paymentreconData.bankclosing + paymentreconData.cashclosing ) - (paymentreconData.paymentin + paymentreconData.bankopening + paymentreconData.cashopening))+(paymentreconData.adjustmentamount)" -->
+                          </div>
+                        </div>
+                        
+                        <br>
+                        <div class="form-group">
+                          <div class="col-md-offset-5 col-md-5 ">
+                            <button type="submit" ng-disabled="addreconciliation.$invalid"  class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                            </button>
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end edit modal  -->
+              <!-- start view modal -->
+              <div class="modal fade viewpaymentrecon" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">Payment Reconciliation
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="control-label col-md-2" for="">Branch: </label>
+                            <div class="col-md-4">
+                                  {{viewpaymentreconData.branchname}}
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <hr>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-2" for="">Month/Year: </label>
+                            <div class="col-md-4">
+                                  {{viewpaymentreconData.monthyear}}
+                            </div>
+
+                            <label class="control-label col-md-2" for="">Status: </label>
+                            <div class="col-md-4">
+                                {{viewpaymentreconData.status}}
+                            </div>
+                        </div>
+
+                        <div class="clearfix"></div>
+                        <hr>
+ 
+                        <div class="form-group">
+                          <label class="control-label col-md-2" for="">Description: </label>
+                          <div class="col-md-10">
+                            {{viewpaymentreconData.description}}
+                          </div>
+<!-- 
+                          <label class="control-label col-md-2" for="">Batch: </label>
+                          <div class="col-md-4">
+                              {{viewpaymentreconData.statusname}}
+                          </div> -->
+                        </div>
+                        <div class="clearfix"></div>
+                        <hr>
+                        <div class="form-group">
+                            <label class="control-label col-md-2" for="">Payment In:</label>
+                            <div class="col-md-4">
+                                {{viewpaymentreconData.paymentin}}
+                            </div>
+                            <label class="control-label col-md-2" for="">Payment out:</label>
+                              <div class="col-md-4">
+                                  {{viewpaymentreconData.paymentout}}
+                              </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <hr>
+                        <div class="form-group">
+                            <label class="control-label col-md-2" for="">Bank Opening:</label>
+                            <div class="col-md-4">
+                                {{viewpaymentreconData.bankopening}}
+                            </div>
+                            <label class="control-label col-md-2" for="">Bank Closing:</label>
+                              <div class="col-md-4">
+                                  {{viewpaymentreconData.bankclosing}}
+                              </div>
+                        </div>
+                        <div class="clearfix"></div> 
+                        <hr>          
+                        <div class="form-group">
+                            <label class="control-label col-md-2" for="">Cash Opening:</label>
+                            <div class="col-md-4">
+                                {{viewpaymentreconData.cashopening}}
+                            </div>
+                            <label class="control-label col-md-2" for="">Cash Closing:</label>
+                              <div class="col-md-4">
+                                  {{viewpaymentreconData.cashclosing}}
+                              </div>
+                        </div>
+                        <div class="clearfix"></div> 
+                        <hr>
+                        <div class="form-group">
+                            <label class="control-label col-md-2" for="">Reconciliation/adjustment Amount:</label>
+                            <div class="col-md-4">
+                                {{viewpaymentreconData.adjustmentamount}}
+                            </div>
+                            <label class="control-label col-md-2" for="">Description:</label>
+                              <div class="col-md-4">
+                                  {{viewpaymentreconData.descriptionadjustmentamount}}
+                              </div>
+                        </div>
+                         <div class="clearfix"></div>
+                         <hr> 
+                        <div class="form-group">
+                            <label class="control-label col-md-2" for="">Final Total:</label>
+                            <div class="col-md-4">
+                                {{viewpaymentreconData.finalamount}}
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>         
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end view modal -->
+              <!-- start delete modal -->
+              <div class="modal fade deletepaymentrecon" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Delete Payment 
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Are you sure you want to delete 
+                          <strong>{{deletepaymentreconData.paymentin}}?
+                          </strong>
+                        </h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="deletepaymentrecon(deletepaymentreconData.pPaymentreconciliationId)" onclick="$('.modal').modal('hide')">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Delete
+                        </a>
+                        <a class="btn btn-default btn-sm" data-dismiss="modal">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Cancel
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!-- end delete modal -->
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Payment/PaymentreconciliationCtrl.js"></script>
+

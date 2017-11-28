@@ -1,0 +1,438 @@
+
+<!--================================
+=            Controller            =
+=================================-->
+  <div ng-include="'view/shared/header/header.html'"></div>
+
+  <div class="page-content" sidebar-directive="state" >
+    <div class="container-fluid">
+    <div class="row no-margin" ng-controller="feedbackCtrl">
+    <div class="col-md-12 no-padding">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Trainer Feedback</h3>
+            </div>
+            <div class="panel-body">
+            
+                <!-- toaster message -->
+                <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+                <!-- toaster message -->
+
+                <div class="button-group">
+                    <a data-toggle="modal" data-target=".addfeedback" class="btn btn-default btn-labeled btn-sm">
+                        <i class="fa fa-plus"></i>&nbsp;&nbsp;Add Feedback</a>
+                      <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                        <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</a>
+                </div>
+
+                <!--===================================
+                =            Feedback table            =
+                ====================================-->
+
+                 <table ng-table="usersTable_TrainerFeedback" show-filter="true" class="table table-bordered table-striped text-center">
+                    <tbody>
+                      <tr ng-repeat="tfeed in data_TrainerFeedback">
+                       <td data-title="'Student Name'" filter="{'firstname': 'text'}" sortable="'firstname'">{{tfeed.firstname}}&nbsp;{{tfeed.middlename}}&nbsp;{{tfeed.lastname}}
+                        </td>
+                       <td data-title="'Technologies'" filter="{'technologyname': 'text'}" sortable="'technologyname'">{{tfeed.technologyname}}
+                        </td>
+                        
+                         <td data-title="'Start Date'" filter="{'startdate': 'text'}" sortable="'startdate'">{{tfeed.startdate | date}}
+                        </td>
+                         <td data-title="'End Date'" filter="{'enddate': 'text'}" sortable="'enddate'">{{tfeed.enddate | date}}
+                        </td>
+                        <td data-title="'Final Exam  Score'" filter="{'finalexamscore': 'text'}" sortable="'finalexamscore'">{{tfeed.finalexamscore}}
+                        </td>
+                         <td data-title="'Attendance in %'" filter="{'attendance': 'text'}" sortable="'attendance'">{{tfeed.attendance}}
+                        </td>
+                       <td data-title="'Remark'" filter="{'remark': 'text'}" sortable="'remark'">{{tfeed.remark}}
+                        </td>
+                         <td data-title="'Status'" filter="{'status': 'text'}" sortable="'status'">
+                         {{tfeed.status}}
+                        </td>
+                        <td data-title="'Actions'" class="w150">
+                          <a data-toggle="modal" data-target=".editTrainerFeedback" class="btn btn-success btn-xs" ng-click="editTrainerFeedback1(tfeed.eTrainerfeedbackId)" tooltip-placement="top" uib-tooltip="Edit">
+                            <i class="fa fa-pencil-square-o" disabled>
+                            </i>
+                          </a> 
+                         <a class="btn btn-info btn-xs" data-toggle="modal" data-target=".viewTrainerFeedback" ng-click="viewTrainerFeedback(tfeed.eTrainerfeedbackId, data_TrainerFeedback)">
+                            <i class="fa fa-eye">
+                            </i>
+                          </a>
+                          <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deleteTrainerFeedbackModal" ng-click="delTrainerFeedback(tfeed.eTrainerfeedbackId, data_TrainerFeedback)" tooltip-placement="top" uib-tooltip="Delete">
+                            <i class="fa fa-trash">
+                            </i>
+                          </a>
+                          
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                <!--==================================
+                =            Add Activity            =
+                ===================================-->
+                <div class="modal fade addfeedback" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                    <div class="modal-dialog modal-lg" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" ng-click="clearModalOnClosefeedback()" data-dismiss="modal">&times;
+                          </button>
+                          <h4 class="modal-title">Add Feedback
+                          </h4>
+                        </div>
+                        <div class="modal-body">
+                          
+                           <div class="form-group ">
+
+                              <label class="control-label col-sm-1" for="">Course</label>
+                              <div class="col-sm-3">
+                                  <select ng-model="feedbackData.cCourseId" class="form-control inputEle" ng-options="co.cCourseId as co.coursename for co in Course" ng-change="courseChange(feedbackData.cCourseId)" ng-required="true">
+                                    <option value="">Select Course</option>
+                                  </select> 
+                              </div>
+
+                               <label class="control-label col-sm-1" for="">Batch</label>
+                              <div class="col-sm-3">
+                                  <select ng-model="feedbackData.cBatchId" class="form-control inputEle" ng-options="btch.cBatchId as btch.batchname for btch in Batch" ng-change="batchChange(feedbackData.cBatchId)" ng-required="true"> 
+                                  </select>
+                              </div> 
+
+                              <label class="control-label col-sm-1" for="">Technology</label>
+                              <div class="col-sm-3">
+                                  <select ng-model="feedbackData.cTechnologyMasterId" class="form-control inputEle" ng-options="tech.cTechnologyMasterId as tech.technologyname for tech in Technology" ng-change="technologyChange(feedbackData.cTechnologyMasterId)" ng-required="true"> 
+                                  </select>
+                              </div>                                       
+                            </div> 
+
+
+                            <!-- <label class="control-label col-sm-1" for="">Student</label>
+                              <div class="col-sm-3">
+                                  <select ng-model="feedbackData.eEnquiryFormId" class="form-control inputEle" ng-options="stu.eEnquiryFormId as (stu.firstname + ' ' + stu.middlename + ' ' + stu.lastname) for stu in Students"  ng-change="studentChange(feedbackData.eEnquiryFormId)" ng-required="true"> 
+                                  </select>
+                              </div>                                       
+                            </div>  -->
+
+                            
+                              <hr>
+
+                              <!-- <form name="trainerFeedbackForm" class="form-horizontal" ng-submit="saveFeedback(feedbackData1, feedback_data)" novalidate> -->
+
+                                 <table class="table table-bordered table-striped text-center">
+                                  <tbody>
+                                    <tr>
+                                      <td>Sr. No.</td>
+                                      <td><strong>Students</strong></td>
+                                      <td><strong>Start Date</strong></td>
+                                      <td><strong>End Date</strong></td>
+                                      <td><strong>Exam Score</strong></td>
+                                      <td><strong>Attendance</strong></td>
+                                      <td><strong>Remarks</strong></td>
+                                      <td><strong>Status</strong></td>
+                                      <td><strong>Action</strong></td>
+                                    </tr>
+                                    
+
+                                    
+                                    <tr ng-repeat="Afeed in feedback_data" ng-form="myForm" name="trainerFeedbackForm{{$index}}">
+                                      <!-- <input type="text" ng-model="feedbackData1.name" ng-value="test"> -->
+                                      <!-- <form  class="form-horizontal" novalidate> -->
+                                      
+                                      <td><input type="hidden" name="eEnquiryFormId" ng-model="feedbackData1.eEnquiryFormId" ng-init="feedbackData1.eEnquiryFormId = Afeed.eEnquiryFormId">{{$index + 1}}
+                                        <input type="hidden" name="bBranchId" ng-model="feedbackData1.bBranchId" ng-init="feedbackData1.bBranchId = Afeed.bBranchId">
+                                      </td>
+                                      
+                                        
+                                      
+
+                                      <td>{{Afeed.firstname}}&nbsp;{{Afeed.middlename}}&nbsp;{{Afeed.lastname}}</td>
+                                      
+                                      <td>
+                                          <datepicker date-format="yyyy-MM-dd">
+                                              <input type="text" name="startdate" ng-model="feedbackData1.startdate" placeholder="Enter Date" class="form-control" ng-required="true" restrict-to="[0-9]" />
+                                          </datepicker>
+                                      </td>
+
+                                      <td>
+                                          <datepicker date-format="yyyy-MM-dd">
+                                              <input type="text" name="enddate" ng-model="feedbackData1.enddate" placeholder="Enter Date" class="form-control" ng-required="true" restrict-to="[0-9]" />
+                                          </datepicker>
+                                      </td>
+
+                                      <td>
+                                        <input type="number" name="finalexamscore" ng-model="feedbackData1.finalexamscore" class="form-control" ng-required="true">
+                                      </td>
+
+                                      <!-- <td>
+                                        <input type="number" name="attendance" ng-model="feedbackData1.attendance" class="form-control" ng-required="true">
+                                      </td> -->
+
+                                     <td>
+                                      <input type="number" name="attendance" ng-model="feedbackData1.attendance" ng-init="feedbackData1.attendance = Afeed.attendancepercentage" class="form-control" ng-required="true" readonly>
+                                      </td>
+
+                                     <td>  
+                                     <select class="form-control inputEle" name="remark" ng-model="feedbackData1.remark" ng-required="true">
+                                        <option value="Average">Average</option>
+                                        <option value="Good">Good</option>
+                                        <option value="Excellent">Excellent</option> 
+                                        </select>
+                                      </td>
+
+                                       <td>  
+                                       <select class="form-control inputEle" name="status" ng-model="feedbackData1.status" ng-required="true"> 
+                                        <option value="Eligible">Eligible</option>
+                                        <option value="Not-Eligible">Not-Eligible</option>
+                                      </select>
+                                      </td>
+
+                                      <td>
+                                        <button type="submit" class="btn btn-success" ng-disabled="trainerFeedbackForm{{$index}}.$invalid" ng-click="saveAll(feedbackData1)" onclick="$('.modal').modal('hide')">Save
+                                        </button>
+                                      </td>
+                                     <!--  </form> -->
+                                    </tr>
+
+                                    <br>
+                                  <div class="form-group">
+                                      <div class="col-md-12 text-center">
+                                        <!-- <button type="submit"  class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                                        </button> -->
+
+                                      </div>
+                                    </div>
+                                  </tbody>
+                                </table>
+                                <!-- </form> -->
+                        </div>
+                      </div>
+                    </div>
+
+                </div>
+                <!--====  End of Add Activity  ====-->
+
+                <!--=============================================
+                =            Update Trainer Feedback            =
+                ==============================================-->
+                <div class="modal fade editTrainerFeedback" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Edit Trainer Feedback
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <form class="form-horizontal" name="editTrainerFeedback" ng-submit="saveAll(feedbackData2)" novalidate>
+                        <!-- <input type="text" ng-model="feedbackData2.cCourseId">
+                        <input type="text" ng-model="feedbackData2.cBatchId"> -->
+                        <input type="hidden" ng-model="feedbackData2.eTrainerfeedbackId">
+                        <input type="hidden" ng-model="feedbackData2.cTechnologyMasterId">
+                        <!-- <input type="text" ng-model="feedbackData2.eEnquiryFormId"> -->
+                        <div class="form-group required">
+                            <label class="control-label col-md-3" for="">Student Name
+                            </label>
+                            <div class="col-md-7">
+                              <input type="text" name="technology" class="form-control inputEle" ng-model="stdName" ng-required="true" disabled>
+                            </div>
+                          </div>
+
+                          <div class="form-group required">
+                            <label class="control-label col-md-3" for="">Technology
+                            </label>
+                            <div class="col-md-7">
+                              <input type="text" name="technology" class="form-control inputEle" ng-model="feedbackData2.technologyname" placeholder="Enter Technology" ng-required="true" disabled>
+                            </div>
+                          </div>
+
+                          <div class="form-group required">
+                            <label class="control-label col-md-3" for="">Start Date
+                            </label>
+                            <div class="col-md-7">
+                              <datepicker date-format="yyyy-MM-dd">
+                                  <input type="text" name="startdate" ng-model="feedbackData2.startdate" placeholder="Enter Date" class="form-control" ng-required="true" restrict-to="[0-9]" />
+                              </datepicker>
+                            </div>
+                          </div>
+
+                          <div class="form-group required">
+                            <label class="control-label col-md-3" for="">End Date
+                            </label>
+                            <div class="col-md-7">
+                              <datepicker date-format="yyyy-MM-dd">
+                                  <input type="text" name="startdate" ng-model="feedbackData2.startdate" placeholder="Enter Date" class="form-control" ng-required="true" restrict-to="[0-9]" />
+                              </datepicker>
+                            </div>
+                          </div>
+
+                          <div class="form-group required">
+                            <label class="control-label col-md-3" for="">Final Exam Score
+                            </label>
+                            <div class="col-md-7">
+                              <input type="number" name="finalexamscore" ng-model="feedbackData2.finalexamscore" class="form-control" ng-required="true">
+                            </div>
+                          </div>
+
+                          <div class="form-group required">
+                            <label class="control-label col-md-3" for="">Attendance
+                            </label>
+                            <div class="col-md-7">
+                              <input type="number" name="attendance" ng-model="feedbackData2.attendance" class="form-control" ng-required="true">
+                            </div>
+                          </div>
+
+                          <div class="form-group required">
+                            <label class="control-label col-md-3" for="">Remark
+                            </label>
+                            <div class="col-md-7">
+                              <select class="form-control inputEle" name="remark" ng-model="feedbackData2.remark" ng-required="true">
+                                  <option value="Average">Average</option>
+                                  <option value="Good">Good</option>
+                                  <option value="Excellent">Excellent</option> 
+                              </select>
+                            </div>
+                          </div>
+
+                          <div class="form-group required">
+                            <label class="control-label col-md-3" for="">Status
+                            </label>
+                            <div class="col-md-7">
+                              <select class="form-control inputEle" name="status" ng-model="feedbackData2.status" ng-required="true"> 
+                                <option value="Eligible">Eligible</option>
+                                <option value="Not-Eligible">Not-Eligible</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="clearfix"></div>
+                          <br>
+                          <div class="form-group">
+                            <div class="col-md-12 text-center">
+                              <button type="submit" ng-disabled="editTrainerFeedback.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                              </button>
+                            </div>
+                          </div>
+                          <div class="clearfix"></div>
+                          <br>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!--====  End of Update Trainer Feedback  ====-->
+
+                <!--===========================
+                =            View             =
+                ============================-->
+                <div class="modal fade viewTrainerFeedback" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Edit Trainer Feedback
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <form class="form-horizontal">
+                        
+                          <div class="form-group">
+                            <label class="control-label col-md-offset-2 col-md-3" for="">Technology</label>
+                            <label class="control-label col-md-5" style="text-align: left;" for="">{{viewTrainerFeedbackData.technologyname}}</label>
+                          </div>
+                          <div class="clearfix"></div>
+                          <hr>
+
+                          <div class="form-group">
+                            <label class="control-label col-md-offset-2 col-md-3" for="">Start Date
+                            </label>
+                            <label class="control-label col-md-5" style="text-align: left;" for="">{{viewTrainerFeedbackData.startdate}}</label> 
+                          </div>
+                          <div class="clearfix"></div>
+                          <hr>
+
+                          <div class="form-group">
+                            <label class="control-label col-md-offset-2 col-md-3" for="">End Date
+                            </label>
+                            <label class="control-label col-md-5" style="text-align: left;" for="">{{viewTrainerFeedbackData.enddate}}</label>
+                          </div>
+                          <div class="clearfix"></div>
+                          <hr>
+
+                          <div class="form-group">
+                            <label class="control-label col-md-offset-2 col-md-3" for="">Final Exam Score
+                            </label>
+                            <label class="control-label col-md-5" style="text-align: left;" for="">{{viewTrainerFeedbackData.finalexamscore}}</label>
+                          </div>
+                          <div class="clearfix"></div>
+                          <hr>
+
+                          <div class="form-group">
+                            <label class="control-label col-md-offset-2 col-md-3" for="">Attendance
+                            </label>
+                            <label class="control-label col-md-5" style="text-align: left;" for="">{{viewTrainerFeedbackData.attendance}}</label>
+                          </div>
+                          <div class="clearfix"></div>
+                          <hr>
+
+                          <div class="form-group">
+                            <label class="control-label col-md-offset-2 col-md-3" for="">Remark
+                            </label>
+                            <label class="control-label col-md-5" style="text-align: left;" for="">{{viewTrainerFeedbackData.remark}}</label>
+                          </div>
+                          <div class="clearfix"></div>
+                          <hr>
+
+                          <div class="form-group">
+                            <label class="control-label col-md-offset-2 col-md-3" for="">Status
+                            </label>
+                            <label class="control-label col-md-5" style="text-align: left;" for="">{{viewTrainerFeedbackData.status}}</label>
+                          </div>
+                          <div class="clearfix"></div>
+                          <br>
+                          <div class="clearfix"></div>
+                          <br>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!--====  End of View   ====-->
+                
+
+                <!--=============================================
+                =            Delete Trainer Feedback            =
+                ==============================================-->
+                <div class="modal fade deleteTrainerFeedbackModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <button type="button" class="close" data-dismiss="modal">&times;</button>
+                              <h4 class="modal-title">Delete Enrollment</h4>
+                          </div>
+                          <div class="modal-body">
+                              <h4>Are you sure you want to delete feedback for following technology <br> <strong>{{deleteTrainerFeedbackData.technologyname}}?</strong></h4>
+                              <br>
+                              <a class="btn btn-danger btn-sm" ng-click="deleteTrainerFeedback(deleteTrainerFeedbackData.eTrainerfeedbackId)" onclick="$('.modal').modal('hide')"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a>
+
+                              <a class="btn btn-default btn-sm" data-dismiss="modal"><i class="fa fa-trash"></i>&nbsp;&nbsp;Cancel</a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                
+                
+                <!--====  End of Delete Trainer Feedback  ====-->
+                
+                
+           </div>
+       </div>
+      </div>
+    </div>
+  </div>
+ </div>
+  
+
+<!--====  End of Controller  ====-->
+
+ <script src="view/pages/Sales/Trainer Feedback/TrainerfeedbackCtrl.js"></script>

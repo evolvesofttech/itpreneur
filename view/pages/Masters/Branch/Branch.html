@@ -1,0 +1,305 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="branchCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Branch
+              <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{branch.length}}</span></span>
+              </h3>
+            </div>
+            <div class="panel-body">
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+              <div class="button-group">
+                <a data-toggle="modal" data-target=".addbranch" ng-click="addbranchclick()" class="btn btn-default btn-labeled btn-sm">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp;Add Branch
+                </a>
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+              </div>
+              <table ng-table="usersTable" show-filter="true" class="table table-bordered table-striped text-center">
+                <tbody>
+                  <tr ng-repeat="bo in data">
+                    <td data-title="'Branch'" filter="{'branchname': 'text'}" sortable="'branchname'">{{bo.branchname}}
+                    </td>
+                    <td data-title="'Description'" filter="{'description': 'text'}" sortable="'description'">{{bo.description}}
+                    </td>
+                    <td data-title="'Email'" filter="{'email': 'text'}" sortable="'email'">{{bo.email}}
+                    </td>
+                    <td data-title="'Contact No'" filter="{'contactno': 'text'}" sortable="'contactno'">{{bo.contactno}}
+                    </td>
+                     <td data-title="'State'" filter="{'statename': 'text'}" sortable="'statename'">{{bo.statename}}
+                    </td>
+                     <td data-title="'City'" filter="{'city': 'text'}" sortable="'city'">{{bo.city}}
+                    </td>
+                    <td data-title="'Actions'" class="w150">
+                      <a data-toggle="modal" data-target=".addbranch" class="btn btn-success btn-xs" ng-click="editBranch(bo.bBranchId)" tooltip-placement="top" uib-tooltip="Edit">
+                        <i class="fa fa-pencil-square-o">
+                        </i>
+                      </a> 
+                      <a data-toggle="modal" data-target=".viewbranch" class="btn btn-info btn-xs" ng-click="viewBranch(bo.bBranchId, data)" tooltip-placement="top" uib-tooltip="View">
+                        <i class="fa fa-eye">
+                        </i>
+                      </a>
+                      <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletebranch" ng-click="delBranch(bo.bBranchId, data)" tooltip-placement="top" uib-tooltip="Delete">
+                        <i class="fa fa-trash">
+                        </i>
+                      </a>
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <hr>
+              <!-- start edit modal -->
+              <div class="modal fade addbranch" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title" ng-init="headingMessage ='Add Branch'">{{headingMessage}}</h4>
+                    </div>
+                    <div class="modal-body">
+                      <form class="form-horizontal" name="addBranch" ng-submit="save(branchData)" novalidate>
+                        <div class="form-group  required">
+                          <label class="control-label col-md-3" for="">Branch
+                          </label>
+                          <div class="col-md-7">
+                            <input type="text" name="branchName" class="form-control inputEle" ng-model="branchData.branchname" placeholder="Enter Branch Name" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="addBranch.branchName.$invalid && addBranch.branchName.$touched">Please Enter Branch Name</p>
+                          </div>
+                        </div>
+                         <div class="form-group required">
+                          <label class="control-label col-md-3" for="">Description
+                          </label>
+                          <div class="col-md-7">
+                            <input type="text" name="desc" class="form-control inputEle" ng-model="branchData.description" placeholder="Describe your Branch" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="addBranch.desc.$invalid && addBranch.desc.$touched">Please Enter Description</p>
+                          </div>
+                        </div>
+
+                        <div class="form-group required">
+                          <label class="control-label col-md-3" for="">Email</label>
+                          <div class="col-md-7">
+                              <input type="email" name="emailId" class="form-control inputEle" ng-model="branchData.email" placeholder="Enter Email" ng-disabled="disableEmail" ng-required="true"  ng-pattern="/^[a-zA-Z]+[a-zA-Z0-9._]+@[a-zA-Z]+\.[a-zA-Z.]{2,5}$/">
+                              <div class="clearfix"></div>
+                            <p class="error" ng-show="addBranch.emailId.$invalid && addBranch.emailId.$touched">Please Enter Email</p>
+                          </div>
+                          </div>
+                        <div class="form-group required">
+                          <label class="control-label col-md-3" for="">Contact Number</label>
+                            <div class="col-md-7">
+                              <input type="number" name="contactnumber" class="form-control inputEle" ng-model="branchData.contactno" placeholder="Enter Number" ng-disabled="disableContact" maxlength="10" minlength="10" ng-required="true" restrict-to="[0-9]" required>
+                              <div class="clearfix"></div>
+                                <p class="error" ng-show="addBranch.contactnumber.$error.required">Please Enter Valid Contact Number</p>
+                                 <p class="error" ng-show="addBranch.contactnumber.$error.maxlength">Please Enter 10 digits Number</p>
+                                 <p class="error" ng-show="addBranch.contactnumber.$error.minlength">Too Short Number !!!</p>
+                            </div>
+                        </div>
+                         <div class="form-group required">
+                           <label class="control-label col-sm-3" for="">Address</label>
+                           <div class="col-sm-7">
+                              <textarea class="form-control inputEle" name="addr" ng-model="branchData.address" placeholder="Enter Permenant Address" ng-required="true"> </textarea>
+                               <div class="clearfix"></div>
+                               <p class="error" ng-show="addBranch.addr.$invalid && addBranch.addr.$touched">Please Enter Address</p>
+                           </div>
+                        </div>
+                         <div class="form-group required">   
+                            <label class="control-label col-md-3" for="">State</label>
+                            <div class="col-md-3">
+                                <select ng-model="branchData.cStateId" name="state" class="form-control inputEle" ng-options="st.cStateId as st.statename for st in State" ng-change="OnStateChange(branchData.cStateId)" ng-disabled="disableState" ng-focus="ngStateFocus()"  ng-required="true">
+                                    <option value="">select a State</option>
+                                </select>
+                                <div class="clearfix"></div>
+                              <p class="error" ng-show="addBranch.state.$invalid && addBranch.state.$touched">select a State</p>
+                            </div>
+
+                            <label class="control-label col-md-1" for="">City</label>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" name="City" placeholder="Enter City" ng-model="branchData.city" required ng-disabled="disableField" ng-required="true" />
+                                <div class="clearfix"></div>
+                              <p class="error" ng-show="addBranch.City.$invalid && addBranch.City.$touched">Please Enter City</p>
+                            </div>
+                          </div>
+
+                          <div class="form-group required">
+                            <label class="control-label col-md-3" for="">District</label>
+                            <div class="col-md-3">
+                                <select ng-model="branchData.cDistrictId" name="district" class="form-control inputEle" ng-options="ds.cDistrictId as ds.districtname for ds in District" ng-change="OnDistrictChange(branchData.cDistrictId)" ng-disabled="disableDistrict"  ng-required="true">
+                                    <option value="">Select a District</option>
+                                </select>
+                               <div class="clearfix"></div>
+                              <p class="error" ng-show="addBranch.district.$invalid && addBranch.district.$touched">Select a District</p>
+                            </div>
+                            <label class="control-label col-md-1" for="">Taluka</label>
+                            <div class="col-md-3">
+                                <select ng-model="branchData.cTalukaId" name="taluka" class="form-control inputEle" ng-options="tk.cTalukaId as tk.talukaname for tk in Taluka" ng-disabled="disableTaluka"  ng-required="true">
+                                    <option value="">Select a Taluka</option>
+                                </select> 
+                                <div class="clearfix"></div>
+                              <p class="error" ng-show="addBranch.taluka.$invalid && addBranch.taluka.$touched">Select a Taluka</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group required">
+                          <label class="control-label col-md-3" for="">Pin Code</label>
+                          <div class="col-md-3">
+                              <input type="number" name="pinCode" class="form-control inputEle" ng-model="branchData.pincode" placeholder="Enter Pin Code" ng-disabled="disableField"  ng-required="true" restrict-to="[0-9]">
+                               <div class="clearfix"></div>
+                            <p class="error" ng-show="addBranch.pinCode.$invalid && addBranch.pinCode.$touched">Please Enter Pin Code</p>
+                          </div>
+                      </div>
+                      <div class="clearfix"></div>
+                      <br>
+                        <div class="form-group">
+                          <div class="col-md-12 text-center">
+                            <button type="submit" ng-disabled="addBranch.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                            </button>
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end edit modal  -->
+              <!-- start view modal -->
+              <div class="modal fade viewbranch" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">View Branch
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label class="control-label  col-md-2" for="">Branch:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewbranchData.branchname}}
+                        </label>
+                      
+                        <label class="control-label  col-md-2" for="">Description:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewbranchData.description}}
+                        </label>
+                      </div>
+                       <div class="clearfix"></div>
+                      <hr>
+
+                       <div class="form-group">
+                        <label class="control-label  col-md-2" for="">Email:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewbranchData.email}}
+                        </label>
+                        
+                        <label class="control-label  col-md-2" for="">Contact No:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewbranchData.contactno}}
+                        </label>
+                      </div>
+                       <div class="clearfix"></div>
+                      <hr>
+
+                       <div class="form-group">
+                        <label class="control-label  col-md-2" for="">Address:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewbranchData.address}}
+                        </label>
+                     
+
+                        <label class="control-label  col-md-2" for="">State:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewbranchData.statename}}
+                        </label>
+                      </div>
+                       <div class="clearfix"></div>
+                      <hr>
+
+                       <div class="form-group">
+                        <label class="control-label  col-md-2" for="">City:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewbranchData.city}}
+                        </label>
+                     
+                        <label class="control-label  col-md-2" for="">District:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewbranchData.districtname}}
+                        </label>
+                      </div>
+                       <div class="clearfix"></div>
+                      <hr>
+
+                       <div class="form-group">
+                        <label class="control-label  col-md-2" for="">Taluka:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewbranchData.talukaname}}
+                        </label>
+                      
+                        <label class="control-label  col-md-2" for="">Pin Code:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewbranchData.pincode}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <br>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end view modal -->
+              <!-- start delete modal -->
+              <div class="modal fade deletebranch" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Delete Branch
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Are you sure you want to delete 
+                          <strong>{{deletebranchData.branchname}}?
+                          </strong>
+                        </h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="delete(deletebranchData.bBranchId)" onclick="$('.modal').modal('hide')">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Delete
+                        </a>
+                        <a class="btn btn-default btn-sm" data-dismiss="modal">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Cancel
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!-- end delete modal -->
+             
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Masters/Branch/BranchCtrl.js"></script>
+

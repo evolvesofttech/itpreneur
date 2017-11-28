@@ -1,0 +1,119 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+        <div class="row no-margin" ng-controller="stateCtrl">
+           <div class="col-md-12 no-padding">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">State
+                            <span class="pull-right"><small>Total: </small><span class="badge">{{State.length}}</span></span>
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <!-- alert messages -->
+                        <flash-message duration="5000" show-close="true" on-dismiss="myCallback(flash)">
+                        </flash-message>
+                        <!-- alert messages -->
+
+                        <!--=============================
+                        =            Buttons            =
+                        ==============================-->
+                        <div class="button-group">
+                            <a data-toggle="modal" data-target=".addState" class="btn btn-default btn-labeled btn-sm" ng-click="addForEnable()">
+                                <i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Add State</a>
+                            <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                              <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                            </a>
+                        </div>
+                        <!--====  End of Buttons  ====-->
+
+                        <!--===========================
+                        =            Table            =
+                        ============================-->
+                        <table ng-table="usersTable" show-filter="true" class="table table-bordered table-striped text-center">
+                            <tbody>
+                                <tr ng-repeat="st in data">
+                                    <td data-title="'State'" filter="{ 'statename': 'text' }">{{st.statename}}</td>
+                                    <td data-title="'Actions'" class="w150">
+                                        <a data-toggle="modal" data-target=".addState" ng-click="editState(st.cStateId)" class="btn btn-success btn-xs" tooltip-placestnt="top" uib-tooltip="Edit">
+                                        <i class="fa fa-pencil-square-o"></i></a>
+
+                                        <a class="btn btn-info btn-xs" disabled>
+                                        <i class="fa fa-eye"></i></a>
+
+                                        <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletestate" ng-click="delState(st.cStateId, data)" tooltip-placestnt="top" uib-tooltip="Delete">
+                                        <i class="fa fa-trash"></i></a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!--====  End of Table  ====-->
+
+                        <hr>
+
+                        <!--===============================
+                        =            Add State            =
+                        ================================-->
+                        <div class="modal fade addState" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title">Add State</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form class="form-horizontal" ng-submit="save(stateData)" novalidate>
+                                            <div class="form-group form-group required">
+                                                <label class="control-label col-md-4" for="">state</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" name="stnm" class="form-control inputEle" ng-model="stateData.statename" placeholder="Enter State Name" >
+                                                   
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-md-offset-4 col-md-3">
+                                                    <button type="submit"  class="btn btn-success" onclick="$('.modal').modal('hide')">Save</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--====  End of Add State  ====-->
+
+                        <!--==================================
+                        =            Delete State            =
+                        ===================================-->
+                        <div class="modal fade deletestate" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    <h4 class="modal-title">Delete State</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <h4>Are you sure you want to delete <strong>{{deletestateData.statename}}?</strong></h4>
+                                    <br>
+                                    <a class="btn btn-danger btn-sm" ng-click="delete(deletestateData.cStateId)" onclick="$('.modal').modal('hide')"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a>
+
+                                    <a class="btn btn-default btn-sm" data-dismiss="modal"><i class="fa fa-trash"></i>&nbsp;&nbsp;Cancel</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--====  End of Delete State  ====-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/RegionSetting/State/stateCtrl.js"></script>

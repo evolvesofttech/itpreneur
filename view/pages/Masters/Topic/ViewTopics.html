@@ -1,0 +1,197 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+
+
+<div class="page-content" sidebar-directive="state" >
+    <div class="container-fluid">
+        <div class="row no-margin" ng-controller="ViewTopicsCtrl">
+         
+            <div class="col-md-12 no-padding">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Topics of Course: {{currentCourse}} &amp; Technology: {{currentTechnology}}
+                          <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{Topics.length}}</span></span>
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <!-- toaster message -->
+                          <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+                        <!-- toaster message -->
+
+                        <div class="button-group">
+                            <a href="#/Topic" class="btn btn-default btn-labeled btn-sm">
+                                <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back</a>
+                            <!-- <a data-toggle="modal" data-target=".addtopic" class="btn btn-default btn-labeled btn-sm" ng-click="addTopic()">
+                              <i class="fa fa-plus-circle">
+                              </i>&nbsp;&nbsp;Add Topic
+                            </a> -->
+                            <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm">
+                                <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</a>
+                        </div>
+
+                        <table ng-table="usersTable_Topics" show-filter="true" class="table table-bordered table-striped text-center">
+                            <tbody>
+                              <tr ng-repeat="bo in data">
+                                <td data-title="'Topic Name'" filter="{'topicname': 'text'}" sortable="'topicname'">{{bo.topicname}}
+                                </td>
+                                <td data-title="'Actions'">
+                                  <a href="#/Edit Topic/{{bo.cTopicId}}" class="btn btn-success btn-xs" tooltip-placement="top" uib-tooltip="Edit">
+                                    <i class="fa fa-pencil-square-o">
+                                    </i>
+                                  </a> 
+                                  <a data-toggle="modal" data-target=".viewtopic" class="btn btn-info btn-xs" ng-click="viewTopic(bo)" tooltip-placement="top" uib-tooltip="View">
+                                    <i class="fa fa-eye">
+                                    </i>
+                                  </a>
+                                  <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletetopic" ng-click="delTopic(bo)" tooltip-placement="top" uib-tooltip="Delete">
+                                    <i class="fa fa-trash">
+                                    </i>
+                                  </a>
+                                </td>
+                              </tr>
+                            </tbody>
+                      </table>
+                      <hr>
+                    </div>
+                </div>
+            </div>
+
+            <!-- start edit modal -->
+              <div class="modal fade addtopic" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">Add Topic
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <form class="form-horizontal" name="topicform" ng-submit="saveTopic(TopicData)" novalidate>
+                        <div class="form-group required">
+                          <label class="control-label col-md-3" for="">Course
+                          </label>
+                          <div class="col-md-7">
+                            <input type="text" class="form-control" ng-model="TopicData.coursename" disabled>
+                            <input type="hidden" class="form-control" ng-model="TopicData.cCourseId" disabled>
+                          </div>
+                        </div><!-- form-group -->
+
+                        <div class="form-group required">
+                          <label class="control-label col-md-3" for="">Technology
+                          </label>
+                          <div class="col-md-7">
+                            <input type="text" class="form-control" ng-model="TopicData.technologyname" disabled>
+                            <input type="hidden" class="form-control" ng-model="TopicData.cTechnologyMasterId" disabled>
+                          </div>
+                        </div><!-- form-group -->
+
+                        <div class="form-group required">
+                          <label class="control-label col-md-3" for="">Topic
+                          </label>
+                          <div class="col-md-7">
+                            <input type="text" class="form-control" name="topicname" ng-model="TopicData.topicname" ng-required="true">
+                            <div class="clearfix"></div>
+                            <p class="error" ng-show="topicform.topicname.$invalid && topicform.topicname.$touched">Please Enter Topic Name</p>
+                          </div>
+                        </div><!-- form-group -->
+                        <div class="clearfix"></div>
+                        <br>
+                        <div class="form-group">
+                          <div class="col-md-12 text-center">
+                            <button type="submit" ng-disabled="topicform.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                            </button>
+                          </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end edit modal  -->
+
+            <!-- start view modal -->
+              <div class="modal fade viewtopic" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">Topic - {{viewTopicData.topicname}}
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label class="control-label col-md-3" for="">Course:
+                        </label>
+                        <label class="control-label col-md-9" for="">{{viewTopicData.coursename}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <hr>
+                      <div class="form-group">
+                        <label class="control-label col-md-3" for="">Technology:
+                        </label>
+                        <label class="control-label col-md-9" for="">{{viewTopicData.technologyname}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <hr>
+                      <div class="form-group">
+                        <label class="control-label col-md-3" for="">Topic:
+                        </label>
+                        <label class="control-label col-md-9" for="">{{viewTopicData.topicname}}
+                        </label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <br>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end view modal -->
+
+              <!-- start delete modal -->
+              <div class="modal fade deletetopic" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;
+                        </button>
+                        <h4 class="modal-title">Delete Topic
+                        </h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Are you sure you want to delete <br>
+                          <strong>{{deleteTopicData.topicname}}?
+                          </strong>
+                        </h4>
+                        <br>
+                        <a class="btn btn-danger btn-sm" ng-click="deleteTopic(deleteTopicData.cTopicId)" onclick="$('.modal').modal('hide')">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Delete
+                        </a>
+                        <a class="btn btn-default btn-sm" data-dismiss="modal">
+                          <i class="fa fa-trash">
+                          </i>&nbsp;&nbsp;Cancel
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!-- end delete modal -->
+
+        </div> <!-- end controller div -->
+    </div>
+
+
+</div>
+
+
+<script src="view/pages/Masters/Topic/ViewTopicsCtrl.js"></script>

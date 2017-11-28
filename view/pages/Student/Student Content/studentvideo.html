@@ -1,0 +1,90 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="studentvideoCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Videos</h3>
+            </div>
+            <div class="panel-body">
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+              <!-- <div class="button-group">
+                <a data-toggle="modal" data-target=".addbranch" ng-click="addbranchclick()" class="btn btn-default btn-labeled btn-sm">
+                  <i class="fa fa-plus-circle">
+                  </i>&nbsp;&nbsp;Add Branch
+                </a>
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+              </div> -->
+              <table ng-table="usersTable" show-filter="true" class="table table-bordered table-striped text-center">
+                <tbody>
+                  <tr ng-repeat="bo in data">
+                    <td data-title="'Course'" filter="{'coursename': 'text'}" sortable="'coursename'">{{bo.coursename}}
+                    </td>
+                    <td data-title="'Technology'" filter="{'technologyname': 'text'}" sortable="'technologyname'">{{bo.technologyname}}
+                    </td>
+                    
+                    <td data-title="'Topic'" filter="{'topicname': 'text'}" sortable="'topicname'">{{bo.topicname}}
+                    </td>
+                     
+                    <td data-title="'Actions'" class="w150">
+                      <a href="#/Edit Video/{{currentCourseId}}/{{currentTechnoId}}/{{currentTopicId}}" class="btn btn-info btn-xs" ng-click="editVideo(bo)" tooltip-placement="top" uib-tooltip="View">
+                        <i class="fa fa-eye">
+                        </i>
+                      </a> 
+                      
+                      
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <hr>
+              
+              <!-- start view modal -->
+              <div class="modal fade viewbranch" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnClose()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">View Video
+                      </h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label class="control-label  col-md-2" for="">Course:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewbranchData.branchname}}
+                        </label>
+                      
+                        <label class="control-label  col-md-2" for="">Technology:
+                        </label>
+                        <label class="control-label col-md-4" for="">{{viewbranchData.description}}
+                        </label>
+                      </div>                      
+                      <div class="clearfix"></div>
+                      <br>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- end view modal -->             
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Student/Student Content/studentvideoCtrl.js"></script>
+

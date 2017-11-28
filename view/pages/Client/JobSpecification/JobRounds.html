@@ -1,0 +1,211 @@
+<!--================================
+=            Controller            =
+=================================-->
+<div class="row no-margin" ng-controller="jobCtrl as Jobs">
+  <div class="col-md-12 no-padding">
+    <div class="panel panel-info">
+      <div class="panel-body">
+        
+        <!-- toaster message -->
+        <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+        <!-- toaster message -->
+
+        <div class="button-group">
+          <a data-toggle="modal" data-target=".addJobRounds" class="btn btn-default btn-labeled btn-sm"  ng-click="addJobroundsClick()">
+            <i class="fa fa-plus-circle">
+            </i>&nbsp;&nbsp;Add Job Rounds
+          </a>
+        </div>
+
+        <table ng-table="usersTable_JobRounds" show-filter="true" class="table table-bordered table-striped text-center">
+          <tbody>
+            <tr ng-repeat="bo in data_jobrounds">
+              <td data-title="'Round'" filter="{'round': 'text'}" sortable="'round'">{{bo.round}}
+              </td>
+               <td data-title="'Location'" filter="{'location': 'text'}" sortable="'location'">{{bo.location}}
+              </td>
+              <td data-title="'Interview Date'" filter="{'interviewdate': 'text'}" sortable="'interviewdate'">{{bo.interviewdate}}
+              </td>
+               <td data-title="'Description'" filter="{'rounddescription': 'text'}" sortable="'rounddescription'">{{bo.rounddescription}}
+              </td>
+              <td data-title="'Actions'" class="w150">
+                <a data-toggle="modal"  class="btn btn-success btn-xs" data-target=".addJobRounds" ng-click="editJobRound(bo.clClientjobroundId)" tooltip-placement="top" uib-tooltip="Edit">
+                  <i class="fa fa-pencil-square-o"></i>
+                </a> 
+                <a data-toggle="modal" data-target=".viewRound" class="btn btn-info btn-xs" ng-click="viewJobRound(bo.clClientjobroundId, data_jobrounds)" tooltip-placement="top" uib-tooltip="View">
+                  <i class="fa fa-eye">
+                  </i>
+                </a>
+                <a class="btn btn-danger btn-xs" data-toggle="modal" data-target=".deletejobround" ng-click="delJobRound(bo.clClientjobroundId, data_jobrounds)" tooltip-placement="top" uib-tooltip="Delete">
+                  <i class="fa fa-trash">
+                  </i>
+                </a>
+                
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <hr>
+        
+        <!-- start edit modal -->
+        <div class="modal fade addJobRounds" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  data-keyboard="false" data-backdrop="false">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="clearModalOnCloseJobRounds()" data-dismiss="modal">&times;
+                </button>
+                <h4 class="modal-title" ng-show="add">Add Job Rounds
+                </h4>
+                <h4 class="modal-title" ng-show="edit">Edit Job Rounds
+                </h4>
+              </div>
+              <div class="modal-body">
+                
+              <form class="form-horizontal" name="jobRoundForm" ng-submit="saveJobRound(jobRoundData)" novalidate>
+                  <input type="hidden" name="jobRoundData.clClientId">
+                  <div class="form-group ">
+                    <label class="control-label col-sm-4 mandatory" for="">Round</label>
+                    <div class="col-sm-7">
+                        <select class="form-control inputEle" ng-model="jobRoundData.round" ng-required="true" name="rou">
+                          <option value="firstround" ng-hide="hide1">firstround</option>
+                          <option value="secondround" ng-hide="hide2">secondround</option>
+                          <option value="thirdround" ng-hide="hide3">thirdround</option>
+                          <option value="forthround" ng-hide="hide4">forthround</option>
+                          <option value="fifthround" ng-hide="hide5">fifthround</option>
+                        </select>
+                        <div class="clearfix"></div>
+                        <p class="error" ng-show="jobRoundForm.rou.$invalid && jobRoundForm.rou.$touched">please Select Round</p>
+                    </div>
+                  </div>
+
+                  <div class="form-group ">
+                    <label class="control-label col-sm-4" for="">Location</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" ng-model="jobRoundData.location">
+                    </div>
+                  </div>
+
+                  <div class="form-group ">
+                    <label class="control-label col-sm-4 mandatory" for="">Interview Date</label>
+                    <div class="col-sm-7">
+                        <datepicker date-format="yyyy-MM-dd">
+                          <input ng-model="jobRoundData.interviewdate" placeholder="Enter Date" class="form-control" type="text" ng-required="true" name="inter"/>
+                       </datepicker>
+                        <div class="clearfix"></div>
+                        <p class="error" ng-show="jobRoundForm.inter.$invalid && jobRoundForm.inter.$touched">please Enter Date</p>
+                    </div>
+                  </div>
+
+                  <div class="form-group ">
+                    <label class="control-label col-sm-4" for="">Description</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" ng-model="jobRoundData.rounddescription">
+                    </div>
+                  </div>
+
+                  <br>
+                  <div class="clearfix"></div>
+                  <div class="form-group">
+                    <div class="col-md-12 text-center">
+                      <button type="submit" ng-disabled="jobRoundForm.$invalid" class="btn btn-success" onclick="$('.modal').modal('hide')">Save
+                      </button>
+                       <!-- ng-disabled="clientDataform.$invalid" -->
+                    </div>
+                  </div>
+                  <br>
+              </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end edit modal  -->
+
+
+        <!-- start view modal -->
+        <div class="modal fade viewRound" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="clearModalOnCloseJobRounds()" data-dismiss="modal">&times;
+                </button>
+                <h4 class="modal-title">View Job Rounds
+                </h4>
+              </div>
+              <div class="modal-body">
+                
+                <!-- form -->
+                <!--  <form> -->
+                  
+                  <div class="form-group ">
+                    <label class="control-label col-sm-2" for="">Round</label>
+                    <label class="control-label col-sm-4" for="">{{viewRoundData.round}}</label>
+                  </div>
+                  <div class="clearfix"></div>
+                  <hr>
+                  <div class="form-group ">
+                    <label class="control-label col-sm-2" for="">Location</label>
+                    <label class="control-label col-sm-4" for="">{{viewRoundData.location}}</label>
+                  </div>
+                  <div class="clearfix"></div>
+                  <hr>
+                  <div class="form-group ">
+                    <label class="control-label col-sm-2" for="">Interview Date</label>
+                    <label class="control-label col-sm-4" for="">{{viewRoundData.interviewdate}}</label>
+                  </div>
+                  <div class="clearfix"></div>
+                  <hr>
+                  <div class="form-group ">
+                    <label class="control-label col-sm-2" for="">Description</label>
+                    <label class="control-label col-sm-4" for="">{{viewRoundData.rounddescription}}</label>
+                  </div>
+                  <div class="clearfix"></div>
+                  
+             <!--  </form> -->
+                <!-- form -->
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end view modal -->
+
+        <!-- start delete modal -->
+        <div class="modal fade deletejobround" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;
+                  </button>
+                  <h4 class="modal-title">Delete Job Rounds
+                  </h4>
+                </div>
+                <div class="modal-body">
+                  <h4>Are you sure you want to delete following round
+                    <strong>{{deleteJobRoundData.round}}?
+                    </strong>
+                  </h4>
+                  <br>
+                  <a class="btn btn-danger btn-sm" ng-click="deleteJobRound(deleteJobRoundData.clClientjobroundId, deleteJobRoundData.round)" onclick="$('.modal').modal('hide')">
+                    <i class="fa fa-trash">
+                    </i>&nbsp;&nbsp;Delete
+                  </a>
+                  <a class="btn btn-default btn-sm" data-dismiss="modal">
+                    <i class="fa fa-trash">
+                    </i>&nbsp;&nbsp;Cancel
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        <!-- end delete modal -->
+       
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--====  End of Controller  ====-->
+
+ <script src="view/pages/Client/JobSpecification/JobSpecificationCtrl.js"></script>

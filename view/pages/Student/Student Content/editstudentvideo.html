@@ -1,0 +1,126 @@
+<style>
+  .responsive-video {
+    max-width: 100%;  
+    height: auto;  
+    }
+    .video-post {
+      height: 400px;
+      max-height: 400px;
+      min-height: 400px;
+      margin-bottom: 50px;
+    }
+    .video-post:hover .editnotes-btn {
+      display: block;
+    }
+    thumbnail canvas {
+      width: 100%;
+      height: 150px;
+    }
+    thumbnail {
+      cursor: pointer;
+    }
+    .btn-del, .btn-edit, .btn-active {
+      position: absolute;
+      right: 0;
+      top: 0;
+      border-radius: 0;
+     display: none;
+    }
+    
+    .btn-edit {
+      right: 25px;
+    }
+    .thumbnail:hover .btn-del,
+    .thumbnail:hover .btn-edit,
+    .thumbnail:hover .btn-active {
+      display: block;
+    }
+</style>
+<!--================================
+=            Controller            =
+=================================-->
+<div ng-include="'view/shared/header/header.html'"></div>
+
+<div class="page-content" sidebar-directive="state">
+    <div class="container-fluid">
+      <div class="row no-margin" ng-controller="studentvideoCtrl">
+        <div class="col-md-12 no-padding">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Student Videos - {{topicData_View.topicname}}
+              <!-- <span class="pull-right"><small>Total: </small><span class="badge" ng-cloak>{{branch.length}}</span></span> -->
+              </h3>
+            </div>
+            <div class="panel-body">
+              
+              <!-- toaster message -->
+              <toaster-container toaster-options="{'time-out': 4000}"></toaster-container>
+              <!-- toaster message -->
+              <div class="button-group">
+                <a href="#/Video" class="btn btn-default btn-labeled btn-sm">
+                                    <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back</a>
+                <a ng-click="refreshPage()" class="btn btn-default btn-labeled btn-sm btn-refresh">
+                  <i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh
+                </a>
+              </div>
+              
+              <div class="row">
+                  <div ng-repeat="vivi in Video_abc">
+                    <div class="col-md-4">
+                      <div class="thumbnail">
+                      <thumbnail file-type="video" source="{{vivi.path}}" max-height="150" ng-click="viewVideoModal(vivi.conVideoId)" data-toggle="modal" data-target=".viewModal" style="height: 150px;">
+                        
+                      </thumbnail>
+
+                        <div class="video-info">
+                           <h5>{{vivi.name | limitTo:30}}</h5>
+                           <div class="divider"></div>
+                           <div class="description">
+                              <p>{{vivi.description | limitTo:20}}</p>
+                           </div>
+                        </div> <!-- Video info ends -->
+                      </div> <!-- class thumbnail ends -->
+                    </div> <!-- col-md-3 ends -->
+                  </div> <!-- repeat ends -->
+
+                </div> <!-- row ends -->
+              <!-- table ends -->
+              <!--=========================================
+              =            View Video On Modal            =
+              ==========================================-->
+              
+              <div class="modal fade viewModal" pause-on-close tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" ng-click="clearModalOnCloseView1()" data-dismiss="modal">&times;
+                      </button>
+                      <h4 class="modal-title">{{videoModalData.name}}</h4>
+                    </div>
+                    <div class="modal-body">
+                       <video ng-src="{{videoModalData.path | trusted}}" controls="true"></video>
+                       <div class="well">
+                          Description:&nbsp;&nbsp;
+                         <span ng-if="videoModalData.description != 'undefined'">{{videoModalData.description}}</span>
+                         <span ng-if="videoModalData.description == 'undefined'"><i>Description not available</i></span>
+                       </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!--====  End of View Video On Modal  ====-->
+          
+            <hr>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--====  End of Controller  ====-->
+
+<script src="view/pages/Student/Student Content/studentvideoCtrl.js"></script>
+
+
+
